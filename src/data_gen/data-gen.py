@@ -73,9 +73,10 @@ def border(fsa,n):
     
 def build (border, lang, lang_name, n):
     '''
-    A function that creates the adv_data files that are in /data/ ;
+    A function is called in `create_adversarial_pairs()` to create
+    the _Test3.txt files for a language;
     It gets the set of "border" strings from `border()`
-    and writes them to adv_data files using the function `by_len()`
+    and writes them to _Test3.txt files using the function `by_len()`
     
     Inputs:
     -------
@@ -83,6 +84,8 @@ def build (border, lang, lang_name, n):
         the fsa that recognizes border strings
     lang : fst
         the fsa that recognizes the language in question
+    lang_name : str
+        the name of the language in question; to be used in naming the output files
     n : int
         length of the strings used to generate the border strings
     '''
@@ -95,8 +98,8 @@ def build (border, lang, lang_name, n):
     
     count = 0
     
-    # 10 times:
-    for i in range(10):
+    # 5 times:
+    for i in range(5):
         # writes 2*xk/10 random strings to the files in f
         # border(lang, n) creates border pairs for length n
         by_len(border(lang, n), f, count)
@@ -107,11 +110,32 @@ def build (border, lang, lang_name, n):
     return count
     
 def create_adversarial_examples(pos_dict, fsa, lang_name, min_len, max_len):
+    '''
+    A function that generates the _Test3.txt files, which contain strings grouped
+    in adversarial pairs. It does so by calling `build()` for each length of string needed.
+    
+    Inputs:
+    -------
+    pos_dict : dict
+    	a dictionary; keys are string lengths (int) and values are FSAs which accept
+    	strings of the corresponding length from a given language
+    fsa : fst
+        the fsa which accepts the given language
+    lang_name : str
+        the name of the language in question
+    min_len : int
+        the smallest string length desired in the output files
+    max_len : int
+        the largest string length desired in the output files
+    '''
     for i in range(ls_min_len,ls_max_len+1):
         c = build(border,fsa,lang_name, i)
     return c
     
 def by_len(ex, f, count):
+    '''
+    
+    '''
     random_examples=pynini.randgen(ex,10000)
     ps = random_examples.paths(input_token_type="utf8", output_token_type="utf8")
 
