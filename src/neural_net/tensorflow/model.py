@@ -19,9 +19,8 @@ class MainModel(models.Model):
         self.softmax_layer = layers.Softmax()
 
     def call(self, inputs, training : bool = False):
-        mask = inputs == 0
         out = self.embeddings(inputs)
-        out = self.rnn_layer(out, mask=mask, training=training)
+        out = self.rnn_layer(out, training=training)
         out = self.linear_layer(out)
         out = self.softmax_layer(out)
         return out

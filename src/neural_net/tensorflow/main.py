@@ -1,6 +1,7 @@
 import argparse
 import tensorflow as tf
 import tensorflow.keras as keras
+import os.path as path
 from data import *
 from model import MainModel
 
@@ -9,6 +10,7 @@ if __name__ == "__main__":
     parser.add_argument('--train-data', type=str, required=True)
     parser.add_argument('--val-data', type=str, required=True)
     parser.add_argument('--output-dir', type=str, required=True)
+    parser.add_argument('--vocab-file', type=str, required=True)
     parser.add_argument('--batch-size', type=int, default=64)
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--embed-dim', type=int, default=100)
@@ -18,7 +20,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    vocabulary, x_train, y_train = parse_dataset(args.train_data)
+    if path.exists(args.vocab_file):
+        vocabulary = load_vocab(args.vocab_file)
+    else:
+        vocabulary = {'pad': 0}
+
+    vocabulary, x_train, y_train = parse_dataset(args.train_data, vocabulary)
     vocabulary, x_val, y_val = parse_dataset(args.val_data, vocabulary)
 
     x_train = tf.constant(pad_data(x_train, vocabulary))
@@ -31,9 +38,10 @@ if __name__ == "__main__":
 
     model = MainModel(**config)
     model.compile(optimizer=keras.optimizers.Adam(),
-            loss=keras.losses.CategoricalCrossentropy(),
-            metrics=[keras.metrics.CategoricalAccuracy()])
+            loss=keras.losses.BinaryCrossentropy(),
+            metrics=[keras.metrics.BinaryAccuracy()])
     training_record = model.fit(x_train, y_train, batch_size=args.batch_size,
             epochs=args.epochs, validation_data=(x_val, y_val))
 
     model.save(args.output_dir)
+    save_vocab(args.vocab_file, vocabulary)

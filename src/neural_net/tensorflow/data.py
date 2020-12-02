@@ -1,9 +1,22 @@
+def save_vocab(fname, vocabulary):
+    with open(fname, 'w') as f:
+        for key in vocabulary:
+            f.write(key + '\t' + str(vocabulary[key]) + '\n')
+
+def load_vocab(fname):
+    vocabulary = {}
+    with open(fname, 'r') as f:
+        for line in f.readlines():
+            word, index = line.strip().split('\t')
+            vocabulary[word] = int(index)
+    return vocabulary
+
 def parse_dataset(fname, vocabulary={'pad': 0}):
     x_items = []
     y_items = []
     with open(fname, 'r') as f:
         for line in f.readlines():
-            x, y = line.split('\t')
+            x, y = line.strip().split('\t')
             x_indices = []
             for c in x:
                 if c not in vocabulary:
