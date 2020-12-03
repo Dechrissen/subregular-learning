@@ -1,5 +1,15 @@
 #
 # A script to generate train/dev/test set
+# goes with /data_n/ and tags.txt
+
+# This script has 3 versions of the rand_gen_no_duplicate function:
+	# cody_rand_gen_no_duplicate
+	# alternate_rand_gen_no_duplicate
+	# rand_gen_no_duplicate (the original) (inefficient)
+# Right now it's using alternate_rand_gen_no_duplicate
+# It puts files of sizes 100k, 10k, and 1k strings into a data_n folder
+
+# updated 2 December 2020
 #
 import pynini
 import functools
@@ -86,17 +96,17 @@ def build (border, lang, lang_name, n):
     n : int
         length of the strings used to generate the border strings
     '''
-    test3_files = ["data/100k/"+lang_name+"_Test3.txt",
-                   "data/10k/"+lang_name+"_Test3.txt",
-                   "data/1k/"+lang_name+"_Test3.txt"]
+    test3_files = ["data_n/100k/"+lang_name+"_Test3.txt",
+                   "data_n/10k/"+lang_name+"_Test3.txt",
+                   "data_n/1k/"+lang_name+"_Test3.txt"]
     f = [open(test3_files[0], "w+"),
          open(test3_files[1], "w+"),
          open(test3_files[2], "w+")]
     
     count = 0
     
-    # 10 times:
-    for i in range(10):
+    # 5 times:
+    for i in range(5):
         # writes 2*xk/10 random strings to the files in f
         # border(lang, n) creates border pairs for length n
         by_len(border(lang, n), f, count)
@@ -178,11 +188,12 @@ def rand_gen_no_duplicate(acceptor, n):
 
 def alternate_rand_gen_no_duplicate(acceptor, n):
     rand_list = []
-    loop = 10000
+    loop = 10
+    seed = 0
     for i in range(loop):
         print('(alternate) trying to generate random strings ('+str(i)+')')
         num = int(n + n*i*.01)
-        temp = pynini.randgen(acceptor, npath=num, seed=0, select='uniform', max_length=2147483647, weighted=False)
+        temp = pynini.randgen(acceptor, npath=num, seed=seed, select='uniform', max_length=2147483647, weighted=False)
         print('made new `temp`')
         temp_list = list_string_set(temp)
         print('temp got '+str(len(temp_list))+' random strings')
@@ -193,10 +204,15 @@ def alternate_rand_gen_no_duplicate(acceptor, n):
             if t not in rand_list:
                 rand_list.append(t)
                 if len(rand_list)==n:
+                    print('rand_list now has '+str(len(rand_list))+' strings')
                     print('finally got enough strings in rand_list; i='+str(i))
                     return acceptor, rand_list
-            acceptor = pynini.difference(acceptor, temp)
+        acceptor = pynini.difference(acceptor, temp)
+        seed += 1
+        print('rand_list now has '+str(len(rand_list))+' strings')
         print('need to add strings to rand_list ('+str(i)+')')
+    print('finished loop; returning incomplete set')
+    return acceptor, rand_list
         
 def cody_rand_gen_no_duplicate(acceptor, n):
     loop = 50000
@@ -231,11 +247,14 @@ def cody_rand_gen_no_duplicate(acceptor, n):
 def create_data_no_duplicate(filename, pos_dict, neg_dict, min_len, max_len, num):
     with open(filename, "w+") as f:
         for i in range(min_len, max_len + 1):
-            acceptor, results = cody_rand_gen_no_duplicate(pos_dict[i], num)
+            print('\nworking on length '+str(i))
+            print('getting positive strings for length '+str(i))
+            acceptor, results = alternate_rand_gen_no_duplicate(pos_dict[i], num)
             pos_dict[i] = acceptor
             for ele in results:
                 f.write(ele + "\t" + "TRUE\n")
-            acceptor, results = cody_rand_gen_no_duplicate(neg_dict[i], num)
+            print('getting negative strings for length '+str(i))
+            acceptor, results = alternate_rand_gen_no_duplicate(neg_dict[i], num)
             neg_dict[i] = acceptor
             for ele in results:
                 f.write(ele + "\t" + "FALSE\n")
@@ -269,8 +288,8 @@ def prune(f, name):
     
     data = open(name).readlines()
     
-    small = [open("data/10k/" + f, "w+"),
-                open("data/1k/" + f, "w+")]
+    small = [open("data_n/10k/" + f, "w+"),
+                open("data_n/1k/" + f, "w+")]
     
     tr = []
     fl = [] 
@@ -312,11 +331,11 @@ def construct_all():
 
 
 ############################################
-####main body (until functions finished#####
+####main body (util functions finished)#####
 ############################################
 
-path_to_fsa = "/home/ekp/Documents/SBU_Fall2020/CSE538_NLP/Project/subregular_neural_models/"
-tags = open(path_to_fsa+"tags_TSL.txt")
+path_to_fsa = "/home/ekp/Documents/SBU_Fall2020/CSE538_NLP/Project/CSE538_FinalProject/"
+tags = open(path_to_fsa+"tags.txt")
 tags = tags.readlines()
 
 # define hyper-parameters
@@ -336,7 +355,7 @@ for x in tags:
     ls_min_len = 31
     ls_max_len = 50
 
-    dir_name = "data/100k/" + x
+    dir_name = "data_n/100k/" + x
    
         
     #FIRST - set up dictionary 

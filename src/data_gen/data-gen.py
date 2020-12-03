@@ -1,5 +1,14 @@
 #
 # A script to generate train/dev/test set
+# goes with /data/ and tags.txt
+
+# This script has 1 versions of the rand_gen_no_duplicate function, and it's insufficient
+# and unable to generate 100k sets for certain languages with strings of length <12
+
+# Right now it's using alternate_rand_gen_no_duplicate
+# It puts files of sizes 100k, 10k, and 1k strings into a data_n folder
+
+# updated 30 November 2020
 #
 import pynini
 import functools
@@ -293,7 +302,7 @@ def construct_all():
 ############################################
 
 path_to_fsa = "/home/ekp/Documents/SBU_Fall2020/CSE538_NLP/Project/subregular_neural_models/"
-tags = open(path_to_fsa+"tags_remaining_201128_1542.txt")
+tags = open(path_to_fsa+"tags.txt")
 tags = tags.readlines()
 
 # define hyper-parameters
