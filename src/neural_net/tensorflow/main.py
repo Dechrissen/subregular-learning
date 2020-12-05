@@ -10,7 +10,6 @@ if __name__ == "__main__":
     parser.add_argument('--train-data', type=str, required=True)
     parser.add_argument('--val-data', type=str, required=True)
     parser.add_argument('--output-dir', type=str, required=True)
-    parser.add_argument('--vocab-file', type=str, required=True)
     parser.add_argument('--batch-size', type=int, default=64)
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--embed-dim', type=int, default=100)
@@ -19,11 +18,11 @@ if __name__ == "__main__":
     parser.add_argument('--bidi', type=bool, default=False)
 
     args = parser.parse_args()
+    model_path = path.dirname(args.output_dir)
+    vocab_file = model_path + '/vocab.txt'
+    config_file = model_path + '/config.txt'
 
-    if path.exists(args.vocab_file):
-        vocabulary = load_vocab(args.vocab_file)
-    else:
-        vocabulary = {'pad': 0}
+    vocabulary = {'pad': 0}
 
     vocabulary, x_train, y_train = parse_dataset(args.train_data, vocabulary)
     vocabulary, x_val, y_val = parse_dataset(args.val_data, vocabulary)
@@ -43,5 +42,7 @@ if __name__ == "__main__":
     training_record = model.fit(x_train, y_train, batch_size=args.batch_size,
             epochs=args.epochs, validation_data=(x_val, y_val))
 
-    model.save(args.output_dir)
-    save_vocab(args.vocab_file, vocabulary)
+    model.save(model_path)
+    save_vocab(vocab_file, vocabulary)
+    with open(config_file, 'w') as f:
+        f.write(str(config))
