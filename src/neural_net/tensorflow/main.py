@@ -29,6 +29,8 @@ if __name__ == "__main__":
     vocabulary, x_train, y_train = parse_dataset(args.train_data, vocabulary)
     vocabulary, x_val, y_val = parse_dataset(args.val_data, vocabulary)
 
+    tf.random.set_seed(333)
+
     x_train = tf.constant(pad_data(x_train, vocabulary))
     x_val = tf.constant(pad_data(x_val, vocabulary))
     y_train = tf.constant(y_train)
