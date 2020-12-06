@@ -2,6 +2,7 @@ import argparse
 import tensorflow as tf
 import tensorflow.keras as keras
 import os.path as path
+import datetime
 from data import *
 from model import MainModel
 
@@ -39,8 +40,12 @@ if __name__ == "__main__":
     model.compile(optimizer=keras.optimizers.Adam(),
             loss=keras.losses.BinaryCrossentropy(),
             metrics=[keras.metrics.BinaryAccuracy()])
+            
+    log_dir = model_path + "/logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+        
     training_record = model.fit(x_train, y_train, batch_size=args.batch_size,
-            epochs=args.epochs, validation_data=(x_val, y_val))
+            epochs=args.epochs, validation_data=(x_val, y_val), callbacks=tensorboard_callback)
 
     model.save(model_path)
     save_vocab(vocab_file, vocabulary)
