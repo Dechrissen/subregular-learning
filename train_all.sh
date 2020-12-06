@@ -9,8 +9,8 @@ trap abort SIGINT
 UNIVERSAL_ARGS=( --batch-size 64 --epochs 50 --embed-dim 100 --rnn-type gru )
 
 LANGS=( SL.4.2.1 SL.4.2.2 SL.4.2.4 SP.4.2.1 SP.4.2.2 SP.4.2.4 TSL.0 TSL.1 TSL.2 )
-DATA_SIZES=( 1k 10k 100k )
-DROPOUTS=( NoDrop Drop )
+DATA_SIZES=( 10k 100k )
+DROPOUTS=( NoDrop )
 DIRECTIONS=( Uni Bi )
 TESTS=( Test1 Test2 Test3 )
 
