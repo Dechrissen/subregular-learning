@@ -2,6 +2,8 @@ import argparse
 import tensorflow as tf
 import tensorflow.keras as keras
 from os.path import dirname, basename
+import json
+from model import MainModel
 from data import *
 
 def indices_to_text(indices, index_map):
@@ -9,6 +11,11 @@ def indices_to_text(indices, index_map):
     for index in indices:
         result += index_map[index]
     return result
+
+def load_model_config(config_file):
+    with open(config_file, 'r') as f:
+        config = json.load(f)
+    return config
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -30,7 +37,11 @@ if __name__ == "__main__":
     x_padded = tf.constant(pad_data(x_data, vocabulary))
     true_labels = tf.math.argmax(y_data, axis=1)
 
-    model = keras.models.load_model(model_dir)
+    #model = keras.models.load_model(model_dir)
+    config = load_model_config(model_dir + '/config.txt')
+    model = MainModel(**config)
+    #model.compile(optimizer=keras.optimizers.Adam(), loss=keras.losses.BinaryCrossentropy(), metrics
+    model.load_weights(model_dir + '/checkpoint.ckpt')
 
     predictions = model.predict(x_padded)
     category_predictions = tf.math.argmax(predictions, axis=1)

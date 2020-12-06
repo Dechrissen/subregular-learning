@@ -3,6 +3,7 @@ import tensorflow as tf
 import tensorflow.keras as keras
 import os.path as path
 import datetime
+import json
 from data import *
 from model import MainModel
 
@@ -40,14 +41,17 @@ if __name__ == "__main__":
     model.compile(optimizer=keras.optimizers.Adam(),
             loss=keras.losses.BinaryCrossentropy(),
             metrics=[keras.metrics.BinaryAccuracy()])
+
+    checkpoint_path = model_path + '/checkpoint.ckpt'
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True)
             
     log_dir = model_path + "/logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
         
     training_record = model.fit(x_train, y_train, batch_size=args.batch_size,
-            epochs=args.epochs, validation_data=(x_val, y_val), callbacks=tensorboard_callback)
+            epochs=args.epochs, validation_data=(x_val, y_val), callbacks=[checkpoint_callback, tensorboard_callback])
 
-    model.save(model_path)
+    #model.save(model_path)
     save_vocab(vocab_file, vocabulary)
     with open(config_file, 'w') as f:
-        f.write(str(config))
+        json.dump(config, f)
