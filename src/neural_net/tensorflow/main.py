@@ -43,7 +43,8 @@ if __name__ == "__main__":
             metrics=[keras.metrics.BinaryAccuracy()])
 
     checkpoint_path = model_path + '/checkpoint.ckpt'
-    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True)
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True,
+            monitor='val_acc', mode='max', save_best_only=True)
             
     log_dir = model_path + "/logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
