@@ -35,7 +35,7 @@ if __name__ == "__main__":
     predictions = model.predict(x_padded)
     category_predictions = tf.math.argmax(predictions, axis=1)
 
-    with open(model_name + "/" + test_name + "_pred.txt", 'w') as f:
+    with open(model_dir + "/" + test_name + "_pred.txt", 'w') as f:
         for i in range(len(x_data)):
             string = indices_to_text(x_data[i], index_to_char)
             true_label = 'TRUE' if true_labels[i] == 0 else 'FALSE'
