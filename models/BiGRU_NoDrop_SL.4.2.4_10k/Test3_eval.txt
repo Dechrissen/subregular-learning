@@ -1,0 +1,7 @@
+Prediction file: models/BiGRU_NoDrop_SL.4.2.4_10k/Test3_pred.txt
+TPR: 1.0
+FPR: 0.1028
+Accuracy: 0.9486
+Error rate: 0.0514
+Precision: 0.9067827348567283
+F-score: 0.9511128019783145

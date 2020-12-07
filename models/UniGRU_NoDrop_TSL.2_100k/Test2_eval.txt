@@ -1,0 +1,7 @@
+Prediction file: models/UniGRU_NoDrop_TSL.2_100k/Test2_pred.txt
+TPR: 1.0
+FPR: 5.999999999994898e-05
+Accuracy: 0.99997
+Error rate: 3e-05
+Precision: 0.999940003599784
+F-score: 0.999970000899973
