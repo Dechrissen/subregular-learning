@@ -1,0 +1,7 @@
+Prediction file: models_lstm/UniLSTM_NoDrop_TSL.1_10k/Test3_pred.txt
+TPR: 0.3474
+FPR: 0.4404
+Accuracy: 0.4535
+Error rate: 0.5465
+Precision: 0.44097486671744096
+F-score: 0.3886340753999329

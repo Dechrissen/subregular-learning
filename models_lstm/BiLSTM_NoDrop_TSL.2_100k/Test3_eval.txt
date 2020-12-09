@@ -1,0 +1,7 @@
+Prediction file: models_lstm/BiLSTM_NoDrop_TSL.2_100k/Test3_pred.txt
+TPR: 1.0
+FPR: 0.65466
+Accuracy: 0.67267
+Error rate: 0.32733
+Precision: 0.6043537645195992
+F-score: 0.753392148147032

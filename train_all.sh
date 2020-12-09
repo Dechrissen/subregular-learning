@@ -6,7 +6,7 @@ abort() {
 
 trap abort SIGINT
 
-UNIVERSAL_ARGS=( --batch-size 64 --epochs 50 --embed-dim 100 --rnn-type gru )
+UNIVERSAL_ARGS=( --batch-size 64 --epochs 30 --embed-dim 100 --rnn-type gru )
 
 LANGS=( SL.4.2.1 SL.4.2.2 SL.4.2.4 SP.4.2.1 SP.4.2.2 SP.4.2.4 TSL.0 TSL.1 TSL.2 )
 DATA_SIZES=( 10k 100k )
