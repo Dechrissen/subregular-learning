@@ -1,14 +1,15 @@
 #
 # A script to generate train/dev/test set
-# goes with /data/ and tags.txt
+# goes with /data_3langs/ and text_3langs.txt
 
-# This script has 1 versions of the rand_gen_no_duplicate function, and it's insufficient
-# and unable to generate 100k sets for certain languages with strings of length <12
-
+# This script has 3 versions of the rand_gen_no_duplicate function:
+	# cody_rand_gen_no_duplicate
+	# alternate_rand_gen_no_duplicate
+	# rand_gen_no_duplicate (the original) (inefficient)
 # Right now it's using alternate_rand_gen_no_duplicate
-# It puts files of sizes 100k, 10k, and 1k strings into a data_n folder
+# It puts files of sizes 100k, 10k, and 1k strings into a data_3langs folder
 
-# updated 30 November 2020
+# updated 3 December 2020
 #
 import pynini
 import functools
@@ -47,7 +48,7 @@ def list_string_set(acceptor):
     return my_list
 
 ################
-# functions for determining the border and generating adversial pairs 
+# functions for determining the border and generating adversial pairs
 ################
 
 # defining edit distance transducer
@@ -61,7 +62,7 @@ for x in list(alpha):
 edits.optimize()
 editExactly1 = sigmaStar + edits + sigmaStar
 # a transducer that produces all strings that are within 1 edit of its input string
-editExactly1.optimize() 
+editExactly1.optimize()
 
 def border(fsa,n):
     '''
@@ -78,73 +79,49 @@ def border(fsa,n):
     bpairsN = sigmaN @ bpairs               # here we limit the border to input words of length=n
     bpairsN.optimize()
     return bpairsN
-    
-    
+
+
 def build (border, lang, lang_name, n):
     '''
-    A function is called in `create_adversarial_pairs()` to create
-    the _Test3.txt files for a language;
+    A function that creates the adv_data files that are in /data/ ;
     It gets the set of "border" strings from `border()`
-    and writes them to _Test3.txt files using the function `by_len()`
-    
+    and writes them to adv_data files using the function `by_len()`
+
     Inputs:
     -------
     border : fst
         the fsa that recognizes border strings
     lang : fst
         the fsa that recognizes the language in question
-    lang_name : str
-        the name of the language in question; to be used in naming the output files
     n : int
         length of the strings used to generate the border strings
     '''
-    test3_files = ["data/100k/"+lang_name+"_Test3.txt",
-                   "data/10k/"+lang_name+"_Test3.txt",
-                   "data/1k/"+lang_name+"_Test3.txt"]
+    test3_files = ["data_3langs/100k/"+lang_name+"_Test3.txt",
+                   "data_3langs/10k/"+lang_name+"_Test3.txt",
+                   "data_3langs/1k/"+lang_name+"_Test3.txt"]
     f = [open(test3_files[0], "w+"),
          open(test3_files[1], "w+"),
          open(test3_files[2], "w+")]
-    
+
     count = 0
-    
+
     # 5 times:
     for i in range(5):
         # writes 2*xk/10 random strings to the files in f
         # border(lang, n) creates border pairs for length n
         by_len(border(lang, n), f, count)
-  
+
     for i in range(3):
         f[i].close()
-        
+
     return count
-    
+
 def create_adversarial_examples(pos_dict, fsa, lang_name, min_len, max_len):
-    '''
-    A function that generates the _Test3.txt files, which contain strings grouped
-    in adversarial pairs. It does so by calling `build()` for each length of string needed.
-    
-    Inputs:
-    -------
-    pos_dict : dict
-    	a dictionary; keys are string lengths (int) and values are FSAs which accept
-    	strings of the corresponding length from a given language
-    fsa : fst
-        the fsa which accepts the given language
-    lang_name : str
-        the name of the language in question
-    min_len : int
-        the smallest string length desired in the output files
-    max_len : int
-        the largest string length desired in the output files
-    '''
     for i in range(ls_min_len,ls_max_len+1):
         c = build(border,fsa,lang_name, i)
     return c
-    
+
 def by_len(ex, f, count):
-    '''
-    
-    '''
     random_examples=pynini.randgen(ex,10000)
     ps = random_examples.paths(input_token_type="utf8", output_token_type="utf8")
 
@@ -159,7 +136,7 @@ def by_len(ex, f, count):
                     f[2].write(ps.istring() + "\tTRUE\n")
                     f[2].write(ps.ostring() + "\tFALSE\n")
         ps.next()
-        count=count+1      
+        count=count+1
 
 
 # Utility function that gets the strings of an fsa
@@ -209,6 +186,59 @@ def rand_gen_no_duplicate(acceptor, n):
             acceptor = pynini.difference(acceptor, temp)
             return acceptor, rand_list
 
+def alternate_rand_gen_no_duplicate(acceptor, n):
+    rand_list = []
+    loop = 10
+    seed = 0
+    for i in range(loop):
+        print('(alternate) trying to generate random strings ('+str(i)+')')
+        num = int(n + n*i*.01)
+        temp = pynini.randgen(acceptor, npath=num, seed=seed, select='uniform', max_length=2147483647, weighted=False)
+        print('made new `temp`')
+        temp_list = list_string_set(temp)
+        print('temp got '+str(len(temp_list))+' random strings')
+        temp_list = list(set(temp_list))
+        new_strings = [t for t in temp_list if t not in rand_list]
+        print('got '+str(len(new_strings))+' new strings')
+        for t in temp_list:
+            if t not in rand_list:
+                rand_list.append(t)
+                if len(rand_list)==n:
+                    print('rand_list now has '+str(len(rand_list))+' strings')
+                    print('finally got enough strings in rand_list; i='+str(i))
+                    return acceptor, rand_list
+        acceptor = pynini.difference(acceptor, temp)
+        seed += 1
+        print('rand_list now has '+str(len(rand_list))+' strings')
+        print('need to add strings to rand_list ('+str(i)+')')
+    print('finished loop; returning incomplete set')
+    return acceptor, rand_list
+
+def cody_rand_gen_no_duplicate(acceptor, n):
+    loop = 50000
+    result_set = set()
+    seed = 0
+    for i in range(loop):
+        print('started loop '+str(i))
+        num = int(n + n*i*0.1)
+        temp = pynini.randgen(acceptor, npath=num, seed=seed, select='uniform', max_length=2147483647, weighted=False)
+        rand_list = list_string_set(temp)
+        result_set = result_set.union(set(rand_list))
+        uniq_len = len(result_set)
+        if uniq_len < n and i < loop - 1:
+            print('insufficient random strings')
+            seed += 1
+            continue
+        else:
+            rand_list = list(result_set)
+            random.shuffle(rand_list)
+            rand_list = rand_list[:n]
+            rand_list.sort()
+            acceptor = pynini.difference(acceptor, temp)
+            print('returning')
+            if len(rand_list) >= n:
+                print('got full rand_list\n')
+            return acceptor, rand_list
 
 # Create {num} positive and negative examples from fsa.
 # No duplicates in the dataset.
@@ -217,11 +247,14 @@ def rand_gen_no_duplicate(acceptor, n):
 def create_data_no_duplicate(filename, pos_dict, neg_dict, min_len, max_len, num):
     with open(filename, "w+") as f:
         for i in range(min_len, max_len + 1):
-            acceptor, results = rand_gen_no_duplicate(pos_dict[i], num)
+            print('\nworking on length '+str(i))
+            print('getting positive strings for length '+str(i))
+            acceptor, results = alternate_rand_gen_no_duplicate(pos_dict[i], num)
             pos_dict[i] = acceptor
             for ele in results:
                 f.write(ele + "\t" + "TRUE\n")
-            acceptor, results = rand_gen_no_duplicate(neg_dict[i], num)
+            print('getting negative strings for length '+str(i))
+            acceptor, results = alternate_rand_gen_no_duplicate(neg_dict[i], num)
             neg_dict[i] = acceptor
             for ele in results:
                 f.write(ele + "\t" + "FALSE\n")
@@ -252,16 +285,16 @@ def create_data_with_duplicate(filename, pos_dict, neg_dict, min_len, max_len, n
 
 # function that will take the 100k word list and create 10k and 1k from that list
 def prune(f, name):
-    
+
     data = open(name).readlines()
-    
-    small = [open("data/10k/" + f, "w+"),
-                open("data/1k/" + f, "w+")]
-    
+
+    small = [open("data_3langs/10k/" + f, "w+"),
+                open("data_3langs/1k/" + f, "w+")]
+
     tr = []
-    fl = [] 
-    count = 0 
-    
+    fl = []
+    count = 0
+
     for line in data:
         if count % 2 == 0:
             tr.append(line)
@@ -269,39 +302,39 @@ def prune(f, name):
             fl.append(line)
         count += 1
     count = 0
-    
+
     for x in range(len(tr)):
         if count % 10 == 0:
             small[0].write(tr[x] + fl[x])
             if count %100 ==0:
                 small[1].write(tr[x] + fl[x])
-        count=count+1   
-    
+        count=count+1
+
     return True
-    
+
 ###########################################################
 ## util functions to generate data and confirm file size ##
 ###########################################################
 ## moved this to a separate file
 
-    
+
 # have not made use of this yet
 '''def construct_data(n):
     return True
-    
+
 def construct_all():
     tags = open("tags.txt").readlines()
-    
+
     for x in tags:
         construct_data(x[:-1])
     return True'''
 
 
 ############################################
-####main body (until functions finished#####
+####main body (util functions finished)#####
 ############################################
 
-path_to_fsa = "/home/ekp/Documents/SBU_Fall2020/CSE538_NLP/Project/subregular_neural_models/"
+path_to_fsa = "/home/ekp/Documents/SBU_Fall2020/CSE538_NLP/Project/CSE538_FinalProject/"
 tags = open(path_to_fsa+"tags.txt")
 tags = tags.readlines()
 
@@ -314,24 +347,24 @@ for x in tags:
     ss_max_len = 19
     train_pos_num = 5000
     dev_pos_num = 5000
-    
+
     test1_pos_num = 5000
     test2_pos_num = 2500
     test3_pos_num = 5000
-    
+
     ls_min_len = 31
     ls_max_len = 50
 
-    dir_name = "data/100k/" + x
-   
-        
-    #FIRST - set up dictionary 
+    dir_name = "data_3langs/100k/" + x
+
+
+    #FIRST - set up dictionary
     pos_dict = get_pos_string(my_fsa, ss_min_len, ss_max_len)
     neg_dict = get_neg_string(my_fsa, ss_min_len, ss_max_len)
 
 
     # create training data with duplicates
-    # start with a file that has 100k words. from there, prune to have 10k and 1k from that file. 
+    # start with a file that has 100k words. from there, prune to have 10k and 1k from that file.
     pos_dict, neg_dict = \
     create_data_with_duplicate(dir_name + "_Training.txt", pos_dict, neg_dict, ss_min_len, ss_max_len, train_pos_num, 1)
     prune(x + "_Training.txt", dir_name + "_Training.txt")
@@ -357,5 +390,5 @@ for x in tags:
     create_adversarial_examples(pos_dict, my_fsa, x, ls_min_len, ls_max_len)
 
     print("Finished", x)
-        
+
 print("Finished!")
