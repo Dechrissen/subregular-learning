@@ -250,14 +250,16 @@ def create_data_no_duplicate(filename, pos_dict, neg_dict, min_len, max_len, num
             print('\nworking on length '+str(i))
             print('getting positive strings for length '+str(i))
             acceptor, results = alternate_rand_gen_no_duplicate(pos_dict[i], num)
-            max_pos_examples = len(results) # TODO this saves the number of pos strings
+            if len(results) < num:
+                print('WARNING: Only', str(len(results)), 'positive strings generated for length', str(i))
+            num = len(results) # this saves the number of pos strings into num, so that neg strings don't exceed pos strings
             pos_dict[i] = acceptor
             for ele in results:
                 f.write(ele + "\t" + "TRUE\n")
             print('getting negative strings for length '+str(i))
             acceptor, results = alternate_rand_gen_no_duplicate(neg_dict[i], num)
             neg_dict[i] = acceptor
-            for ele in results: # TODO this line is where the loop should break if there are insufficient pos strings (to match the number of pos strings). Maybe just check if len(results) > max_pos_examples at this point. If yes, break after that amount of iterations.
+            for ele in results:
                 f.write(ele + "\t" + "FALSE\n")
     return pos_dict, neg_dict
 
