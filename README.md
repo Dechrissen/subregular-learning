@@ -37,7 +37,7 @@ conda install -c conda-forge pynini
 ```
 
 ### Data generation
-Data (test strings) is generated according to FSAs (in the form of `.fst` files) of given subregular languages. The process of data generation is outlined in the below 3 steps:
+Data for each language (sets of strings) is generated according to FSAs (in the form of `.fst` files) of given subregular languages. The process of data generation is outlined in the below 3 steps:
 
 #### 1 - `.att` files
 Provide a file encoding the possible transitions in a given subregular language in the form of an `.att` file (example below). One file per language should be placed in the `/src/data_gen/lib` directory.
@@ -74,7 +74,7 @@ python /src/data_gen/data-gen.py
 
 This will generate Training, Dev, Test 1, Test 2, and Test 3 sets for the languages listed in `/tags.txt` and store them in `/src/data_gen/data`. Check whether the data was generated successfully using `check.py`. If any of the files are missing strings, a "missing" or "incomplete" message will be printed to the terminal.  
 
-In `/src/data_gen/data`, there are three subsets generated: `1k`, `10k`, and `100k`. Each one contains `_Training`, `_Dev.txt`, `_Test1.py`, `_Test2.py`, and `_Test3.py` for each language.
+In `/src/data_gen/data`, there are three subsets generated: `1k`, `10k`, and `100k`. Each one contains `_Training.txt`, `_Dev.txt`, `_Test1.txt`, `_Test2.txt`, and `_Test3.txt` for each language.
 
 ### Neural models
 The currently supported RNN types are GRU and LSTM.  
