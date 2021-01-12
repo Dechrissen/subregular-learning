@@ -12,6 +12,11 @@ The `data-gen` scripts were adapted from https://github.com/kkostyszyn/SBFST_201
 -   Pynini >= 2.1.3
 
 ## Usage
+1. [Prerequisite setup](#prerequisite-setup)
+2. [Data generation](#data-generation)
+3. [Neural models](#neural-models)
+4. [Adding new languages](#adding-new-languages)
+
 ### Prerequisite setup
 The workflow of this codebase was tested using Conda, available through the Anaconda toolkit [here](https://www.anaconda.com/products/individual). First, install Conda. Next, download this repository with the green 'Code' button or via `git`:
 
@@ -47,7 +52,7 @@ Provide a file encoding the possible transitions in a given subregular language 
 0
 1
 ```
-The `.att` files can be written by hand, but the process can be automated using `plebby`, which is included in The Language Toolkit [here](https://github.com/vvulpes0/Language-Toolkit-2). See [using plebby]().
+The `.att` files can be written by hand, but the process can be automated using `plebby`, which is included in The Language Toolkit [here](https://github.com/vvulpes0/Language-Toolkit-2). (See [Adding new languages](#adding-new-languages))
 
 #### 2 - `att2fst.sh` script
 
@@ -64,7 +69,7 @@ This will create corresponding `.fst` files (which go in `/src/data_gen/lib/lib_
 After the `.fst` files are compiled, run `data-gen.py` which is in `/src/data_gen`:
 
 ```cmd
-python data-gen.py
+python /src/data_gen/data-gen.py
 ```
 
 This will generate Training, Dev, Test 1, Test 2, and Test 3 sets for the languages listed in `/tags.txt` and store them in `/src/data_gen/data`. Check whether the data was generated successfully using `check.py`. If any of the files are missing strings, a "missing" or "incomplete" message will be printed to the terminal.  
@@ -75,14 +80,26 @@ In `/src/data_gen/data`, there are three subsets generated: `1k`, `10k`, and `10
 The currently supported RNN types are GRU and LSTM.  
 
 #### Training
-To train a single model, run `main.py` in `/src/neural_net/tensorflow`. Most of its arguments are self-expanatory, but note that the `--bidi` flag denotes whether the model's RNN is bidirectional. Valid values for `--rnn-type` are either "gru" or "lstm".
+To train a single model, run `main.py` in `/src/neural_net/tensorflow`. Most of its arguments are self-expanatory, but note that the `--bidi` flag denotes whether the model's RNN is bidirectional. Example:
 
-- list
-- args
-- here
+```cmd
+python src/neural_net/tensorflow/main.py --batch-size 64 --epochs 30 --embed-dim 100 --rnn-type gru --dropout 0 --bidi False --train-data "/src/data_gen/data/100k/SL.4.2.0_Training.txt" --val-data "/src/data_gen/data/100k/SL.4.2.0_Dev.txt" --output-dir "/src/models"
+```
+
+Possible arguments for `main.py` are below (along with indications of whether they are required):
+
+- `'--train-data', type=str, required=True`
+- `'--val-data', type=str, required=True`
+- `'--output-dir', type=str, required=True`
+- `'--batch-size', type=int, default=64`
+- `'--epochs', type=int, default=10`
+- `'--embed-dim', type=int, default=100`
+- `'--dropout', type=float, default=0.2`
+- `'--rnn-type', type=str, default="lstm"` (valid values: "gru" or "lstm")
+- `'--bidi', type=bool, default=False`
 
 #### Testing
-To produce a set of predictions from a data file (test set) and a model, run `predict.py` in `/src/neural_net/tensorflow` with the model directory and test set file as arguments. This will output the model's predictions to a file consisting of the name of the test data file + `_pred.txt` in the model's directory. Example:
+To produce a set of predictions from a data file (test set) and a trained model, run `predict.py` in `/src/neural_net/tensorflow` with the model directory and test set file as arguments. This will output the model's predictions to a file consisting of the name of the test data file + `_pred.txt` in the model's directory. Example:
 
 ```cmd
 python src/neural_net/tensorflow/predict.py --model-dir "models/BiGRU_NoDrop_SL.4.2.1_100k" --data-file "src/data_gen/data/10k/SL.4.2.0_Test1.txt"
@@ -97,3 +114,5 @@ python src/neural_net/tensorflow/eval.py --predict-file "models/BiGRU_NoDrop_SL.
 #### Batch-training scripts
 
 The scripts `train_all.sh` and `train_all_lstm.sh` do not take any arguments and will produce all of the models examined in `report.pdf`. After they have been run, the scripts `collect_evals.sh` and `collect_evals_lstm.sh` or `evals_csv.py` can be run without arguments to collect all of the evaluation metrics we considered into a single csv file.
+
+### Adding new languages
