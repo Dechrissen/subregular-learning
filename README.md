@@ -3,7 +3,7 @@
 ## Sources
 This repository is a fork and continuation of the work done by Emily Peterson, Cody St. Clair, and Joanne Chau [here](https://github.com/emkp/CSE538_FinalProject).  
 
-The `data-gen` scripts were adapted from https://github.com/kkostyszyn/SBFST_2019. The use of `pynini` was updated for version 2.1.3. Function `rand_gen_no_duplicate()` was replaced with more efficient alternatives. Function `create_adversarial_examples()` was added. Bugs throughout code were fixed. `check.py` was updated. The model, training, and evaluation code are new contributions.
+The `data-gen` scripts were adapted from https://github.com/kkostyszyn/SBFST_2019. The use of `pynini` was updated for version 2.1.3. Function `rand_gen_no_duplicate` was replaced with more efficient alternatives (`alternate_rand_gen_no_duplicate`). Function `create_adversarial_examples` was added. Bugs throughout code were fixed. `check.py` was updated. The model, training, and evaluation code are new contributions.
 
 ## Dependencies
 
@@ -76,6 +76,10 @@ This will generate Training, Dev, Test 1, Test 2, and Test 3 sets for the langua
 
 In `/src/data_gen/data`, there are three subsets generated: `1k`, `10k`, and `100k`. Each one contains `_Training.txt`, `_Dev.txt`, `_Test1.txt`, `_Test2.txt`, and `_Test3.txt` for each language.
 
+#### `check.py` script
+
+The script `check.py` in `/src/data_gen` will check the `/data` directory for the generated data. For each file size subset (1k, 10k, 100k) the 5 datasets for each language will be checked to determine if they exist/have sufficient strings. For each dataset, `missing` will be output if it doesn't exist, or `incomplete` will be output if the dataset hasn't achieved its designated file size (along with the amount it stopped at).
+
 ### Neural models
 The currently supported RNN types are GRU and LSTM.  
 
@@ -116,3 +120,5 @@ python src/neural_net/tensorflow/eval.py --predict-file "models/BiGRU_NoDrop_SL.
 The scripts `train_all.sh` and `train_all_lstm.sh` do not take any arguments and will produce all of the models examined in `report.pdf`. After they have been run, the scripts `collect_evals.sh` and `collect_evals_lstm.sh` or `evals_csv.py` can be run without arguments to collect all of the evaluation metrics we considered into a single csv file.
 
 ### Adding new languages
+
+Need to add info here to explain how to add languages and describe the `/subreglib` directory.

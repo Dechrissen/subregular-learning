@@ -1,0 +1,21 @@
+=universe {/a /b /c /d /e /f /g /h /i /j /k /l /m /n /o /p}
+
+=aa  </a /a>
+=ab  </a /b>
+=ac  </a /c>
+=ad  </a /d>
+=ba  </b /a>
+=bb  </b /b>
+=bc  </b /c>
+=bd  </b /d>
+=cd  </c /d>
+
+=aa' </a,/a>
+=ab' </a,/b>
+=ac' </a,/c>
+=ad' </a,/d>
+=ba' </b,/a>
+=bb' </b,/b>
+=bc' </b,/c>
+=bd' </b,/d>
+=cd' </c,/d>

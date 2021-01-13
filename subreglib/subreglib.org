@@ -1,0 +1,135 @@
+* Parameters
+
+** alphabet size
+   4
+   16
+   64
+
+** length of factors
+   2
+   4
+   8
+
+** class
+
+   SL
+   SP
+   coSL
+   coSP
+   LT
+   PT
+   LTT
+   SF
+   REG
+
+* Languages built with 2-Factors 
+
+  aa
+  ab
+  ac
+  ad
+  ba
+  bb
+  bc
+  bd
+  
+  | name        | definition            | plebby                      |
+  |-------------+-----------------------+-----------------------------|
+  | SL.4.2.0    | ¬aa                   | ¬aa                         |
+  | SL.4.2.1    | ¬ab                   | ¬ab                         |
+  | SL.4.2.2    | ¬∨{aa,ab,ac}          | ¬∨{aa,ab,ac}                |
+  | SL.4.2.3    | ¬∨{aa,ab,ac,ba,bb,bd} | ¬∨{aa,ab,ac,ba,bb,bd}       |
+  |             |                       |                             |
+  | cSL.4.2.0   | aa                    | aa                          |
+  | cSL.4.2.1   | ab                    | ab                          |
+  | cSL.4.2.2   | ∨{aa,ab,ac}           | ∨{aa,ab,ac}                 |
+  | cSL.4.2.3   | ∨{aa,ab,ac,ba,bb,bd}  | ∨{aa,ab,ac,ba,bb,bd}        |
+  |             |                       |                             |
+  | SP.4.2.0    | ¬aa                   | ¬aa'                        |
+  | SP.4.2.1    | ¬ab                   | ¬ab'                        |
+  | SP.4.2.2    | ¬∨{aa,ab,ac}          | ¬∨{aa',ab',ac'}             |
+  | SP.4.2.3    | ¬∨{aa,ab,ac,ba,bb,bd} | ¬∨{aa',ab',ac',ba',bb',bd'} |
+  |             |                       |                             |
+  | cSP.4.2.0   | aa                    | aa'                         |
+  | cSP.4.2.1   | ab                    | ab'                         |
+  | cSP.4.2.2   | ∨{aa,ab,ac}           | ∨{aa',ab',ac'}              |
+  | cSP.4.2.3   | ∨{aa,ab,ac,ba,bb,bd}  | ∨{aa',ab',ac',ba',bb',bd'}  |
+  |             |                       |                             |
+  | LT.4.2.1    | aa → bb               | ∨{¬aa,bb}                   |
+  | LT.4.2.0    | aa → ab               | ∨{¬aa,ab}                   |
+  | LT.4.2.2    | ab → cd               | ∨{¬ab,cd}                   |
+  | LT.4.2.3    | aa ↔ ab               | ∧{∨{¬aa,ab},∨{¬ab,aa}}      |
+  | LT.4.2.4    | aa ↔ bb               | ∧{∨{¬aa,bb},∨{¬bb,aa}}      |
+  | LT.4.2.5    | ab ↔ cd               | ∧{∨{¬ab,cd},∨{¬cd,ab}}      |
+  | LT.4.2.6    | aa → ab and aa → bb   | ∧{LT.4.2.1,LT.4.2.0}        |
+  | LT.4.2.7    | aa → ab or aa → bb    | ∨{LT.4.2.1,LT.4.2.0}        |
+  |             |                       |                             |
+  | PT.4.2.0    | aa → ab               | ∨{¬aa',ab'}                 |
+  | PT.4.2.1    | aa → bb               | ∨{¬aa',bb'}                 |
+  | PT.4.2.2    | ab → cd               | ∨{¬ab',cd'}                 |
+  | PT.4.2.3    | aa ↔ ab               | ∧{∨{¬aa',ab'},∨{¬ab',aa'}}  |
+  | PT.4.2.4    | aa ↔ bb               | ∧{∨{¬aa',bb'},∨{¬bb',aa'}}  |
+  | PT.4.2.5    | ab ↔ cd               | ∧{∨{¬ab',cd'},∨{¬cd',ab'}}  |
+  |             |                       |                             |
+  | LTT.4.2.3.1 | exactly 2 aa          |                             |
+  | LTT.4.2.3.2 | exactly 2 ab          |                             |
+  | LTT.4.2.6.1 | exactly 5 aa          |                             |
+  | LTT.4.2.6.2 | exactly 5 ab          |                             |
+  |             |                       |                             |
+  
+
+
+** Nomenclature
+
+   CLS.a(.t).k.i
+
+   CLS: class
+   a: alphabet size
+   (.t): the threshold for LTT
+   k : the k-value
+   i : enumerator of lgs (should be unique)
+
+** Plebby basic factors
+
+   =universe {/a,/b,/c,/d}
+   
+   =aa  </a /a>
+   =ab  </a /b>
+   =ac  </a /c>
+   =ad  </a /d>
+   =ba  </b /a>
+   =bb  </b /b>
+   =bc  </b /c>
+   =bd  </b /d>
+   
+   =aa' </a,/a>
+   =ab' </a,/b>
+   =ac' </a,/c>
+   =ad' </a,/d>
+   =ba' </b,/a>
+   =bb' </b,/b>
+   =bc' </b,/c>
+   =bd' </b,/d>
+
+   =SL.4.2.0 ¬aa
+
+
+**  Star-free 
+
+   We want is languages that are SF but not LTT nor PT.
+
+   One we know is :  Latin liquid dissimilation . If ll subsequence then r occurs between them and if rr subsequence then l occurs between them. So we can do some variations of these.
+
+   SF = closure of LT under concatenation.
+
+   One strategy is to concatenate LT languages and check with plebby if they are SF but not LTT and not PT.
+   
+
+** Plebby basic counting mod n
+
+   =aMod2.0 
+   =aMod3.0 
+   =aMod7.0 
+   =abMod2.0
+   =abMod3.0
+   =abMod7.0
