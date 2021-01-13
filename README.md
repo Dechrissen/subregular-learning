@@ -81,7 +81,7 @@ In `/src/data_gen/data`, there are three subsets generated: `1k`, `10k`, and `10
 The script `check.py` in `/src/data_gen` will check the `/data` directory for the generated data. For each file size subset (1k, 10k, 100k) the 5 datasets for each language will be checked to determine if they exist/have sufficient strings. For each dataset, `missing` will be output if it doesn't exist, or `incomplete` will be output if the dataset hasn't achieved its designated file size (along with the amount it stopped at).
 
 ### Neural models
-The currently supported RNN types are GRU and LSTM.  
+The currently supported RNN types are s-RNN, GRU and LSTM.  
 
 #### Training
 To train a single model, run `main.py` in `/src/neural_net/tensorflow`. Most of its arguments are self-expanatory, but note that the `--bidi` flag denotes whether the model's RNN is bidirectional. Example:
@@ -99,7 +99,7 @@ Possible arguments for `main.py` are below (along with indications of whether th
 - `'--epochs', type=int, default=10`
 - `'--embed-dim', type=int, default=100`
 - `'--dropout', type=float, default=0.2`
-- `'--rnn-type', type=str, default="lstm"` (valid values: "gru" or "lstm")
+- `'--rnn-type', type=str, default="simple"` (valid values: "simple", "gru" or "lstm")
 - `'--bidi', type=bool, default=False`
 
 #### Testing
