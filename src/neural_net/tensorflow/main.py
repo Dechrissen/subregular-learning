@@ -16,7 +16,7 @@ if __name__ == "__main__":
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--embed-dim', type=int, default=100)
     parser.add_argument('--dropout', type=float, default=0.2)
-    parser.add_argument('--rnn-type', type=str, default="lstm")
+    parser.add_argument('--rnn-type', type=str, default="simple")
     parser.add_argument('--bidi', type=bool, default=False)
 
     args = parser.parse_args()
@@ -47,10 +47,10 @@ if __name__ == "__main__":
     checkpoint_path = model_path + '/checkpoint.ckpt'
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True,
             monitor='val_acc', mode='max')
-            
+
     log_dir = model_path + "/logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-        
+
     training_record = model.fit(x_train, y_train, batch_size=args.batch_size,
             epochs=args.epochs, validation_data=(x_val, y_val), callbacks=[checkpoint_callback, tensorboard_callback])
 
