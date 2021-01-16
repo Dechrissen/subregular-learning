@@ -1,13 +1,13 @@
 #
 # A script to generate train/dev/test set
-# goes with /data_3langs/ and text_3langs.txt
+# goes with /data/ and tags.txt
 
 # This script has 3 versions of the rand_gen_no_duplicate function:
 	# cody_rand_gen_no_duplicate
 	# alternate_rand_gen_no_duplicate
 	# rand_gen_no_duplicate (the original) (inefficient)
 # Right now it's using alternate_rand_gen_no_duplicate
-# It puts files of sizes 100k, 10k, and 1k strings into a data_3langs folder
+# It puts files of sizes 100k, 10k, and 1k strings into a data folder
 
 # updated 3 December 2020
 #
@@ -96,9 +96,9 @@ def build (border, lang, lang_name, n):
     n : int
         length of the strings used to generate the border strings
     '''
-    test3_files = ["data_3langs/100k/"+lang_name+"_Test3.txt",
-                   "data_3langs/10k/"+lang_name+"_Test3.txt",
-                   "data_3langs/1k/"+lang_name+"_Test3.txt"]
+    test3_files = ["data/100k/"+lang_name+"_Test3.txt",
+                   "data/10k/"+lang_name+"_Test3.txt",
+                   "data/1k/"+lang_name+"_Test3.txt"]
     f = [open(test3_files[0], "w+"),
          open(test3_files[1], "w+"),
          open(test3_files[2], "w+")]
@@ -291,8 +291,8 @@ def prune(f, name):
 
     data = open(name).readlines()
 
-    small = [open("data_3langs/10k/" + f, "w+"),
-                open("data_3langs/1k/" + f, "w+")]
+    small = [open("data/10k/" + f, "w+"),
+                open("data/1k/" + f, "w+")]
 
     tr = []
     fl = []
@@ -358,7 +358,7 @@ for x in tags:
     ls_min_len = 31
     ls_max_len = 50
 
-    dir_name = "data_3langs/100k/" + x
+    dir_name = "data/100k/" + x
 
 
     #FIRST - set up dictionary
