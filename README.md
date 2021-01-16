@@ -22,7 +22,7 @@ The `data-gen` scripts were adapted from https://github.com/kkostyszyn/SBFST_201
 The workflow of this codebase was tested using Conda, available through the Anaconda toolkit [here](https://www.anaconda.com/products/individual). First, install Conda. Next, download this repository with the green 'Code' button or via `git`:
 
 ```cmd
-git clone https://github.com/Dechrissen/subregular.git
+git clone https://github.com/Dechrissen/subregular-learning.git
 ```
 
 Open an Anaconda prompt, `cd` to the root of this project's directory, and attempt to install all of the dependencies:
