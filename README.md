@@ -155,16 +155,16 @@ al. (2017)](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2
 with Heinz, Fodor, and Shibata overseeing its development. Apart from
 Shibata, the researchers are based at Stony Brook University.
 
-- Joanne Chau (Compling MA 2020)
+- Joanne Chau (CompLing MA 2020)
 - Paul Fodor (Professor of Instruction, CS)
 - Tiantian Gao (CS, PhD 2019)
 - Jeffrey Heinz (Professor, Linguistics & IACS)
 - Kalina Kostyzyn (Ling, current PhD)
-- Emily Peterson (Ling, compling MA 2020)
+- Emily Peterson (Ling, CompLing MA 2020)
 - Chihiro Shibata (Professor, Tokyo University of Technology CS)
-- Cody St. Clair (Ling, current MA)
+- Cody St. Clair (Ling MA 2020)
 - Rahul Verma (CS, MS 2018)
 
-Most recently, this repository is a fork and continuation of the work done by Emily Peterson, Cody St. Clair, and Joanne Chau [here](https://github.com/emkp/CSE538_FinalProject). A summary of the results from their work is in `/docs/2020_report.pdf`. They themslves forked repository Kostyzyn's [repo](https://github.com/kkostyszyn/SBFST_2019). Kostyzyn inherited the code from Gao, and Verma originated the code based for the project.
+Most recently, this repository is a fork and continuation of the work done by Emily Peterson, Cody St. Clair, and Joanne Chau [here](https://github.com/emkp/CSE538_FinalProject). A summary of the results from their work is in `/docs/2020_report.pdf`. They themslves forked Kostyzyn's [repo](https://github.com/kkostyszyn/SBFST_2019). Kostyzyn inherited the code from Gao, and Verma originated the code base for the project.
 
 
