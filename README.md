@@ -1,9 +1,7 @@
-# Unnamed Subregular Learning Library
+# Subregular Language Library for Machine Learning
 
-## Sources
-This repository is a fork and continuation of the work done by Emily Peterson, Cody St. Clair, and Joanne Chau [here](https://github.com/emkp/CSE538_FinalProject). A summary of the results from their work is in `/docs/2020_report.pdf`.
-
-The `data-gen` scripts were adapted from https://github.com/kkostyszyn/SBFST_2019. The use of `pynini` was updated for version 2.1.3. Function `rand_gen_no_duplicate` was replaced with more efficient alternatives (`alternate_rand_gen_no_duplicate`). Function `create_adversarial_examples` was added. Bugs throughout code were fixed. `check.py` was updated. The model, training, and evaluation code are new contributions.
+This repository provides a variety of regular languages of varying types in order to provide a benchmark for Machine Learning models and to help better understand the kind of sequential patterns neural networks in particular are able to learn successfuly and under what conditions. Some motivation is provided in [Avcu et al. (2017) paper "Subregular Complexity and Deep Learning"](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjggda6gaTuAhVRElkFHcpJD4kQFjACegQIBhAC&url=http%3A%2F%2Fprojects.illc.uva.nl%2FLaCo%2Fclclab%2Fmedia%2Fpdfs%2F2017%2Fvelhoen2017.pdf&usg=AOvVaw3YNi86XUzp5U_I1sKb6u_I).
+The regular languages themselves are based on the Subregular Hierarchies of languages (see [Rogers and Pullum 2011](https://link.springer.com/article/10.1007/s10849-011-9140-2) and [Rogers et al. 2013](https://link.springer.com/chapter/10.1007%2F978-3-642-39998-5_6)]).
 
 ## Dependencies
 
@@ -53,7 +51,7 @@ Provide a file encoding the possible transitions in a given subregular language 
 0
 1
 ```
-The `.att` files can be written by hand, but the process can be automated using `plebby`, which is included in The Language Toolkit [here](https://github.com/vvulpes0/Language-Toolkit-2). (See [Adding new languages](#adding-new-languages))
+The `.att` files can be written by hand, but this is time-consuming and error-prone. We recommed writing automata with software such as [openfst](http://www.openfst.org/twiki/bin/view/FST/WebHome) currently maintained by researchers at Google, or `plebby`, which is included in [The Language Toolkit](https://github.com/vvulpes0/Language-Toolkit-2) by Dakotah Lambert. We have used `plebby` for specifying the acceptors and `openfst` for data generation through its python wrapper [Pynini](http://www.openfst.org/twiki/bin/view/GRM/Pynini) (See [Adding new languages](#adding-new-languages))
 
 #### 2 - `att2fst.sh` script
 
@@ -63,7 +61,7 @@ Once all the desired languages (as `.att` files) are placed in `/src/data_gen/li
 ./att2fst.sh
 ```
 
-This will create corresponding `.fst` files (which go in `/src/data_gen/lib/lib_fst/`). These files are what `pynini` uses to generate strings in a given language.
+This will create corresponding `.fst` files (which go in `/src/data_gen/lib/lib_fst/`). These are binary files which can be processed by `openfst` and are what `pynini` uses to generate strings in a given language.
 
 #### 3 - `data-gen.py` script
 
@@ -73,9 +71,21 @@ After the `.fst` files are compiled, run `data-gen.py` which is in `/src/data_ge
 python /src/data_gen/data-gen.py
 ```
 
-This will generate Training, Dev, Test 1, Test 2, and Test 3 sets for the languages listed in `/tags.txt` and store them in `/src/data_gen/data/`. Check whether the data was generated successfully using `check.py`. If any of the files are missing strings, a "missing" or "incomplete" message will be printed to the terminal.  
+This will generate Training, Dev, Test 1, Test 2, and Test 3 sets for the languages listed in `/tags.txt` and store them in `/src/data_gen/data/`. 
+
+Check whether the data was generated successfully using `check.py`. If any of the files are missing strings, a "missing" or "incomplete" message will be printed to the terminal.  
 
 In `/src/data_gen/data/`, there are three subsets generated: `1k`, `10k`, and `100k`. Each one contains `_Training.txt`, `_Dev.txt`, `_Test1.txt`, `_Test2.txt`, and `_Test3.txt` for each language.
+
+#### About the training, dev, and test data
+
+- **Training** data contains equal numbers of positive and negative strings between the lengths of 12 and 20.
+- **Dev** data contains equal numbers of positive and negative strings between the lengths of 12 and 20 which are disjoint from Training.
+- **Test 1** data contains equal numbers of positive and negative strings between the lengths of 12 and 20 which are disjoint from both Training and Dev.
+- **Test 2** data contains equal numbers of positive and negative strings between the lengths of 21 and 50.
+- **Test 3** data contains equal numbers of positive and negative strings between the lengths of 21 and 50; in particular, each postive string *x* is paired with a negative string *y* such that the string edit distance of *(x,y)* is 1.
+
+Equal numbers of strings of each length in the selected length range are chosen. Under these constraints, the strings themselves are randomly selected uniformly.
 
 #### `check.py` script
 
@@ -135,3 +145,26 @@ To organize these results nicely into a `.csv` file, run `/evals2csv.py`. This w
 ### Adding new languages
 
 (Need to add info here to explain how to add languages and describe the `subreglib` directory.)
+
+## Acknowledgements
+
+This repository is the latest installment of work by several
+individuals since 2017 and is a continuation of the work reported by
+[Avcu et
+al. (2017)](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjggda6gaTuAhVRElkFHcpJD4kQFjACegQIBhAC&url=http%3A%2F%2Fprojects.illc.uva.nl%2FLaCo%2Fclclab%2Fmedia%2Fpdfs%2F2017%2Fvelhoen2017.pdf&usg=AOvVaw3YNi86XUzp5U_I1sKb6u_I).
+with Heinz, Fodor, and Shibata overseeing its development. Apart from
+Shibata, the researchers are based at Stony Brook University.
+
+- Joanne Chau (Compling MA 2020)
+- Paul Fodor (Professor of Instruction, CS)
+- Tiantian Gao (CS, PhD 2019)
+- Jeffrey Heinz (Professor, Linguistics & IACS)
+- Kalina Kostyzyn (Ling, current PhD)
+- Emily Peterson (Ling, compling MA 2020)
+- Chihiro Shibata (Professor, Tokyo University of Technology CS)
+- Cody St. Clair (Ling, current MA)
+- Rahul Verma (CS, MS 2018)
+
+Most recently, this repository is a fork and continuation of the work done by Emily Peterson, Cody St. Clair, and Joanne Chau [here](https://github.com/emkp/CSE538_FinalProject). A summary of the results from their work is in `/docs/2020_report.pdf`. They themslves forked repository Kostyzyn's [repo](https://github.com/kkostyszyn/SBFST_2019). Kostyzyn inherited the code from Gao, and Verma originated the code based for the project.
+
+
