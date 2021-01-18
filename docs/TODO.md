@@ -8,8 +8,16 @@
 ## Workflow
 
 - [ ] write `plebby` scripts for each combination of parameters (*k* value and alphabet size): 9 total
-  - k = {2,4,8}
-  - alphabet size = {4,16,64}
+  - [x] k = 2 / alph = 4
+  - [ ] k = 2 / alph = 16
+  - [ ] k = 2 / alph = 64
+  - [ ] k = 4 / alph = 4
+  - [ ] k = 4 / alph = 16
+  - [ ] k = 4 / alph = 64
+  - [ ] k = 8 / alph = 4
+  - [ ] k = 8 / alph = 16
+  - [ ] k = 8 / alph = 64
+- [ ] write Python script to automate generation of `plebby` scripts according to some user-specified values
 - [x] rewrite shell script template for model training
   - ~~create directory `languages` to store languages (?)~~ this is actually just `/tags.txt`
   - shell script should have parameters that can be tweaked (NN types, languages to use)
