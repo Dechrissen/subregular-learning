@@ -248,26 +248,50 @@ def create_data_no_duplicate(filename, pos_dict, neg_dict, min_len, max_len, num
     with open(filename, "w+") as f:
         for i in range(min_len, max_len + 1):
             print('\nworking on length '+str(i))
+
+            # generate positive strings
             print('getting positive strings for length '+str(i))
-            acceptor, results = alternate_rand_gen_no_duplicate(pos_dict[i], num)
-            if len(results) < num:
-                print('WARNING: Only', str(len(results)), 'positive strings generated for length', str(i))
-            num = len(results) # this saves the number of pos strings into num, so that neg strings don't exceed pos strings
+            acceptor, pos_results = alternate_rand_gen_no_duplicate(pos_dict[i], num)
+            amount_pos = len(pos_results)
+            if amount_pos < num:
+                print('WARNING: Only', str(amount_pos), 'positive strings generated for length', str(i))
             pos_dict[i] = acceptor
-            for ele in results:
-                f.write(ele + "\t" + "TRUE\n")
+
+            # generate negative strings
             print('getting negative strings for length '+str(i))
-            acceptor, results = alternate_rand_gen_no_duplicate(neg_dict[i], num)
+            acceptor, neg_results = alternate_rand_gen_no_duplicate(neg_dict[i], num)
+            amount_neg = len(neg_results)
+            if amount_neg < num:
+                print('WARNING: Only', str(amount_neg), 'negative strings generated for length', str(i))
             neg_dict[i] = acceptor
-            for ele in results:
+
+            # check which of the pos results or neg results is smaller, and set that to the stopping number
+            if amount_pos > amount_neg:
+                stop = amount_neg
+            else:
+                stop = amount_pos
+
+            # write positive results to file, stopping at stopping number
+            counter = 0
+            for ele in pos_results:
+                f.write(ele + "\t" + "TRUE\n")
+                counter+=1
+                if counter == stop:
+                    break
+
+            # write negative results to file, stopping at stopping number
+            counter = 0
+            for ele in neg_results:
                 f.write(ele + "\t" + "FALSE\n")
+                counter+=1
+                if counter == stop:
+                    break
+
     return pos_dict, neg_dict
 
 
 # create {num} random strings of positive/negative examples.
 # This may be duplicates.
-
-
 def create_data_with_duplicate(filename, pos_dict, neg_dict, min_len, max_len, num, get_difference):
     with open(filename, "w+") as f:
         for i in range(min_len, max_len + 1):

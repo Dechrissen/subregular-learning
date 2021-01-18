@@ -1,7 +1,7 @@
 # Subregular Language Library for Machine Learning
 
 This repository provides a variety of regular languages of varying types in order to provide a benchmark for Machine Learning models and to help better understand the kind of sequential patterns neural networks in particular are able to learn successfuly and under what conditions. Some motivation is provided in [Avcu et al. (2017) paper "Subregular Complexity and Deep Learning"](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjggda6gaTuAhVRElkFHcpJD4kQFjACegQIBhAC&url=http%3A%2F%2Fprojects.illc.uva.nl%2FLaCo%2Fclclab%2Fmedia%2Fpdfs%2F2017%2Fvelhoen2017.pdf&usg=AOvVaw3YNi86XUzp5U_I1sKb6u_I).
-The regular languages themselves are based on the Subregular Hierarchies of languages (see [Rogers and Pullum 2011](https://link.springer.com/article/10.1007/s10849-011-9140-2) and [Rogers et al. 2013](https://link.springer.com/chapter/10.1007%2F978-3-642-39998-5_6)]).
+The regular languages themselves are based on the Subregular Hierarchies of languages (see [Rogers and Pullum 2011](https://link.springer.com/article/10.1007/s10849-011-9140-2) and [Rogers et al. 2013](https://link.springer.com/chapter/10.1007%2F978-3-642-39998-5_6)).
 
 ## Dependencies
 
@@ -71,7 +71,7 @@ After the `.fst` files are compiled, run `data-gen.py` which is in `/src/data_ge
 python /src/data_gen/data-gen.py
 ```
 
-This will generate Training, Dev, Test 1, Test 2, and Test 3 sets for the languages listed in `/tags.txt` and store them in `/src/data_gen/data/`. 
+This will generate Training, Dev, Test 1, Test 2, and Test 3 sets for the languages listed in `/tags.txt` and store them in `/src/data_gen/data/`.
 
 Check whether the data was generated successfully using `check.py`. If any of the files are missing strings, a "missing" or "incomplete" message will be printed to the terminal.  
 
@@ -166,5 +166,3 @@ Shibata, the researchers are based at Stony Brook University.
 - Rahul Verma (CS, MS 2018)
 
 Most recently, this repository is a fork and continuation of the work done by Emily Peterson, Cody St. Clair, and Joanne Chau [here](https://github.com/emkp/CSE538_FinalProject). A summary of the results from their work is in `/docs/2020_report.pdf`. They themslves forked Kostyzyn's [repo](https://github.com/kkostyszyn/SBFST_2019). Kostyzyn inherited the code from Gao, and Verma originated the code base for the project.
-
-

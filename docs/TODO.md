@@ -26,4 +26,4 @@
 ## Codebase
 
 - [x] add check for possible positive string undergeneration in  `data-gen.py` > `create_data_no_duplicate` function
-- [ ] add check for possible negative string undergeneration in  `data-gen.py` > `create_data_no_duplicate` function
+- [x] add check for possible negative string undergeneration in  `data-gen.py` > `create_data_no_duplicate` function
