@@ -1,4 +1,4 @@
-# A script for generating `.plebby` files 
+# A script for generating `.plebby` files
 import argparse
 
 if __name__ == "__main__":
@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # argument validitation
+    # argument validation
     if args.k not in [2,4,8]:
         raise argparse.ArgumentError(ref_k, "k must be 2, 4, or 8")
     if args.alph_size not in [4,16,64]:

@@ -21,38 +21,39 @@ import pynini
 import functools
 import numpy as np
 import random
+import pathlib
 
 def check(n):
     #check 1k, 10k, and 100k to see if all files of type n are of correct length
     lengths = ["1k", "10k", "100k"]
     #first 1k
-
-    beginning = "/home/ekp/Documents/SBU_Fall2020/CSE538_NLP/Project/CSE538_FinalProject/src/data_gen/"
+    path_to_library = pathlib.Path(__file__).parent.absolute().parent
+    beginning = path_to_library
 
     for x in lengths:
 
         try:
-            dev = open(beginning+"data_3langs/" + x + "/"+n+"_Dev.txt").readlines(),
+            dev = open(beginning+"/data_gen/" + x + "/"+n+"_Dev.txt").readlines(),
         except:
             dev = 'missing'
 
         try:
-            train = open(beginning+"data_3langs/" + x + "/"+n+"_Training.txt").readlines(),
+            train = open(beginning+"/data_gen/" + x + "/"+n+"_Training.txt").readlines(),
         except:
             train = 'missing'
 
         try:
-            test1 = open(beginning+"data_3langs/" + x + "/"+n+"_Test1.txt").readlines(),
+            test1 = open(beginning+"/data_gen/" + x + "/"+n+"_Test1.txt").readlines(),
         except:
             test1 = 'missing'
 
         try:
-            test2 = open(beginning+"data_3langs/" + x + "/"+n+"_Test2.txt").readlines(),
+            test2 = open(beginning+"/data_gen/" + x + "/"+n+"_Test2.txt").readlines(),
         except:
             test2 = 'missing'
 
         try:
-            test3 = open(beginning+"data_3langs/" + x + "/"+n+"_Test3.txt").readlines(),
+            test3 = open(beginning+"/data_gen/" + x + "/"+n+"_Test3.txt").readlines(),
         except:
             test3 = 'missing'
 
@@ -78,7 +79,8 @@ def check(n):
     return True
 
 def check_all():
-    tags = open("/home/ekp/Documents/SBU_Fall2020/CSE538_NLP/Project/CSE538_FinalProject/tags.txt").readlines()
+    path_to_library = pathlib.Path(__file__).parent.absolute().parent
+    tags = open(path_to_library+"/tags.txt").readlines()
 
     for x in tags:
         check(x[:-1])

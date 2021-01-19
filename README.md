@@ -79,11 +79,11 @@ In `/src/data_gen/data/`, there are three subsets generated: `1k`, `10k`, and `1
 
 #### About the training, dev, and test data
 
-- **Training** data contains equal numbers of positive and negative strings between the lengths of 12 and 20.
-- **Dev** data contains equal numbers of positive and negative strings between the lengths of 12 and 20 which are disjoint from Training.
-- **Test 1** data contains equal numbers of positive and negative strings between the lengths of 12 and 20 which are disjoint from both Training and Dev.
-- **Test 2** data contains equal numbers of positive and negative strings between the lengths of 21 and 50.
-- **Test 3** data contains equal numbers of positive and negative strings between the lengths of 21 and 50; in particular, each postive string *x* is paired with a negative string *y* such that the string edit distance of *(x,y)* is 1.
+- **Training** data contains equal numbers of positive and negative strings between the lengths of 10 and 19.
+- **Dev** data contains equal numbers of positive and negative strings between the lengths of 10 and 19 which are disjoint from Training.
+- **Test 1** data contains equal numbers of positive and negative strings between the lengths of 10 and 19 which are disjoint from both Training and Dev.
+- **Test 2** data contains equal numbers of positive and negative strings between the lengths of 31 and 50.
+- **Test 3** data contains equal numbers of positive and negative strings between the lengths of 31 and 50; in particular, each positive string *x* is paired with a negative string *y* such that the string edit distance of *(x,y)* is 1.
 
 Equal numbers of strings of each length in the selected length range are chosen. Under these constraints, the strings themselves are randomly selected uniformly.
 
@@ -155,14 +155,15 @@ al. (2017)](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2
 with Heinz, Fodor, and Shibata overseeing its development. Apart from
 Shibata, the researchers are based at Stony Brook University.
 
-- Joanne Chau (CompLing MA 2020)
+- [Derek Andersen (CompLing MA 2021)](https://github.com/Dechrissen)
+- [Joanne Chau (CompLing MA 2020)](https://github.com/joannechau)
 - Paul Fodor (Professor of Instruction, CS)
 - Tiantian Gao (CS, PhD 2019)
-- Jeffrey Heinz (Professor, Linguistics & IACS)
-- Kalina Kostyzyn (Ling, current PhD)
-- Emily Peterson (Ling, CompLing MA 2020)
+- [Jeffrey Heinz (Professor, Linguistics & IACS)](http://jeffreyheinz.net/)
+- [Kalina Kostyzyn (Ling, current PhD)](https://github.com/kkostyszyn)
+- [Emily Peterson (Ling, CompLing MA 2020)](https://github.com/emkp)
 - Chihiro Shibata (Professor, Tokyo University of Technology CS)
-- Cody St. Clair (Ling MA 2020)
+- [Cody St. Clair (Ling MA 2020)](https://github.com/cody-stclair)
 - Rahul Verma (CS, MS 2018)
 
-Most recently, this repository is a fork and continuation of the work done by Emily Peterson, Cody St. Clair, and Joanne Chau [here](https://github.com/emkp/CSE538_FinalProject). A summary of the results from their work is in `/docs/2020_report.pdf`. They themslves forked Kostyzyn's [repo](https://github.com/kkostyszyn/SBFST_2019). Kostyzyn inherited the code from Gao, and Verma originated the code base for the project.
+Most recently, this repository is a continuation by Derek Andersen of the work done by Emily Peterson, Cody St. Clair, and Joanne Chau [here](https://github.com/emkp/CSE538_FinalProject). A summary of the results from their work is in `/docs/2020_report.pdf`. They themselves forked [Kostyzyn's repo](https://github.com/kkostyszyn/SBFST_2019). Kostyzyn inherited the code from Gao, and Verma originated the code base for the project.

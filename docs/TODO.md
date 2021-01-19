@@ -17,13 +17,15 @@
   - [ ] k = 8 / alph = 4
   - [ ] k = 8 / alph = 16
   - [ ] k = 8 / alph = 64
-- [ ] write Python script to automate generation of `plebby` scripts according to some user-specified values
+- [ ] ~~write Python script to automate generation of `plebby` scripts according to some user-specified values~~
 - [x] rewrite shell script template for model training
   - ~~create directory `languages` to store languages (?)~~ this is actually just `/tags.txt`
   - shell script should have parameters that can be tweaked (NN types, languages to use)
 - [ ] reorganize `/models` directory and separate into sub-folders for NN type. Other scripts like `predict.py` and `eval.py` might need to updated to use new paths for this
+- [x] reorganize repo structure
 
 ## Codebase
 
 - [x] add check for possible positive string undergeneration in  `data-gen.py` > `create_data_no_duplicate` function
 - [x] add check for possible negative string undergeneration in  `data-gen.py` > `create_data_no_duplicate` function
+- [ ] change paths (`path_to_fsa`, `my_fsa`, `dir_name`) in `data-gen.py`

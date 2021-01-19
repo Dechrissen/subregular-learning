@@ -36,7 +36,7 @@ for lang in ${LANGS[@]}; do
 		for direction in ${DIRECTIONS[@]}; do
 			for drop in ${DROPOUTS[@]}; do
 				model_dir="models/${direction}_${rnn_type}_${drop}_${lang}_${size}/"
-				data_prefix="src/data_gen/data/${size}/${lang}"
+				data_prefix="data_gen/${size}/${lang}"
 				if [ ${drop} == "NoDrop" ]; then
 					if [ ${direction} == "Uni" ]; then
 						python src/neural_net/tensorflow/main.py "${UNIVERSAL_ARGS[@]}" --rnn-type "${rnn_type}" --dropout 0 --bidi False\

@@ -1,6 +1,6 @@
 #
 # A script to generate train/dev/test set
-# goes with /data/ and tags.txt
+# goes with /data_gen/ and tags.txt
 
 # This script has 3 versions of the rand_gen_no_duplicate function:
 	# cody_rand_gen_no_duplicate
@@ -15,6 +15,8 @@ import pynini
 import functools
 import numpy as np
 import random
+import pathlib
+
 
 def A(s):
     return pynini.acceptor(s, token_type="utf8")
@@ -83,7 +85,7 @@ def border(fsa,n):
 
 def build (border, lang, lang_name, n):
     '''
-    A function that creates the adv_data files that are in /data/ ;
+    A function that creates the adv_data files that are in /data_gen/ ;
     It gets the set of "border" strings from `border()`
     and writes them to adv_data files using the function `by_len()`
 
@@ -96,9 +98,10 @@ def build (border, lang, lang_name, n):
     n : int
         length of the strings used to generate the border strings
     '''
-    test3_files = ["data/100k/"+lang_name+"_Test3.txt",
-                   "data/10k/"+lang_name+"_Test3.txt",
-                   "data/1k/"+lang_name+"_Test3.txt"]
+    path_to_library = pathlib.Path(__file__).parent.absolute().parent
+    test3_files = [path_to_library+"/data_gen/100k/"+lang_name+"_Test3.txt",
+                   path_to_library+"/data_gen/10k/"+lang_name+"_Test3.txt",
+                   path_to_library+"/data_gen/1k/"+lang_name+"_Test3.txt"]
     f = [open(test3_files[0], "w+"),
          open(test3_files[1], "w+"),
          open(test3_files[2], "w+")]
@@ -312,11 +315,12 @@ def create_data_with_duplicate(filename, pos_dict, neg_dict, min_len, max_len, n
 
 # function that will take the 100k word list and create 10k and 1k from that list
 def prune(f, name):
+    path_to_library = pathlib.Path(__file__).parent.absolute().parent
 
     data = open(name).readlines()
 
-    small = [open("data/10k/" + f, "w+"),
-                open("data/1k/" + f, "w+")]
+    small = [open(path_to_library+"/data_gen/10k/" + f, "w+"),
+                open(path_to_library+"/data_gen/1k/" + f, "w+")]
 
     tr = []
     fl = []
@@ -361,14 +365,15 @@ def construct_all():
 ####main body (util functions finished)#####
 ############################################
 
-path_to_fsa = "/home/ekp/Documents/SBU_Fall2020/CSE538_NLP/Project/CSE538_FinalProject/"
-tags = open(path_to_fsa+"tags.txt")
+#path_to_library = "/home/ekp/Documents/SBU_Fall2020/CSE538_NLP/Project/CSE538_FinalProject/"
+path_to_library = pathlib.Path(__file__).parent.absolute().parent
+tags = open(path_to_library+"/tags.txt")
 tags = tags.readlines()
 
 # define hyper-parameters
 for x in tags:
     print('\nStarting on', x)
-    my_fsa = pynini.Fst.read(path_to_fsa + "src/data_gen/lib/lib_fst/" + x[:-1] + ".fst")
+    my_fsa = pynini.Fst.read(path_to_library + "/src/fstlib/lib_fst/" + x[:-1] + ".fst")
     x = x[:-1]
     ss_min_len = 10
     ss_max_len = 19
@@ -382,7 +387,7 @@ for x in tags:
     ls_min_len = 31
     ls_max_len = 50
 
-    dir_name = "data/100k/" + x
+    dir_name = path_to_library+"/data_gen/100k/" + x
 
 
     #FIRST - set up dictionary
