@@ -14,7 +14,7 @@ class MainModel(models.Model):
         elif rnn_type == "simple":
             rnn_layer = layers.SimpleRNN(embed_dim, dropout=dropout)
         else:
-            raise ValueError("Invalid RNN Type")
+            raise ValueError("Invalid RNN type")
 
         self.rnn_layer = layers.Bidirectional(rnn_layer) if bidi else rnn_layer
         self.linear_layer = layers.Dense(2)
