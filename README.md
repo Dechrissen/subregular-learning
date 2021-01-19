@@ -51,7 +51,7 @@ Provide a file encoding the possible transitions in a given subregular language 
 0
 1
 ```
-The `.att` files can be written by hand, but this is time-consuming and error-prone. We recommed writing automata with software such as [openfst](http://www.openfst.org/twiki/bin/view/FST/WebHome) currently maintained by researchers at Google, or `plebby`, which is included in [The Language Toolkit](https://github.com/vvulpes0/Language-Toolkit-2) by Dakotah Lambert. We have used `plebby` for specifying the acceptors and `openfst` for data generation through its python wrapper [Pynini](http://www.openfst.org/twiki/bin/view/GRM/Pynini) (See [Adding new languages](#adding-new-languages))
+The `.att` files can be written by hand, but this is time-consuming and error-prone. We recommend writing automata with software such as [openfst](http://www.openfst.org/twiki/bin/view/FST/WebHome) currently maintained by researchers at Google, or `plebby`, which is included in [The Language Toolkit](https://github.com/vvulpes0/Language-Toolkit-2) by Dakotah Lambert. We have used `plebby` for specifying the acceptors and `openfst` for data generation through its Python wrapper [Pynini](http://www.openfst.org/twiki/bin/view/GRM/Pynini). (See [Adding new languages](#adding-new-languages))
 
 #### 2 - `att2fst.sh` script
 
@@ -144,7 +144,7 @@ To organize these results nicely into a `.csv` file, run `/evals2csv.py`. This w
 
 ### Adding new languages
 
-(Need to add info here to explain how to add languages and describe the `subreglib` directory.)
+`/src/subreglib/` contains `.plebby` files which can be used with `plebby` which is included in [The Language Toolkit](https://github.com/vvulpes0/Language-Toolkit-2) by Dakotah Lambert. Each file specifies the acceptors for various languages and, after being run via `plebby`, outputs `.att` files for each language. A usage guide for `plebby` is [here](https://github.com/vvulpes0/Language-Toolkit-2/blob/master/docs/plebbyGuide.txt).
 
 ## Acknowledgements
 
