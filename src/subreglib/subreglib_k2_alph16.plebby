@@ -41,48 +41,48 @@
 ##################################################
 
 
-=SL.4.2.0    ¬aa
-=SL.4.2.1    ¬ab
-=SL.4.2.2    ¬∨{aa,ab,ac}
-=SL.4.2.3    ¬∨{aa,ab,ac,ba,bb,bd}
+=SL.16.2.0    ¬aa
+=SL.16.2.1    ¬ab
+=SL.16.2.2    ¬∨{aa,ab,ac}
+=SL.16.2.3    ¬∨{aa,ab,ac,ba,bb,bd}
 
-=cSL.4.2.0   aa
-=cSL.4.2.1   ab
-=cSL.4.2.2   ∨{aa,ab,ac}
-=cSL.4.2.3   ∨{aa,ab,ac,ba,bb,bd}
+=cSL.16.2.0   aa
+=cSL.16.2.1   ab
+=cSL.16.2.2   ∨{aa,ab,ac}
+=cSL.16.2.3   ∨{aa,ab,ac,ba,bb,bd}
 
-=SP.4.2.0    ¬aa'
-=SP.4.2.1    ¬ab'
-=SP.4.2.2    ¬∨{aa',ab',ac'}
-=SP.4.2.3    ¬∨{aa',ab',ac',ba',bb',bd'}
+=SP.16.2.0    ¬aa'
+=SP.16.2.1    ¬ab'
+=SP.16.2.2    ¬∨{aa',ab',ac'}
+=SP.16.2.3    ¬∨{aa',ab',ac',ba',bb',bd'}
 
-=cSP.4.2.0   aa'
-=cSP.4.2.1   ab'
-=cSP.4.2.2   ∨{aa',ab',ac'}
-=cSP.4.2.3   ∨{aa',ab',ac',ba',bb',bd'}
+=cSP.16.2.0   aa'
+=cSP.16.2.1   ab'
+=cSP.16.2.2   ∨{aa',ab',ac'}
+=cSP.16.2.3   ∨{aa',ab',ac',ba',bb',bd'}
 
-=LT.4.2.0    ∨{¬aa,ab}
-=LT.4.2.1    ∨{¬aa,bb}
-=LT.4.2.2    ∨{¬ab,cd}
-=LT.4.2.3    ∧{∨{¬aa,ab},∨{¬ab,aa}}
-=LT.4.2.4    ∧{∨{¬aa,bb},∨{¬bb,aa}}
-=LT.4.2.5    ∧{∨{¬ab,cd},∨{¬cd,ab}}
-=LT.4.2.6    ∧{LT.4.2.0,LT.4.2.1}
-=LT.4.2.7    ∨{LT.4.2.0,LT.4.2.1}
+=LT.16.2.0    ∨{¬aa,ab}
+=LT.16.2.1    ∨{¬aa,bb}
+=LT.16.2.2    ∨{¬ab,cd}
+=LT.16.2.3    ∧{∨{¬aa,ab},∨{¬ab,aa}}
+=LT.16.2.4    ∧{∨{¬aa,bb},∨{¬bb,aa}}
+=LT.16.2.5    ∧{∨{¬ab,cd},∨{¬cd,ab}}
+=LT.16.2.6    ∧{LT.4.2.0,LT.4.2.1}
+=LT.16.2.7    ∨{LT.4.2.0,LT.4.2.1}
 
-=PT.4.2.0    ∨{¬aa',ab'}
-=PT.4.2.1    ∨{¬aa',bb'}
-=PT.4.2.2    ∨{¬ab',cd'}
-=PT.4.2.3    ∧{∨{¬aa',ab'},∨{¬ab',aa'}}
-=PT.4.2.4    ∧{∨{¬aa',bb'},∨{¬bb',aa'}}
-=PT.4.2.5    ∧{∨{¬ab',cd'},∨{¬cd',ab'}}
-=PT.4.2.6    ∧{PT.4.2.0,PT.4.2.1}
-=PT.4.2.7    ∨{PT.4.2.0,PT.4.2.1}
+=PT.16.2.0    ∨{¬aa',ab'}
+=PT.16.2.1    ∨{¬aa',bb'}
+=PT.16.2.2    ∨{¬ab',cd'}
+=PT.16.2.3    ∧{∨{¬aa',ab'},∨{¬ab',aa'}}
+=PT.16.2.4    ∧{∨{¬aa',bb'},∨{¬bb',aa'}}
+=PT.16.2.5    ∧{∨{¬ab',cd'},∨{¬cd',ab'}}
+=PT.16.2.6    ∧{PT.4.2.0,PT.4.2.1}
+=PT.16.2.7    ∨{PT.4.2.0,PT.4.2.1}
 
-=LTT.4.2.3.0 ∧{least2aa,¬least3aa}
-=LTT.4.2.3.1 ∧{least2ab,¬least3ab}
-=LTT.4.2.6.0 ∧{least5aa,¬least6aa}
-=LTT.4.2.6.1 ∧{least5ab,¬least6ab}
+=LTT.16.2.3.0 ∧{least2aa,¬least3aa}
+=LTT.16.2.3.1 ∧{least2ab,¬least3ab}
+=LTT.16.2.6.0 ∧{least5aa,¬least6aa}
+=LTT.16.2.6.1 ∧{least5ab,¬least6ab}
 
 
 # PROPERLY STAR FREE
