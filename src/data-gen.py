@@ -365,7 +365,7 @@ def construct_all():
 ####main body (util functions finished)#####
 ############################################
 
-#path_to_library = "/home/ekp/Documents/SBU_Fall2020/CSE538_NLP/Project/CSE538_FinalProject/"
+
 path_to_library = pathlib.Path(__file__).parent.absolute().parent
 #print(path_to_library)
 tags = open(path_to_library / pathlib.Path("tags.txt"))
@@ -374,7 +374,7 @@ tags = tags.readlines()
 # define hyper-parameters
 for x in tags:
     print('\nStarting on', x)
-    my_fsa = pynini.Fst.read(str(path_to_library) + "/src/fstlib/lib_fst/" + x[:-1] + ".fst")
+    my_fsa = pynini.Fst.read(str(path_to_library) + "/src/fstlib/fst_format/" + x[:-1] + ".fst")
     x = x[:-1]
     ss_min_len = 10
     ss_max_len = 19

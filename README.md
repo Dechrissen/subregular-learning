@@ -45,7 +45,7 @@ conda install -c conda-forge pynini=2.1.2
 Data for each language (sets of strings) is generated according to FSAs (in the form of `.fst` files) of given subregular languages. The process of data generation is outlined in the below 3 steps:
 
 #### 1 - `.att` files
-Provide a file encoding the possible transitions in a given subregular language in the form of an `.att` file (example below). One file per language should be placed in the `/src/fstlib/` directory.
+Provide a file encoding the possible transitions in a given subregular language in the form of an `.att` file (example below). One file per language should be placed in the `/src/fstlib/att_format` directory.
 ```
 0	0	b	b
 0	0	c	c
@@ -61,27 +61,29 @@ The `.att` files can be written by hand, but this is time-consuming and error-pr
 
 #### 2 - `att2fst.sh` script
 
-Once all the desired languages (as `.att` files) are placed in `/src/fstlib/`, run the `att2fst.sh` script from this directory:
+This script has 3 dependencies: (1) `.att` files, (2) `ins.txt` (input symbols) and (3) `outs.txt` (output symbols), all of which should go in `/src/fstlib/att_format`.  
+
+Once all the desired languages (as `.att` files) and `ins.txt` & `outs.txt` are placed in `/src/fstlib/att_format`, run the `att2fst.sh` script from the `fstlib` directory:
 
 ```cmd
 ./att2fst.sh
 ```
 
-This will create corresponding `.fst` files (which go in `/src/fstlib/lib_fst/`). These are binary files which can be processed by `openfst` and are what `pynini` uses to generate strings in a given language.
+This will create corresponding `.fst` files (which are output to `/src/fstlib/fst_format/`). These are binary files which can be processed by `openfst` and are what `pynini` uses to generate strings in a given language.
 
 #### 3 - `data-gen.py` script
 
-After the `.fst` files are compiled, run `data-gen.py` which is in `/src/`:
+After the `.fst` files are compiled, run `data-gen.py` which is in `/src`:
 
 ```cmd
 python /src/data-gen.py
 ```
 
-This will generate Training, Dev, Test 1, Test 2, and Test 3 sets for the languages listed in `/tags.txt` and store them in `/data_gen/`.
+This will generate Training, Dev, Test 1, Test 2, and Test 3 sets for the languages listed in `/tags.txt` and store them in `/data_gen`.
 
 Check whether the data was generated successfully using `check.py`. If any of the files are missing strings, a "missing" or "incomplete" message will be printed to the terminal.  
 
-In `/data_gen/`, there are three subsets generated: `1k`, `10k`, and `100k`. Each one contains `_Training.txt`, `_Dev.txt`, `_Test1.txt`, `_Test2.txt`, and `_Test3.txt` for each language.
+In `/data_gen`, there are three subsets generated: `1k`, `10k`, and `100k`. Each one contains `_Training.txt`, `_Dev.txt`, `_Test1.txt`, `_Test2.txt`, and `_Test3.txt` for each language.
 
 #### About the training, dev, and test data
 
@@ -95,13 +97,13 @@ Equal numbers of strings of each length in the selected length range are chosen.
 
 #### `check.py` script
 
-The script `check.py` in `/src/` will check the `data_gen` directory for the generated data. For each file size subset (1k, 10k, 100k) the 5 datasets for each language will be checked to determine if they exist/have sufficient strings. For each dataset, `missing` will be output if it doesn't exist, or `incomplete` will be output if the dataset hasn't achieved its designated file size (along with the amount it stopped at).
+The script `check.py` in `/src` will check the `data_gen` directory for the generated data. For each file size subset (1k, 10k, 100k) the 5 datasets for each language will be checked to determine if they exist/have sufficient strings. For each dataset, `missing` will be output if it doesn't exist, or `incomplete` will be output if the dataset hasn't achieved its designated file size (along with the amount it stopped at).
 
 ### Neural models
 The currently supported RNN types are s-RNN, GRU and LSTM.  
 
 #### Training
-To train a single model, run `main.py` in `/src/neural_net/tensorflow/`. Most of its arguments are self-expanatory, but note that the `--bidi` flag denotes whether the model's RNN is bidirectional. Example:
+To train a single model, run `main.py` in `/src/neural_net/tensorflow`. Most of its arguments are self-expanatory, but note that the `--bidi` flag denotes whether the model's RNN is bidirectional. Example:
 
 ```cmd
 python src/neural_net/tensorflow/main.py --batch-size 64 --epochs 30 --embed-dim 100 --rnn-type gru --dropout 0 --bidi False --train-data "/src/data_gen/data/100k/SL.4.2.0_Training.txt" --val-data "/src/data_gen/data/100k/SL.4.2.0_Dev.txt" --output-dir "/src/models"
@@ -126,14 +128,14 @@ To produce a set of predictions from a data file (test set) and a trained model,
 python src/neural_net/tensorflow/predict.py --model-dir "models/Bi_lstm_NoDrop_SL.4.2.1_100k" --data-file "data_gen/10k/SL.4.2.0_Test1.txt"
 ```
 
-To evaluate a model's predictions, run the script `eval.py` in `/src/neural_net/tensorflow/`. This program takes a prediction file as produced by `predict.py` and writes to an equivalently-named `_eval.txt` file also in the model's directory. This file reports a number of statistics regarding the model's predictions. Example:
+To evaluate a model's predictions, run the script `eval.py` in `/src/neural_net/tensorflow`. This program takes a prediction file as produced by `predict.py` and writes to an equivalently-named `_eval.txt` file also in the model's directory. This file reports a number of statistics regarding the model's predictions. Example:
 
 ```cmd
 python src/neural_net/tensorflow/eval.py --predict-file "models/BiGRU_NoDrop_SL.4.2.1_100k/Test1_pred.txt"
 ```
 
 #### Batch-training script
-The script `batch_train.sh` will train multiple models according to the parameters at the top of the file under the heading 'PARAMETERS TO EDIT' (shown below). This script depends on the languages listed in `/tags.txt` (one language per line) which must also have a corresponding `.fst` file in `/src/fstlib/lib_fst/`.
+The script `batch_train.sh` will train multiple models according to the parameters at the top of the file under the heading 'PARAMETERS TO EDIT' (shown below). This script depends on the languages listed in `/tags.txt` (one language per line) which must also have a corresponding `.fst` file in `/src/fstlib/lib_fst`.
 ```{bash}
 UNIVERSAL_ARGS=( --batch-size 64 --epochs 30 --embed-dim 100 )
 rnn_type="simple" # simple / gru / lstm
@@ -144,13 +146,13 @@ For each model, the script will also run `predict.py` for each test set to gener
 
 ### Collecting evaluations
 
-After models have been trained and evaluated (i.e. `_eval.txt` files exist in `/models/`), run the script `collect_evals.sh`. This will collect all of the `_eval.txt` files present in `/models/` and output their evaluation metrics (currently F score and accuracy) into `/all_evals.txt`.  
+After models have been trained and evaluated (i.e. `_eval.txt` files exist in `/models`), run the script `collect_evals.sh`. This will collect all of the `_eval.txt` files present in `/models/` and output their evaluation metrics (currently F score and accuracy) into `/all_evals.txt`.  
 
 To organize these results nicely into a `.csv` file, run `/evals2csv.py`. This will generate a file `/all_evals.csv`.
 
 ### Adding new languages
 
-`/src/subreglib/` contains `.plebby` files which can be used with `plebby` which is included in [The Language Toolkit](https://github.com/vvulpes0/Language-Toolkit-2) by Dakotah Lambert. Each file specifies the acceptors for various languages and, after being run via `plebby`, outputs `.att` files for each language. A usage guide for `plebby` is [here](https://github.com/vvulpes0/Language-Toolkit-2/blob/master/docs/plebbyGuide.txt).
+`/src/subreglib` contains `.plebby` files which can be used with `plebby` which is included in [The Language Toolkit](https://github.com/vvulpes0/Language-Toolkit-2) by Dakotah Lambert. Each file specifies the acceptors for various languages and, after being run via `plebby`, outputs `.att` files for each language. A usage guide for `plebby` is [here](https://github.com/vvulpes0/Language-Toolkit-2/blob/master/docs/plebbyGuide.txt).
 
 ## Acknowledgements
 

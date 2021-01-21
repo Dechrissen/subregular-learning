@@ -4,6 +4,7 @@
 
 - [x] add section to README detailing how to add new subregular languages
 - [x] add section to README detailing how to run the evaluation-collection scripts / `csv` creation
+- [ ] add section to README explaining `ins.txt` and `outs.txt`
 
 ## Workflow
 
