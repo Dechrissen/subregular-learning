@@ -7,7 +7,7 @@ The regular languages themselves are based on the Subregular Hierarchies of lang
 
 -   Python >= 3.6
 -   Tensorflow >= 2.4.0
--   Pynini >= 2.1.3
+-   Pynini == 2.1.2
 
 ## Usage
 1. [Prerequisite setup](#prerequisite-setup)
@@ -17,22 +17,28 @@ The regular languages themselves are based on the Subregular Hierarchies of lang
 5. [Adding new languages](#adding-new-languages)
 
 ### Prerequisite setup
-The workflow of this codebase was tested using Conda, available through the Anaconda toolkit [here](https://www.anaconda.com/products/individual). First, install Conda. Next, download this repository with the green 'Code' button or via `git`:
+The workflow of this codebase was tested on UNIX-like systems using Conda, available through the Anaconda toolkit [here](https://www.anaconda.com/products/individual). Miniconda will also work. The entirety of the workflow should be carried out in a Conda environment (explained below).  
+
+First, install Conda. Next, download this repository with the green 'Code' button or via `git`:
 
 ```cmd
 git clone https://github.com/Dechrissen/subregular-learning.git
 ```
+Create a new environment <environment_name> like below, and activate the environment. The environment can be closed later with `conda deactivate`.
+```cmd
+conda create -n <environment_name>
+conda activate <environment_name>
+```
 
-Open an Anaconda prompt, `cd` to the root of this project's directory, and attempt to install all of the dependencies:
+`cd` to the root of this project's directory, and install the dependencies:
 
 ```cmd
 pip install -r requirements.txt
 ```
 
-*Optional*: If `pynini` fails to install via `pip`, use this method to install it individually:
-
+Install `pynini` via `conda-forge` (only version 2.1.2 has been tested with this workflow).
 ```cmd
-conda install -c conda-forge pynini
+conda install -c conda-forge pynini=2.1.2
 ```
 
 ### Data generation

@@ -98,7 +98,7 @@ def build (border, lang, lang_name, n):
     n : int
         length of the strings used to generate the border strings
     '''
-    path_to_library = pathlib.Path(__file__).parent.absolute().parent
+    path_to_library = str(pathlib.Path(__file__).parent.absolute().parent)
     test3_files = [path_to_library+"/data_gen/100k/"+lang_name+"_Test3.txt",
                    path_to_library+"/data_gen/10k/"+lang_name+"_Test3.txt",
                    path_to_library+"/data_gen/1k/"+lang_name+"_Test3.txt"]
@@ -315,7 +315,7 @@ def create_data_with_duplicate(filename, pos_dict, neg_dict, min_len, max_len, n
 
 # function that will take the 100k word list and create 10k and 1k from that list
 def prune(f, name):
-    path_to_library = pathlib.Path(__file__).parent.absolute().parent
+    path_to_library = str(pathlib.Path(__file__).parent.absolute().parent)
 
     data = open(name).readlines()
 
@@ -367,13 +367,14 @@ def construct_all():
 
 #path_to_library = "/home/ekp/Documents/SBU_Fall2020/CSE538_NLP/Project/CSE538_FinalProject/"
 path_to_library = pathlib.Path(__file__).parent.absolute().parent
-tags = open(path_to_library+"/tags.txt")
+#print(path_to_library)
+tags = open(path_to_library / pathlib.Path("tags.txt"))
 tags = tags.readlines()
 
 # define hyper-parameters
 for x in tags:
     print('\nStarting on', x)
-    my_fsa = pynini.Fst.read(path_to_library + "/src/fstlib/lib_fst/" + x[:-1] + ".fst")
+    my_fsa = pynini.Fst.read(str(path_to_library) + "/src/fstlib/lib_fst/" + x[:-1] + ".fst")
     x = x[:-1]
     ss_min_len = 10
     ss_max_len = 19
@@ -387,7 +388,7 @@ for x in tags:
     ls_min_len = 31
     ls_max_len = 50
 
-    dir_name = path_to_library+"/data_gen/100k/" + x
+    dir_name = str(path_to_library)+"/data_gen/100k/" + x
 
 
     #FIRST - set up dictionary

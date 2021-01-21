@@ -23,7 +23,7 @@
   - shell script should have parameters that can be tweaked (NN types, languages to use)
 - [ ] reorganize `/models` directory and separate into sub-folders for NN type. Other scripts like `predict.py` and `eval.py` might need to updated to use new paths for this
 - [x] reorganize repo structure
-- [ ] automate the generation of `.fst` files into their specified directory, instead of being generated in the same directory as the corresponding `.att` files (update `att2fst.sh`)
+- [x] automate the generation of `.fst` files into their specified directory, instead of being generated in the same directory as the corresponding `.att` files (update `att2fst.sh`)
 
 ## Codebase
 

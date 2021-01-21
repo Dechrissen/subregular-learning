@@ -1,3 +1,2 @@
 numpy==1.19.2
-pynini==2.0.9.post2
 tensorflow==2.4.0
