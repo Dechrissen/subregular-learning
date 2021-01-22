@@ -4,7 +4,7 @@
 
 - [x] add section to README detailing how to add new subregular languages
 - [x] add section to README detailing how to run the evaluation-collection scripts / `csv` creation
-- [ ] add section to README explaining `ins.txt` and `outs.txt`
+- [x] add section to README explaining `ins.txt` and `outs.txt`
 
 ## Workflow
 
@@ -25,6 +25,7 @@
 - [ ] reorganize `/models` directory and separate into sub-folders for NN type. Other scripts like `predict.py` and `eval.py` might need to updated to use new paths for this
 - [x] reorganize repo structure
 - [x] automate the generation of `.fst` files into their specified directory, instead of being generated in the same directory as the corresponding `.att` files (update `att2fst.sh`)
+- [x] write script to generate `ins.txt` and `outs.txt` with all 64 universe symbols
 
 ## Codebase
 

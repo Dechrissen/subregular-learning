@@ -61,7 +61,7 @@ The `.att` files can be written by hand, but this is time-consuming and error-pr
 
 #### 2 - `att2fst.sh` script
 
-This script has 3 dependencies: (1) `.att` files, (2) `ins.txt` (input symbols) and (3) `outs.txt` (output symbols), all of which should go in `/src/fstlib/att_format`.  
+This script has 3 dependencies: (1) `.att` files, (2) `ins.txt` (input symbols) and (3) `outs.txt` (output symbols), all of which should go in `/src/fstlib/att_format`. The `ins.txt` and `outs.txt` files currently in the repo are set up for a max of 64 universe symbols and their UTF-8 encodings. Should you want to support more than 64 symbols, you should modify the script `/src/fstlib/att_format/make-ins-and-outs.py`.
 
 Once all the desired languages (as `.att` files) and `ins.txt` & `outs.txt` are placed in `/src/fstlib/att_format`, run the `att2fst.sh` script from the `fstlib` directory:
 
