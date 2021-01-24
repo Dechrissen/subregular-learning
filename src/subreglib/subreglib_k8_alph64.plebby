@@ -1,0 +1,201 @@
+# https://github.com/vvulpes0/Language-Toolkit-2 (use DEVELOPMENT branch)
+
+#################################################
+#   CLS.a(.t).k.i
+#
+#   CLS: class
+#   a: alphabet size
+#   (.t): the threshold for LTT
+#   k : the k-value
+#   i : enumerator of lgs (should be unique)
+##################################################
+
+=universe {/a /b /c /d /e /f /g /h /i /j /k /l /m /n /o /p /q /r /s /t /u /v /w
+/x /y /z /A /B /C /D /E /F /G /H /I /J /K /L /M /N /O /P /Q /R /S /T /U /V /W /X
+/Y /Z /0 /1 /2 /3 /4 /5 /6 /7 /8 /9 /# /$}
+
+=aaaaaaaa  </a /a /a /a /a /a /a /a>
+=abababab  </a /b /a /b /a /b /a /b>
+=abcdefgh  </a /b /c /d /e /f /g /h>
+=aabbaabb  </a /a /b /b /a /a /b /b>
+=bbaabbaa  </b /b /a /a /b /b /a /a>
+=bbbbbbbb  </b /b /b /b /b /b /b /b>
+=cccccccc  </c /c /c /c /c /c /c /c>
+=dddddddd  </d /d /d /d /d /d /d /d>
+=cdcdcdcd  </c /d /c /d /c /d /c /d>
+
+=aaaaaaaa'  </a,/a,/a,/a,/a,/a,/a,/a>
+=abababab'  </a,/b,/a,/b,/a,/b,/a,/b>
+=abcdefgh'  </a,/b,/c,/d,/e,/f,/g,/h>
+=aabbaabb'  </a,/a,/b,/b,/a,/a,/b,/b>
+=bbaabbaa'  </b,/b,/a,/a,/b,/b,/a,/a>
+=bbbbbbbb'  </b,/b,/b,/b,/b,/b,/b,/b>
+=cccccccc'  </c,/c,/c,/c,/c,/c,/c,/c>
+=dddddddd'  </d,/d,/d,/d,/d,/d,/d,/d>
+=cdcdcdcd'  </c,/d,/c,/d,/c,/d,/c,/d>
+
+=least2aaaaaaaa @@{aaaaaaaa,aaaaaaaa}
+=least3aaaaaaaa @@{least2aaaaaaaa,aaaaaaaa}
+=least5aaaaaaaa @@{least2aaaaaaaa,least3aaaaaaaa}
+=least6aaaaaaaa @@{least3aaaaaaaa,least3aaaaaaaa}
+
+=least2abababab @@{abababab,abababab}
+=least3abababab @@{least2abababab,abababab}
+=least5abababab @@{least2abababab,least3abababab}
+=least6abababab @@{least3abababab,least3abababab}
+
+
+
+
+=SL.64.8.0    ¬aaaaaaaa
+=SL.64.8.1    ¬abababab
+=SL.64.8.2    ¬∨{aaaaaaaa,abababab,abcdefgh}
+=SL.64.8.3    ¬∨{aaaaaaaa,abababab,abcdefgh,bbaabbaa,bbbbbbbb,cdcdcdcd}
+
+=cSL.64.8.0   aaaaaaaa
+=cSL.64.8.1   abababab
+=cSL.64.8.2   ∨{aaaaaaaa,abababab,abcdefgh}
+=cSL.64.8.3   ∨{aaaaaaaa,abababab,abcdefgh,bbaabbaa,bbbbbbbb,cdcdcdcd}
+
+=SP.64.8.0    ¬aaaaaaaa'
+=SP.64.8.1    ¬abababab'
+=SP.64.8.2    ¬∨{aaaaaaaa',abababab',abcdefgh'}
+=SP.64.8.3    ¬∨{aaaaaaaa',abababab',abcdefgh',bbaabbaa',bbbbbbbb',cdcdcdcd'}
+
+=cSP.64.8.0   aaaaaaaa'
+=cSP.64.8.1   abababab'
+=cSP.64.8.2   ∨{aaaaaaaa',abababab',abcd'}
+=cSP.64.8.3   ∨{aaaaaaaa',abababab',abcdefgh',bbaabbaa',bbbbbbbb',cdcdcdcd'}
+
+=LT.64.8.0    ∨{¬aaaaaaaa,abababab}
+=LT.64.8.1    ∨{¬aaaaaaaa,bbbbbbbb}
+=LT.64.8.2    ∨{¬abababab,abcdefgh}
+=LT.64.8.3    ∧{∨{¬aaaaaaaa,abababab},∨{¬abababab,aaaaaaaa}}
+=LT.64.8.4    ∧{∨{¬aaaaaaaa,bbbbbbbb},∨{¬bbbbbbbb,aaaaaaaa}}
+=LT.64.8.5    ∧{∨{¬abababab,abcdefgh},∨{¬abcdefgh,abababab}}
+=LT.64.8.6    ∧{LT.64.8.0,LT.64.8.1}
+=LT.64.8.7    ∨{LT.64.8.0,LT.64.8.1}
+
+=PT.64.8.0    ∨{¬aaaaaaaa',abababab'}
+=PT.64.8.1    ∨{¬aaaaaaaa',bbbbbbbb'}
+=PT.64.8.2    ∨{¬abababab',abcdabcd'}
+=PT.64.8.3    ∧{∨{¬aaaaaaaa',abababab'},∨{¬abababab',aaaaaaaa'}}
+=PT.64.8.4    ∧{∨{¬aaaaaaaa',bbbbbbbb'},∨{¬bbbbbbbb',aaaaaaaa'}}
+=PT.64.8.5    ∧{∨{¬abababab',abcdabcd'},∨{¬abcdabcd',abababab'}}
+=PT.64.8.6    ∧{PT.64.8.0,PT.64.8.1}
+=PT.64.8.7    ∨{PT.64.8.0,PT.64.8.1}
+
+=LTT.64.3.8.0 ∧{least2aaaaaaaa,¬least3aaaaaaaa}
+=LTT.64.3.8.1 ∧{least2abababab,¬least3abababab}
+=LTT.64.6.8.0 ∧{least5aaaaaaaa,¬least6aaaaaaaa}
+=LTT.64.6.8.1 ∧{least5abababab,¬least6abababab}
+
+
+# PROPERLY STAR FREE
+
+# We want is languages that are SF but not LTT nor PT.
+
+#    One we know is :  Latin liquid dissimilation . 
+#    If ll subsequence then r occurs between them and if rr subsequence then l occurs between them. So we can do some variations of these.
+
+# Plebby for LLD:
+# l is a 
+# r is b
+
+=SF.64.8.0 ~@(|%</b>, ~</a>, %|</b>) # complement of strings with 2 bs without an a between them
+=SF.64.8.1 ~@(|%</a>, ~</b>, %|</a>) # complement of strings with 2 as without an b between them
+=SF.64.8.2 /\{SF.64.8.0,SF.64.8.1}
+=SF.64.8.3 /\{SF.64.8.0,LTT.64.3.8.0}
+=SF.64.8.4 /\{SF.64.8.0,PT.64.8.0}
+
+#   SF = closure of LT under concatenation.
+#   One strategy is to concatenate LT languages and check with plebby if they are SF but not LTT and not PT.
+
+
+# PROPERLY REGULAR    
+
+=a          </a>
+=HaH    %||%</a>
+=HbH    %||%</b>
+=HcH    %||%</c>
+=HdH    %||%</d>
+=HabH %||%</a /b>
+
+# #a mod 2 = 0, (even-a)
+=R.1.m2.0 @{~a,*@{HaH,~a,HaH,~a}}
+
+# #a mod 3 = 0
+=R.1.m3.0 @{~a,*@{HaH,~a,HaH,~a,HaH,~a}}
+
+# #a mod 7 = 0
+=R.1.m7.0 @{~a,*@{HaH,~a,HaH,~a,HaH,~a,HaH,~a,HaH,~a,HaH,~a,HaH,~a}}
+
+# #ab mod 2 = 0, (even-ab)
+=R.2.m2.0 @{~ab,*@{HabH,~ab,HabH,~ab}}
+
+# #ab mod 3 = 0
+=R.2.m3.0 @{~ab,*@{HabH,~ab,HabH,~ab,HabH,~ab}}
+
+# #ab mod 7 = 0
+=R.2.m7.0 @{~ab,*@{HabH,~ab,HabH,~ab,HabH,~ab,HabH,~ab,HabH,~ab,HabH,~ab,HabH,~ab}}
+
+
+####################
+# WRITING THE FSAs #
+####################
+
+:writeatt ../fstlib/att_format/SL.64.8.0.att ins.txt outs.txt SL.64.8.0
+:writeatt ../fstlib/att_format/SL.64.8.1.att ins.txt outs.txt SL.64.8.1
+:writeatt ../fstlib/att_format/SL.64.8.2.att ins.txt outs.txt SL.64.8.2
+:writeatt ../fstlib/att_format/SL.64.8.3.att ins.txt outs.txt SL.64.8.3
+
+:writeatt ../fstlib/att_format/cSL.64.8.0.att ins.txt outs.txt cSL.64.8.0
+:writeatt ../fstlib/att_format/cSL.64.8.1.att ins.txt outs.txt cSL.64.8.1
+:writeatt ../fstlib/att_format/cSL.64.8.2.att ins.txt outs.txt cSL.64.8.2
+:writeatt ../fstlib/att_format/cSL.64.8.3.att ins.txt outs.txt cSL.64.8.3
+
+:writeatt ../fstlib/att_format/SP.64.8.0.att ins.txt outs.txt SP.64.8.0
+:writeatt ../fstlib/att_format/SP.64.8.1.att ins.txt outs.txt SP.64.8.1
+:writeatt ../fstlib/att_format/SP.64.8.2.att ins.txt outs.txt SP.64.8.2
+:writeatt ../fstlib/att_format/SP.64.8.3.att ins.txt outs.txt SP.64.8.3
+
+:writeatt ../fstlib/att_format/cSP.64.8.0.att ins.txt outs.txt cSP.64.8.0
+:writeatt ../fstlib/att_format/cSP.64.8.1.att ins.txt outs.txt cSP.64.8.1
+:writeatt ../fstlib/att_format/cSP.64.8.2.att ins.txt outs.txt cSP.64.8.2
+:writeatt ../fstlib/att_format/cSP.64.8.3.att ins.txt outs.txt cSP.64.8.3
+
+:writeatt ../fstlib/att_format/LT.64.8.0.att ins.txt outs.txt LT.64.8.0
+:writeatt ../fstlib/att_format/LT.64.8.1.att ins.txt outs.txt LT.64.8.1
+:writeatt ../fstlib/att_format/LT.64.8.2.att ins.txt outs.txt LT.64.8.2
+:writeatt ../fstlib/att_format/LT.64.8.3.att ins.txt outs.txt LT.64.8.3
+:writeatt ../fstlib/att_format/LT.64.8.4.att ins.txt outs.txt LT.64.8.4
+:writeatt ../fstlib/att_format/LT.64.8.5.att ins.txt outs.txt LT.64.8.5
+:writeatt ../fstlib/att_format/LT.64.8.6.att ins.txt outs.txt LT.64.8.6
+:writeatt ../fstlib/att_format/LT.64.8.7.att ins.txt outs.txt LT.64.8.7
+
+:writeatt ../fstlib/att_format/PT.64.8.0.att ins.txt outs.txt PT.64.8.0
+:writeatt ../fstlib/att_format/PT.64.8.1.att ins.txt outs.txt PT.64.8.1
+:writeatt ../fstlib/att_format/PT.64.8.2.att ins.txt outs.txt PT.64.8.2
+:writeatt ../fstlib/att_format/PT.64.8.3.att ins.txt outs.txt PT.64.8.3
+:writeatt ../fstlib/att_format/PT.64.8.4.att ins.txt outs.txt PT.64.8.4
+:writeatt ../fstlib/att_format/PT.64.8.5.att ins.txt outs.txt PT.64.8.5
+:writeatt ../fstlib/att_format/PT.64.8.6.att ins.txt outs.txt PT.64.8.6
+:writeatt ../fstlib/att_format/PT.64.8.7.att ins.txt outs.txt PT.64.8.7
+
+:writeatt ../fstlib/att_format/LTT.64.3.8.0.att ins.txt outs.txt LTT.64.3.8.0
+:writeatt ../fstlib/att_format/LTT.64.3.8.1.att ins.txt outs.txt LTT.64.3.8.1
+:writeatt ../fstlib/att_format/LTT.64.6.8.0.att ins.txt outs.txt LTT.64.6.8.0
+:writeatt ../fstlib/att_format/LTT.64.6.8.1.att ins.txt outs.txt LTT.64.6.8.1
+
+:writeatt ../fstlib/att_format/SF.64.8.0.att ins.txt outs.txt SF.64.8.0
+:writeatt ../fstlib/att_format/SF.64.8.1.att ins.txt outs.txt SF.64.8.1
+:writeatt ../fstlib/att_format/SF.64.8.2.att ins.txt outs.txt SF.64.8.2
+:writeatt ../fstlib/att_format/SF.64.8.3.att ins.txt outs.txt SF.64.8.3
+:writeatt ../fstlib/att_format/SF.64.8.4.att ins.txt outs.txt SF.64.8.4
+
+:writeatt ../fstlib/att_format/R.1.m2.0.att ins.txt outs.txt R.1.m2.0
+:writeatt ../fstlib/att_format/R.1.m3.0.att ins.txt outs.txt R.1.m3.0
+:writeatt ../fstlib/att_format/R.1.m7.0.att ins.txt outs.txt R.1.m7.0
+:writeatt ../fstlib/att_format/R.2.m2.0.att ins.txt outs.txt R.2.m2.0
+:writeatt ../fstlib/att_format/R.2.m3.0.att ins.txt outs.txt R.2.m3.0
+:writeatt ../fstlib/att_format/R.2.m7.0.att ins.txt outs.txt R.2.m7.0

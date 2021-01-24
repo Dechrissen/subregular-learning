@@ -1,4 +1,8 @@
 # A script for generating `.plebby` files
+
+# Note: this is unfinished, it is just a proof of concept prototype
+# for if it is decided to generate plebby files this way
+
 import argparse
 
 if __name__ == "__main__":

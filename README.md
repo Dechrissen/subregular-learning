@@ -17,26 +17,26 @@ The regular languages themselves are based on the Subregular Hierarchies of lang
 5. [Adding new languages](#adding-new-languages)
 
 ### Prerequisite setup
-The workflow of this codebase was tested on UNIX-like systems using Conda, available through the Anaconda toolkit [here](https://www.anaconda.com/products/individual). Miniconda will also work. The entirety of the workflow should be carried out in a Conda environment (explained below).  
+The workflow of this codebase was tested on Linux systems using Conda, available through the Anaconda toolkit [here](https://www.anaconda.com/products/individual). Miniconda will also work. The entirety of the workflow should be carried out in a Conda environment (explained below).  
 
 First, install Conda. Next, download this repository with the green 'Code' button or via `git`:
 
 ```cmd
 git clone https://github.com/Dechrissen/subregular-learning.git
 ```
-Create a new environment <environment_name> like below, and activate the environment. The environment can be closed later with `conda deactivate`.
+Create a new environment <environment_name> (call it `subreg`, for example) like below, and activate the environment. The environment can be closed when you're finished with `conda deactivate`.
 ```cmd
 conda create -n <environment_name>
 conda activate <environment_name>
 ```
 
-`cd` to the root of this project's directory, and install the dependencies:
+`cd` to the root of this project's directory, and install the dependencies in your Conda environment:
 
 ```cmd
 pip install -r requirements.txt
 ```
 
-Install `pynini` via `conda-forge` (only version 2.1.2 has been tested with this workflow).
+Finally, install `pynini` via `conda-forge` (only version 2.1.2 has been tested with this workflow) in your Conda environment:
 ```cmd
 conda install -c conda-forge pynini=2.1.2
 ```
@@ -61,9 +61,9 @@ The `.att` files can be written by hand, but this is time-consuming and error-pr
 
 #### 2 - `att2fst.sh` script
 
-This script has 3 dependencies: (1) `.att` files, (2) `ins.txt` (input symbols) and (3) `outs.txt` (output symbols), all of which should go in `/src/fstlib/att_format`. The `ins.txt` and `outs.txt` files currently in the repo are set up for a max of 64 universe symbols and their UTF-8 encodings. Should you want to support more than 64 symbols, you should modify the script `/src/fstlib/att_format/make-ins-and-outs.py`.
+This script has 3 dependencies: (1) `.att` files, (2) `ins.txt` (input symbols) and (3) `outs.txt` (output symbols), all of which should go in `/src/fstlib/att_format`. The `ins.txt` and `outs.txt` files currently in the repo are set up for a max of 64 universe symbols and their UTF-8 encodings. Should you want to support more than 64 symbols, you should modify the script `/src/fstlib/att_format/make-ins-and-outs.py`and run it.
 
-Once all the desired languages (as `.att` files) and `ins.txt` & `outs.txt` are placed in `/src/fstlib/att_format`, run the `att2fst.sh` script from the `fstlib` directory:
+Once all the desired languages (as `.att` files) and `ins.txt` & `outs.txt` are in `/src/fstlib/att_format`, run the `att2fst.sh` script from the `fstlib` directory:
 
 ```cmd
 ./att2fst.sh
@@ -174,4 +174,4 @@ Shibata, the researchers are based at Stony Brook University.
 - [Cody St. Clair (Ling MA 2020)](https://github.com/cody-stclair)
 - Rahul Verma (CS, MS 2018)
 
-Most recently, this repository is a continuation by Derek Andersen of the work done by Emily Peterson, Cody St. Clair, and Joanne Chau [here](https://github.com/emkp/CSE538_FinalProject). A summary of the results from their work is in `/docs/2020_report.pdf`. They themselves forked [Kostyzyn's repo](https://github.com/kkostyszyn/SBFST_2019). Kostyzyn inherited the code from Gao, and Verma originated the code base for the project.
+Most recently, this repository is a continuation by Derek Andersen of the work done by Peterson, St. Clair, and Chau [here](https://github.com/emkp/CSE538_FinalProject). A summary of the results from their work is in `/docs/2020_report.pdf`. They themselves forked [Kostyzyn's repo](https://github.com/kkostyszyn/SBFST_2019). Kostyzyn inherited the code from Gao, and Verma originated the code base for the project.

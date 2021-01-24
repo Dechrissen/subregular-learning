@@ -1,0 +1,199 @@
+# https://github.com/vvulpes0/Language-Toolkit-2 (use DEVELOPMENT branch)
+
+#################################################
+#   CLS.a(.t).k.i
+#
+#   CLS: class
+#   a: alphabet size
+#   (.t): the threshold for LTT
+#   k : the k-value
+#   i : enumerator of lgs (should be unique)
+##################################################
+
+=universe {/a /b /c /d /e /f /g /h /i /j /k /l /m /n /o /p}
+
+=aaaa  </a /a /a /a>
+=abab  </a /b /a /b>
+=abcd  </a /b /c /d>
+=aabb  </a /a /b /b>
+=bbaa  </b /b /a /a>
+=bbbb  </b /b /b /b>
+=cccc  </c /c /c /c>
+=dddd  </d /d /d /d>
+=cdcd  </c /d /c /d>
+
+=aaaa'  </a,/a,/a,/a>
+=abab'  </a,/b,/a,/b>
+=abcd'  </a,/b,/c,/d>
+=aabb'  </a,/a,/b,/b>
+=bbaa'  </b,/b,/a,/a>
+=bbbb'  </b,/b,/b,/b>
+=cccc'  </c,/c,/c,/c>
+=dddd'  </d,/d,/d,/d>
+=cdcd'  </c,/d,/c,/d>
+
+=least2aaaa @@{aaaa,aaaa}
+=least3aaaa @@{least2aaaa,aaaa}
+=least5aaaa @@{least2aaaa,least3aaaa}
+=least6aaaa @@{least3aaaa,least3aaaa}
+
+=least2abab @@{abab,abab}
+=least3abab @@{least2abab,abab}
+=least5abab @@{least2abab,least3abab}
+=least6abab @@{least3abab,least3abab}
+
+
+
+
+=SL.16.4.0    ¬aaaa
+=SL.16.4.1    ¬abab
+=SL.16.4.2    ¬∨{aaaa,abab,abcd}
+=SL.16.4.3    ¬∨{aaaa,abab,abcd,bbaa,bbbb,cdcd}
+
+=cSL.16.4.0   aaaa
+=cSL.16.4.1   abab
+=cSL.16.4.2   ∨{aaaa,abab,abcd}
+=cSL.16.4.3   ∨{aaaa,abab,abcd,bbaa,bbbb,cdcd}
+
+=SP.16.4.0    ¬aaaa'
+=SP.16.4.1    ¬abab'
+=SP.16.4.2    ¬∨{aaaa',abab',abcd'}
+=SP.16.4.3    ¬∨{aaaa',abab',abcd',bbaa',bbbb',cdcd'}
+
+=cSP.16.4.0   aaaa'
+=cSP.16.4.1   abab'
+=cSP.16.4.2   ∨{aaaa',abab',abcd'}
+=cSP.16.4.3   ∨{aaaa',abab',abcd',bbaa',bbbb',cdcd'}
+
+=LT.16.4.0    ∨{¬aaaa,abab}
+=LT.16.4.1    ∨{¬aaaa,bbbb}
+=LT.16.4.2    ∨{¬abab,abcd}
+=LT.16.4.3    ∧{∨{¬aaaa,abab},∨{¬abab,aaaa}}
+=LT.16.4.4    ∧{∨{¬aaaa,bbbb},∨{¬bbbb,aaaa}}
+=LT.16.4.5    ∧{∨{¬abab,abcd},∨{¬abcd,abab}}
+=LT.16.4.6    ∧{LT.16.4.0,LT.16.4.1}
+=LT.16.4.7    ∨{LT.16.4.0,LT.16.4.1}
+
+=PT.16.4.0    ∨{¬aaaa',abab'}
+=PT.16.4.1    ∨{¬aaaa',bbbb'}
+=PT.16.4.2    ∨{¬abab',abcd'}
+=PT.16.4.3    ∧{∨{¬aaaa',abab'},∨{¬abab',aaaa'}}
+=PT.16.4.4    ∧{∨{¬aaaa',bbbb'},∨{¬bbbb',aaaa'}}
+=PT.16.4.5    ∧{∨{¬abab',abcd'},∨{¬abcd',abab'}}
+=PT.16.4.6    ∧{PT.16.4.0,PT.16.4.1}
+=PT.16.4.7    ∨{PT.16.4.0,PT.16.4.1}
+
+=LTT.16.3.4.0 ∧{least2aaaa,¬least3aaaa}
+=LTT.16.3.4.1 ∧{least2abab,¬least3abab}
+=LTT.16.6.4.0 ∧{least5aaaa,¬least6aaaa}
+=LTT.16.6.4.1 ∧{least5abab,¬least6abab}
+
+
+# PROPERLY STAR FREE
+
+# We want is languages that are SF but not LTT nor PT.
+
+#    One we know is :  Latin liquid dissimilation . 
+#    If ll subsequence then r occurs between them and if rr subsequence then l occurs between them. So we can do some variations of these.
+
+# Plebby for LLD:
+# l is a 
+# r is b
+
+=SF.16.4.0 ~@(|%</b>, ~</a>, %|</b>) # complement of strings with 2 bs without an a between them
+=SF.16.4.1 ~@(|%</a>, ~</b>, %|</a>) # complement of strings with 2 as without an b between them
+=SF.16.4.2 /\{SF.16.4.0,SF.16.4.1}
+=SF.16.4.3 /\{SF.16.4.0,LTT.16.3.4.0}
+=SF.16.4.4 /\{SF.16.4.0,PT.16.4.0}
+
+#   SF = closure of LT under concatenation.
+#   One strategy is to concatenate LT languages and check with plebby if they are SF but not LTT and not PT.
+
+
+# PROPERLY REGULAR    
+
+=a          </a>
+=HaH    %||%</a>
+=HbH    %||%</b>
+=HcH    %||%</c>
+=HdH    %||%</d>
+=HabH %||%</a /b>
+
+# #a mod 2 = 0, (even-a)
+=R.1.m2.0 @{~a,*@{HaH,~a,HaH,~a}}
+
+# #a mod 3 = 0
+=R.1.m3.0 @{~a,*@{HaH,~a,HaH,~a,HaH,~a}}
+
+# #a mod 7 = 0
+=R.1.m7.0 @{~a,*@{HaH,~a,HaH,~a,HaH,~a,HaH,~a,HaH,~a,HaH,~a,HaH,~a}}
+
+# #ab mod 2 = 0, (even-ab)
+=R.2.m2.0 @{~ab,*@{HabH,~ab,HabH,~ab}}
+
+# #ab mod 3 = 0
+=R.2.m3.0 @{~ab,*@{HabH,~ab,HabH,~ab,HabH,~ab}}
+
+# #ab mod 7 = 0
+=R.2.m7.0 @{~ab,*@{HabH,~ab,HabH,~ab,HabH,~ab,HabH,~ab,HabH,~ab,HabH,~ab,HabH,~ab}}
+
+
+####################
+# WRITING THE FSAs #
+####################
+
+:writeatt ../fstlib/att_format/SL.16.4.0.att ins.txt outs.txt SL.16.4.0
+:writeatt ../fstlib/att_format/SL.16.4.1.att ins.txt outs.txt SL.16.4.1
+:writeatt ../fstlib/att_format/SL.16.4.2.att ins.txt outs.txt SL.16.4.2
+:writeatt ../fstlib/att_format/SL.16.4.3.att ins.txt outs.txt SL.16.4.3
+
+:writeatt ../fstlib/att_format/cSL.16.4.0.att ins.txt outs.txt cSL.16.4.0
+:writeatt ../fstlib/att_format/cSL.16.4.1.att ins.txt outs.txt cSL.16.4.1
+:writeatt ../fstlib/att_format/cSL.16.4.2.att ins.txt outs.txt cSL.16.4.2
+:writeatt ../fstlib/att_format/cSL.16.4.3.att ins.txt outs.txt cSL.16.4.3
+
+:writeatt ../fstlib/att_format/SP.16.4.0.att ins.txt outs.txt SP.16.4.0
+:writeatt ../fstlib/att_format/SP.16.4.1.att ins.txt outs.txt SP.16.4.1
+:writeatt ../fstlib/att_format/SP.16.4.2.att ins.txt outs.txt SP.16.4.2
+:writeatt ../fstlib/att_format/SP.16.4.3.att ins.txt outs.txt SP.16.4.3
+
+:writeatt ../fstlib/att_format/cSP.16.4.0.att ins.txt outs.txt cSP.16.4.0
+:writeatt ../fstlib/att_format/cSP.16.4.1.att ins.txt outs.txt cSP.16.4.1
+:writeatt ../fstlib/att_format/cSP.16.4.2.att ins.txt outs.txt cSP.16.4.2
+:writeatt ../fstlib/att_format/cSP.16.4.3.att ins.txt outs.txt cSP.16.4.3
+
+:writeatt ../fstlib/att_format/LT.16.4.0.att ins.txt outs.txt LT.16.4.0
+:writeatt ../fstlib/att_format/LT.16.4.1.att ins.txt outs.txt LT.16.4.1
+:writeatt ../fstlib/att_format/LT.16.4.2.att ins.txt outs.txt LT.16.4.2
+:writeatt ../fstlib/att_format/LT.16.4.3.att ins.txt outs.txt LT.16.4.3
+:writeatt ../fstlib/att_format/LT.16.4.4.att ins.txt outs.txt LT.16.4.4
+:writeatt ../fstlib/att_format/LT.16.4.5.att ins.txt outs.txt LT.16.4.5
+:writeatt ../fstlib/att_format/LT.16.4.6.att ins.txt outs.txt LT.16.4.6
+:writeatt ../fstlib/att_format/LT.16.4.7.att ins.txt outs.txt LT.16.4.7
+
+:writeatt ../fstlib/att_format/PT.16.4.0.att ins.txt outs.txt PT.16.4.0
+:writeatt ../fstlib/att_format/PT.16.4.1.att ins.txt outs.txt PT.16.4.1
+:writeatt ../fstlib/att_format/PT.16.4.2.att ins.txt outs.txt PT.16.4.2
+:writeatt ../fstlib/att_format/PT.16.4.3.att ins.txt outs.txt PT.16.4.3
+:writeatt ../fstlib/att_format/PT.16.4.4.att ins.txt outs.txt PT.16.4.4
+:writeatt ../fstlib/att_format/PT.16.4.5.att ins.txt outs.txt PT.16.4.5
+:writeatt ../fstlib/att_format/PT.16.4.6.att ins.txt outs.txt PT.16.4.6
+:writeatt ../fstlib/att_format/PT.16.4.7.att ins.txt outs.txt PT.16.4.7
+
+:writeatt ../fstlib/att_format/LTT.16.3.4.0.att ins.txt outs.txt LTT.16.3.4.0
+:writeatt ../fstlib/att_format/LTT.16.3.4.1.att ins.txt outs.txt LTT.16.3.4.1
+:writeatt ../fstlib/att_format/LTT.16.6.4.0.att ins.txt outs.txt LTT.16.6.4.0
+:writeatt ../fstlib/att_format/LTT.16.6.4.1.att ins.txt outs.txt LTT.16.6.4.1
+
+:writeatt ../fstlib/att_format/SF.16.4.0.att ins.txt outs.txt SF.16.4.0
+:writeatt ../fstlib/att_format/SF.16.4.1.att ins.txt outs.txt SF.16.4.1
+:writeatt ../fstlib/att_format/SF.16.4.2.att ins.txt outs.txt SF.16.4.2
+:writeatt ../fstlib/att_format/SF.16.4.3.att ins.txt outs.txt SF.16.4.3
+:writeatt ../fstlib/att_format/SF.16.4.4.att ins.txt outs.txt SF.16.4.4
+
+:writeatt ../fstlib/att_format/R.1.m2.0.att ins.txt outs.txt R.1.m2.0
+:writeatt ../fstlib/att_format/R.1.m3.0.att ins.txt outs.txt R.1.m3.0
+:writeatt ../fstlib/att_format/R.1.m7.0.att ins.txt outs.txt R.1.m7.0
+:writeatt ../fstlib/att_format/R.2.m2.0.att ins.txt outs.txt R.2.m2.0
+:writeatt ../fstlib/att_format/R.2.m3.0.att ins.txt outs.txt R.2.m3.0
+:writeatt ../fstlib/att_format/R.2.m7.0.att ins.txt outs.txt R.2.m7.0
