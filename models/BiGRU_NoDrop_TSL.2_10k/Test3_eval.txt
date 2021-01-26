@@ -1,7 +1,0 @@
-Prediction file: models/BiGRU_NoDrop_TSL.2_10k/Test3_pred.txt
-TPR: 1.0
-FPR: 0.026800000000000046
-Accuracy: 0.9866
-Error rate: 0.0134
-Precision: 0.9738994935722634
-F-score: 0.9867771857114664

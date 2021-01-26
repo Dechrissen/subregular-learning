@@ -89,53 +89,7 @@
 =LTT.4.6.8.1 ∧{least5abababab,¬least6abababab}
 
 
-# PROPERLY STAR FREE
 
-# We want is languages that are SF but not LTT nor PT.
-
-#    One we know is :  Latin liquid dissimilation . 
-#    If ll subsequence then r occurs between them and if rr subsequence then l occurs between them. So we can do some variations of these.
-
-# Plebby for LLD:
-# l is a 
-# r is b
-
-=SF.4.8.0 ~@(|%</b>, ~</a>, %|</b>) # complement of strings with 2 bs without an a between them
-=SF.4.8.1 ~@(|%</a>, ~</b>, %|</a>) # complement of strings with 2 as without an b between them
-=SF.4.8.2 /\{SF.4.8.0,SF.4.8.1}
-=SF.4.8.3 /\{SF.4.8.0,LTT.4.3.8.0}
-=SF.4.8.4 /\{SF.4.8.0,PT.4.8.0}
-
-#   SF = closure of LT under concatenation.
-#   One strategy is to concatenate LT languages and check with plebby if they are SF but not LTT and not PT.
-
-
-# PROPERLY REGULAR    
-
-=a          </a>
-=HaH    %||%</a>
-=HbH    %||%</b>
-=HcH    %||%</c>
-=HdH    %||%</d>
-=HabH %||%</a /b>
-
-# #a mod 2 = 0, (even-a)
-=R.1.m2.0 @{~a,*@{HaH,~a,HaH,~a}}
-
-# #a mod 3 = 0
-=R.1.m3.0 @{~a,*@{HaH,~a,HaH,~a,HaH,~a}}
-
-# #a mod 7 = 0
-=R.1.m7.0 @{~a,*@{HaH,~a,HaH,~a,HaH,~a,HaH,~a,HaH,~a,HaH,~a,HaH,~a}}
-
-# #ab mod 2 = 0, (even-ab)
-=R.2.m2.0 @{~ab,*@{HabH,~ab,HabH,~ab}}
-
-# #ab mod 3 = 0
-=R.2.m3.0 @{~ab,*@{HabH,~ab,HabH,~ab,HabH,~ab}}
-
-# #ab mod 7 = 0
-=R.2.m7.0 @{~ab,*@{HabH,~ab,HabH,~ab,HabH,~ab,HabH,~ab,HabH,~ab,HabH,~ab,HabH,~ab}}
 
 
 ####################
@@ -185,15 +139,4 @@
 :writeatt ../fstlib/att_format/LTT.4.6.8.0.att ins.txt outs.txt LTT.4.6.8.0
 :writeatt ../fstlib/att_format/LTT.4.6.8.1.att ins.txt outs.txt LTT.4.6.8.1
 
-:writeatt ../fstlib/att_format/SF.4.8.0.att ins.txt outs.txt SF.4.8.0
-:writeatt ../fstlib/att_format/SF.4.8.1.att ins.txt outs.txt SF.4.8.1
-:writeatt ../fstlib/att_format/SF.4.8.2.att ins.txt outs.txt SF.4.8.2
-:writeatt ../fstlib/att_format/SF.4.8.3.att ins.txt outs.txt SF.4.8.3
-:writeatt ../fstlib/att_format/SF.4.8.4.att ins.txt outs.txt SF.4.8.4
 
-:writeatt ../fstlib/att_format/R.1.m2.0.att ins.txt outs.txt R.1.m2.0
-:writeatt ../fstlib/att_format/R.1.m3.0.att ins.txt outs.txt R.1.m3.0
-:writeatt ../fstlib/att_format/R.1.m7.0.att ins.txt outs.txt R.1.m7.0
-:writeatt ../fstlib/att_format/R.2.m2.0.att ins.txt outs.txt R.2.m2.0
-:writeatt ../fstlib/att_format/R.2.m3.0.att ins.txt outs.txt R.2.m3.0
-:writeatt ../fstlib/att_format/R.2.m7.0.att ins.txt outs.txt R.2.m7.0

@@ -5,6 +5,7 @@
 - [x] add section to README detailing how to add new subregular languages
 - [x] add section to README detailing how to run the evaluation-collection scripts / `csv` creation
 - [x] add section to README explaining `ins.txt` and `outs.txt`
+- [x] add README to `/subreglib`
 
 ## Workflow
 
@@ -32,4 +33,4 @@
 - [x] add check for possible positive string undergeneration in  `data-gen.py` > `create_data_no_duplicate` function
 - [x] add check for possible negative string undergeneration in  `data-gen.py` > `create_data_no_duplicate` function
 - [x] change paths (`path_to_fsa`, `my_fsa`, `dir_name`) in `data-gen.py`
-- [ ] add args to top of `data-gen.py`
+- [x] add args to top of `data-gen.py`

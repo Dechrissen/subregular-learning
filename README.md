@@ -152,7 +152,7 @@ To organize these results nicely into a `.csv` file, run `/evals2csv.py`. This w
 
 ### Adding new languages
 
-`/src/subreglib` contains `.plebby` files which can be used with `plebby` which is included in [The Language Toolkit](https://github.com/vvulpes0/Language-Toolkit-2) by Dakotah Lambert. Each file specifies the acceptors for various languages and, after being run via `plebby`, outputs `.att` files for each language. A usage guide for `plebby` is [here](https://github.com/vvulpes0/Language-Toolkit-2/blob/master/docs/plebbyGuide.txt).
+`/src/subreglib` contains `.plebby` files which can be used with `plebby` which is included in [The Language Toolkit](https://github.com/vvulpes0/Language-Toolkit-2) by Dakotah Lambert. Each file specifies the acceptors for various languages and, after being run via `plebby`, outputs `.att` files for each language. A usage guide for `plebby` is [here](https://github.com/vvulpes0/Language-Toolkit-2/blob/master/docs/plebbyGuide.txt). For more info about the organization of `.plebby` files for use in this library, refer to the README in `/src/subreglib` .
 
 ## Acknowledgements
 
