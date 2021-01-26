@@ -4,7 +4,7 @@ This directory contains the `.plebby` files for use with `plebby` which is inclu
 
 ## `.plebby` files
 
-Currently, these files uses three varying alphabet sizes (4, 16, 64) and three different *k*-values (2, 4, 8). For the majority of language types, there is one `.plebby` file per alphabet size / *k*-value configuration (9) plus 3 more for the Star-free and Regular languages with the 3 different alphabet sizes. There are 12 total `.plebby` files. They are named according to the scheme `subreglib_k<value>_alph<size>.plebby`, or in the case of the Star-free and Regular files, `subreglib_SFR_alph<size>.plebby`..  
+Currently, these files uses three varying alphabet sizes (4, 16, 64) and three different *k*-values (2, 4, 8). For the majority of language types, there is one `.plebby` file per alphabet size / *k*-value configuration (9) plus 3 more for the Star-free and Regular languages with the 3 different alphabet sizes. There are 12 total `.plebby` files. They are named according to the scheme `subreglib_k<value>_alph<size>.plebby`, or in the case of the Star-free and Regular files, `subreglib_SFR_alph<size>.plebby`.  
 
 Each of these files can be used with `plebby` to generate the `.att` files for each language (some of which already exist in `/src/fstlib/att_format`).  
 
