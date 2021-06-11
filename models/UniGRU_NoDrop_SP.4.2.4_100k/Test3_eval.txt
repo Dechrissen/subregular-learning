@@ -1,7 +1,0 @@
-Prediction file: models/UniGRU_NoDrop_SP.4.2.4_100k/Test3_pred.txt
-TPR: 1.0
-FPR: 0.48036
-Accuracy: 0.75982
-Error rate: 0.24018
-Precision: 0.6755113621011105
-F-score: 0.8063345643374349
