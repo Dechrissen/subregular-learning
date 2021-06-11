@@ -24,7 +24,7 @@ done < $filename
 
 DATA_SIZES=( 1k 10k 100k )
 DROPOUTS=( NoDrop )
-DIRECTIONS=( Uni Bi )
+DIRECTIONS=( Uni ) # may add Bi
 TESTS=( Test1 Test2 Test3 )
 
 if [ ! -e models ]; then

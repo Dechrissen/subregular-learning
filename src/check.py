@@ -2,7 +2,7 @@
 ###########################################################
 ########### util functions to confirm file size ###########
 ###########################################################
-# updated 2 December 2020
+# updated 29 May 2021
 # goes with /data/ and tags.txt
 
 # This script confirms that the
@@ -33,27 +33,27 @@ def check(n):
     for x in lengths:
 
         try:
-            dev = open(beginning+"/data_gen/" + x + "/"+n+"_Dev.txt").readlines(),
+            dev = open("./data_gen/" + x + "/"+n+"_Dev.txt").readlines(),
         except:
             dev = 'missing'
 
         try:
-            train = open(beginning+"/data_gen/" + x + "/"+n+"_Training.txt").readlines(),
+            train = open("./data_gen/" + x + "/"+n+"_Training.txt").readlines(),
         except:
             train = 'missing'
 
         try:
-            test1 = open(beginning+"/data_gen/" + x + "/"+n+"_Test1.txt").readlines(),
+            test1 = open("./data_gen/" + x + "/"+n+"_Test1.txt").readlines(),
         except:
             test1 = 'missing'
 
         try:
-            test2 = open(beginning+"/data_gen/" + x + "/"+n+"_Test2.txt").readlines(),
+            test2 = open("./data_gen/" + x + "/"+n+"_Test2.txt").readlines(),
         except:
             test2 = 'missing'
 
         try:
-            test3 = open(beginning+"/data_gen/" + x + "/"+n+"_Test3.txt").readlines(),
+            test3 = open("./data_gen/" + x + "/"+n+"_Test3.txt").readlines(),
         except:
             test3 = 'missing'
 
@@ -71,8 +71,10 @@ def check(n):
 
         for i in range(len(files)):
             if files[i] != 'missing':
-                if len(files[i][0]) < k:
+                if len(files[i][0]) != k:
                     print(x + "/" + n + filetypes[i] + " incomplete:", str(len(files[i][0])))
+                else:
+                    print(x + "/" + n + filetypes[i] + " complete")
             else:
                  print(x + "/" + n + filetypes[i] + " missing")
 
@@ -80,10 +82,11 @@ def check(n):
 
 def check_all():
     path_to_library = pathlib.Path(__file__).parent.absolute().parent
-    tags = open(path_to_library+"/tags.txt").readlines()
+    #tags = open(str(path_to_library)+"/tags.txt").readlines()
+    tags = open("./tags.txt").readlines()
 
     for x in tags:
-        check(x[:-1])
+        check(x)
         print()
     return True
 
