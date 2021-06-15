@@ -374,8 +374,8 @@ tags = tags.readlines()
 # define hyper-parameters
 for x in tags:
     print('\nStarting on', x)
-    my_fsa = pynini.Fst.read(str(path_to_library) + "/src/fstlib/fst_format/" + x + ".fst")
-    #x = x[:-1]
+    my_fsa = pynini.Fst.read(str(path_to_library) + "/src/fstlib/fst_format/" + x[:-1] + ".fst")
+    x = x[:-1]
     ss_min_len = 10
     ss_max_len = 19
     train_pos_num = 5000
