@@ -18,6 +18,8 @@ with open('samples/smpl_results.csv', 'w') as f:
             valid = 0
             for line in file:
                 count += 1
+                sys.stdout.write("\rWorking on line " + str(count) + ' in lang ' + lang)
+                sys.stdout.flush()
                 test_str = line.rstrip()   # remove eol char
                 compose = pynini.acceptor(test_str) @ fsa
                 if compose.num_states() != 0:
