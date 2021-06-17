@@ -9,7 +9,7 @@ with open('samples/smpl_results.csv', 'w') as f:
     f.write('lang,proportion_valid\n')
     #fractions = {}
     for lang in langs:
-        print("Working on lang " + lang)
+        #print("Working on lang " + lang)
         alph = lang.split('.')[1]
         smpl_file = "samples/alph" + alph + "_sample.txt"
         fsa = pynini.Fst.read("src/fstlib/fst_format/" + lang + ".fst")
