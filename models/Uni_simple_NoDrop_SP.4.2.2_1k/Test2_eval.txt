@@ -5,3 +5,4 @@ Accuracy: 0.996
 Error rate: 0.004
 Precision: 0.9923664122137404
 F-score: 0.9961685823754789
+AUC: 0.99858

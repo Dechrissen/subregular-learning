@@ -4,6 +4,9 @@ Updated 1 December 2020
 '''
 import argparse
 import os.path as path
+import matplotlib.pyplot as plt
+from sklearn.metrics import auc
+import numpy as np
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -42,39 +45,65 @@ if __name__ == "__main__":
             if pred == 'FALSE':
                 TN += 1
                 
-
     # True Positive Rate (TPR) aka Hit Rate aka Recall aka Sensitivity = TP / (TP + FN)
     TPR = TP/(TP+FN)
-    
     # False Positive Rate(FPR) aka False Alarm Rate = 1 - Specificity = 1 - (TN / (TN + FP))
     FPR = 1 - (TN / (TN + FP))
-    
     # Accuracy = (TP + TN) / (TP + TN + FP + FN)
     accuracy = (TP + TN) / (TP + TN + FP + FN)
-    
     # Error Rate = 1 – accuracy or (FP + FN) / (TP + TN + FP + FN)
     error_rate = (FP + FN) / (TP + TN + FP + FN)
-    
     # Precision = TP / (TP + FP)
     precision = TP / (TP + FP)
-    
     # F-measure: 2 / ( (1 / Precision) + (1 / Recall) )
     F_score = 2 / ((1/precision) + (1/TPR))
 
-    
+    probs_file = args.predict_file.replace('_pred.txt', '_probs.txt')
+    with open(probs_file, 'r') as f:
+        str_probs = [l.rstrip().split() for l in f.readlines()]
+        probs = np.array([[float(l[0]), float(l[1])] for l in str_probs])
+
+    true_labels = np.array(lines)[:, 0] == 'TRUE'
+    tpr = []
+    fpr = []
+    for thresh in np.linspace(0, 1, num=100):
+        preds = probs[:, 0] > thresh
+        TP = sum(preds & true_labels)
+        TN = sum(~preds & ~true_labels)
+        FP = sum(preds & ~true_labels)
+        FN = sum(~preds & true_labels)
+        tpr += [TP/(TP+FN)]
+        fpr += [FP/(FP+TN)]
+    AUC = round(auc(fpr, tpr), 5)
+    #print('AUC: ', AUC)
+
+    fig, ax = plt.subplots()
+    for i in np.linspace(0,1,num=11):
+        ax.axhline(i, linestyle='--', color='k', alpha=0.4, linewidth=0.5)
+        ax.axvline(i, linestyle='--', color='k', alpha=0.4, linewidth=0.5)
+    ax.set_xlim(-0.05,1.05)
+    ax.set_ylim(-0.05,1.05)
+    ax.plot(fpr, tpr, 'r', alpha=0.5)
+    ax.plot([0,1], [0,1], 'g:')
+    ax.text(0.6, 0.25, 'AUC = ' + str(AUC))
     model_name = args.predict_file[:-9]
-    eval_file = model_name+'_eval.txt'
+    split_lines = model_name.split('/')[1].split('_')
+    test_name = model_name.split('/')[2]
+    ax.set(xlabel='False Positive Rate', ylabel='True Positive Rate',
+           title='ROC Curve for ' + ' '.join(split_lines) + ' ' + test_name)
+    fig.savefig(model_name[:-5] + test_name + '_roc' + '.png', dpi=500)
     
+    eval_file = args.predict_file.replace('_pred.txt', '_eval.txt')
     message = 'Prediction file: '+args.predict_file+'\n' + \
               'TPR: '+str(TPR)+'\n' + \
               'FPR: '+str(FPR)+'\n' + \
               'Accuracy: '+str(accuracy)+'\n' + \
               'Error rate: '+str(error_rate)+'\n' + \
               'Precision: '+str(precision)+'\n' + \
-              'F-score: '+str(F_score)+'\n'
+              'F-score: '+str(F_score)+'\n' + \
+              'AUC: '+str(AUC)+'\n'
     print(message)
     print("Evaluations stored in", eval_file)
 
-    
     with open(eval_file, 'w') as f:
         f.write(message)

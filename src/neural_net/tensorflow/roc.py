@@ -7,7 +7,6 @@ from model import MainModel
 from data import *
 import numpy as np
 import matplotlib.pyplot as plt
-
 from sklearn.metrics import auc
 
 def load_model_config(config_file):
