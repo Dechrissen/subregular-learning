@@ -1,4 +1,4 @@
-import pynini as pynini
+import pynini
 import sys
 
 with open('tags.txt', 'r') as f:
@@ -16,9 +16,13 @@ with open('samples/smpl_results.csv', 'w') as f:
         with open(smpl_file, 'r') as file:
             count = 0
             valid = 0
+            for total, l in enumerate(file):
+                pass
+            file.seek(0)
             for line in file:
                 count += 1
-                sys.stdout.write("\rWorking on line " + str(count) + ' in lang ' + lang)
+                sys.stdout.write("\rChecking well-formedness of line " + str(count) + \
+                                 " of " + str(total) + " for lang " + lang + ' ')
                 sys.stdout.flush()
                 test_str = line.rstrip()   # remove eol char
                 compose = pynini.acceptor(test_str) @ fsa
@@ -28,6 +32,7 @@ with open('samples/smpl_results.csv', 'w') as f:
                 #else:
                     #is_valid = False
                 #print(test_str + ", " + str(is_valid))
+            print('')
             prop_valid = valid/count
             #fractions[lang] = prop_valid
         f.write(lang + ',' + str(round(prop_valid, 4)) + '\n')
