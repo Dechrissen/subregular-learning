@@ -5,3 +5,4 @@ Accuracy: 1.0
 Error rate: 0.0
 Precision: 1.0
 F-score: 1.0
+AUC: 1.0

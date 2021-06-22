@@ -52,3 +52,7 @@ if __name__ == "__main__":
             true_label = 'TRUE' if true_labels[i] == 0 else 'FALSE'
             predicted_label = 'TRUE' if category_predictions[i] == 0 else 'FALSE'
             f.write(string + '\t' + true_label + '\t' + predicted_label + '\n')
+
+    with open(model_dir + "/" + test_name + "_probs.txt", 'w') as f:
+        for i in range(len(predictions)):
+            f.write(str(predictions[i, 0]) + ' ' + str(predictions[i, 1]) + '\n')
