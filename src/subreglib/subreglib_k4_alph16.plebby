@@ -10,7 +10,7 @@
 #   i : enumerator of lgs (should be unique)
 ##################################################
 
-=universe {/a /b /c /d /e /f /g /h /i /j /k /l /m /n /o /p}
+=universe {/a, /b, /c, /d, /e, /f, /g, /h, /i, /j, /k, /l, /m, /n, /o, /p}
 
 =aaaa  </a /a /a /a>
 =abab  </a /b /a /b>

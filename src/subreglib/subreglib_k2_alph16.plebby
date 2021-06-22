@@ -10,7 +10,7 @@
 #   i : enumerator of lgs (should be unique)
 ##################################################
 
-=universe {/a /b /c /d /e /f /g /h /i /j /k /l /m /n /o /p}
+=universe {/a, /b, /c, /d, /e, /f, /g, /h, /i, /j, /k, /l, /m, /n, /o, /p}
 
 =aa  </a /a>
 =ab  </a /b>
@@ -86,8 +86,6 @@
 =LTT.16.3.2.1 ∧{least2ab,¬least3ab}
 =LTT.16.6.2.0 ∧{least5aa,¬least6aa}
 =LTT.16.6.2.1 ∧{least5ab,¬least6ab}
-
-
 
 
 
