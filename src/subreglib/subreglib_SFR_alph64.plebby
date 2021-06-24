@@ -75,8 +75,8 @@
 =SF.64.1.3 /\{SF.64.1.0,LTT.64.3.2.0}
 =SF.64.1.4 /\{SF.64.1.0,PT.64.2.0}
 
-=SF.64.2.0 ~@(|%</ab>, ~</ba>, %|</ab>) # complement of strings with 2 abs without a ba between them
-=SF.64.2.1 ~@(|%</ba>, ~</ab>, %|</ba>) # complement of strings with 2 bas without an ab between them
+=SF.64.2.0 ~@(|%</a /b>, ~</b /a>, %|</a /b>) # complement of strings with 2 abs without a ba between them
+=SF.64.2.1 ~@(|%</b /a>, ~</a /b>, %|</b /a>) # complement of strings with 2 bas without an ab between them
 =SF.64.2.2 /\{SF.64.2.0,SF.64.2.1}
 =SF.64.2.3 /\{SF.64.2.0,LTT.64.3.2.0}
 =SF.64.2.4 /\{SF.64.2.0,PT.64.2.0}

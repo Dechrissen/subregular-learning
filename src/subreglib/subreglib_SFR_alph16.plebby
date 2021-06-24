@@ -73,8 +73,8 @@
 =SF.16.1.3 /\{SF.16.1.0,LTT.16.3.2.0}
 =SF.16.1.4 /\{SF.16.1.0,PT.16.2.0}
 
-=SF.16.2.0 ~@(|%</ab>, ~</ba>, %|</ab>) # complement of strings with 2 abs without a ba between them
-=SF.16.2.1 ~@(|%</ba>, ~</ab>, %|</ba>) # complement of strings with 2 bas without an ab between them
+=SF.16.2.0 ~@(|%</a /b>, ~</b /a>, %|</a /b>) # complement of strings with 2 abs without a ba between them
+=SF.16.2.1 ~@(|%</b /a>, ~</a /b>, %|</b /a>) # complement of strings with 2 bas without an ab between them
 =SF.16.2.2 /\{SF.16.2.0,SF.16.2.1}
 =SF.16.2.3 /\{SF.16.2.0,LTT.16.3.2.0}
 =SF.16.2.4 /\{SF.16.2.0,PT.16.2.0}
