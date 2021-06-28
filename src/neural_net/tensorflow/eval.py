@@ -68,7 +68,7 @@ if __name__ == "__main__":
     tpr = []
     fpr = []
     for thresh in np.linspace(0, 1, num=100):
-        sys.stdout.write("\rROC: Working on threshold " + str(thresh // 0.01 / 100))
+        sys.stdout.write("\rROC: Working on threshold " + str(thresh // 0.01 / 100) + ' / 1.00 ')
         sys.stdout.flush()
         preds = probs[:, 0] > thresh
         TP = sum(preds & true_labels)
@@ -77,7 +77,7 @@ if __name__ == "__main__":
         FN = sum(~preds & true_labels)
         tpr += [TP/(TP+FN)]
         fpr += [FP/(FP+TN)]
-    sys.stdout.write("\rROC: done" + 22*' ' + '\n')
+    sys.stdout.write("\rROC: done" + 30*' ' + '\n')
     AUC = round(auc(fpr, tpr), 5)
     #print('AUC: ', AUC)
 

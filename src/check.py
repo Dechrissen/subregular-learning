@@ -86,7 +86,7 @@ def check_all():
     tags = open("./tags.txt").readlines()
 
     for x in tags:
-        check(x)
+        check(x[:-1])
         print()
     return True
 

@@ -5,21 +5,7 @@ alph64 = c(letters, LETTERS, 0:9, '#', '$')
 for (i in c('4', '16', '64')) {
      filename = paste('samples/alph', i, '_sample.txt',sep='')
      alph = get(paste('alph',i,sep=''))
-     cat(alph, file=filename, sep="\n")
-     if (i=='4' || i=='16') {
-          C = apply(expand.grid(alph, alph), 1, paste)
-          cat(paste(C[1,], C[2,], sep=''), file=filename, sep="\n", append=TRUE)
-          if (i=='4') {
-               C = apply(expand.grid(alph, alph, alph), 1, paste)
-               cat(paste(C[1,], C[2,], C[3,], sep=''), file=filename,
-                   sep="\n", append=TRUE)
-               C = apply(expand.grid(alph, alph, alph, alph), 1, paste)
-               cat(paste(C[1,], C[2,], C[3,], C[4,], sep=''), file=filename,
-                   sep="\n", append=TRUE)
-          }
-     }
-     strt.idx = list('4'=5, '16'=3, '64'=2)[[i]]
-     for (j in strt.idx:100) {
+     for (j in 5:200) {
           cat('Sampling strings of length', j, 'in alphabet', i, '\n')
           strlist = c()
           while (length(strlist) < 1000) {

@@ -22,7 +22,7 @@ do
   LANGS+=($line)
 done < $filename
 
-DATA_SIZES=( 1k 10k 100k )
+DATA_SIZES=( 1k 10k ) # may add 100k
 DROPOUTS=( NoDrop )
 DIRECTIONS=( Uni ) # may add Bi
 TESTS=( Test1 Test2 Test3 )
