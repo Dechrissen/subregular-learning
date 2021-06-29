@@ -47,17 +47,29 @@ if __name__ == "__main__":
                 TN += 1
                 
     # True Positive Rate (TPR) aka Hit Rate aka Recall aka Sensitivity = TP / (TP + FN)
-    TPR = TP/(TP+FN)
+    if TP+FN==0:
+        TPR=1
+    else:
+        TPR = TP/(TP+FN)
     # False Positive Rate(FPR) aka False Alarm Rate = 1 - Specificity = 1 - (TN / (TN + FP))
-    FPR = 1 - (TN / (TN + FP))
+    if TN+FP==0:
+        FPR=1
+    else:
+        FPR = FP / (TN + FP)
     # Accuracy = (TP + TN) / (TP + TN + FP + FN)
     accuracy = (TP + TN) / (TP + TN + FP + FN)
     # Error Rate = 1 – accuracy or (FP + FN) / (TP + TN + FP + FN)
     error_rate = (FP + FN) / (TP + TN + FP + FN)
     # Precision = TP / (TP + FP)
-    precision = TP / (TP + FP)
+    if TP+FP==0:
+        precision=1
+    else:
+        precision = TP / (TP + FP)
     # F-measure: 2 / ( (1 / Precision) + (1 / Recall) )
-    F_score = 2 / ((1/precision) + (1/TPR))
+    if TP+FP+FN==0:
+        F_score=1
+    else:
+        F_score = TP/(TP+0.5*(FP+FN))
 
     probs_file = args.predict_file.replace('_pred.txt', '_probs.txt')
     with open(probs_file, 'r') as f:
@@ -75,10 +87,16 @@ if __name__ == "__main__":
         TN = sum(~preds & ~true_labels)
         FP = sum(preds & ~true_labels)
         FN = sum(~preds & true_labels)
-        tpr += [TP/(TP+FN)]
-        fpr += [FP/(FP+TN)]
+        if TP+FN==0:
+            tpr += [1]
+        else:
+            tpr += [TP/(TP+FN)]
+        if TN+FP==0:
+            fpr += [1]
+        else:
+            fpr += [FP/(FP+TN)]
     sys.stdout.write("\rROC: done" + 30*' ' + '\n')
-    AUC = round(auc(fpr, tpr), 5)
+    AUC = abs(round(auc(fpr, tpr), 5))
     #print('AUC: ', AUC)
 
     fig, ax = plt.subplots()
