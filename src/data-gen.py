@@ -30,14 +30,37 @@ zero.optimize()
 
 # Defining alphabet
 
-alpha = "abcd"
-sigma = zero
-for x in list(alpha):
-    sigma = A(x) | sigma
-sigma.optimize()
+# alpha = "abcd"
+# sigma = zero
+# for x in list(alpha):
+#     sigma = A(x) | sigma
+# sigma.optimize()
 
-# sigmaStar accepts all strings made of the characters in alpha
-sigmaStar = (sigma.star).optimize()
+# # sigmaStar accepts all strings made of the characters in alpha
+# sigmaStar = (sigma.star).optimize()
+
+
+# FUNCTIONS that take an fsa and return its alphabet, sigma and sigmastar, respectively
+
+def alph(fsa):
+    symtable = fsa.input_symbols()
+    i = iter(symtable)
+    next(i) # this skips over epsilon which is always
+            # the first entry in the symbol table
+    temp = ''
+    for sympair in i:  # the table entries are pairs of the form (num,symbol)
+        temp = temp + sympair[1]
+    return temp
+
+def sigma(fsa):
+    chars = alph(fsa)
+    s = zero
+    for c in chars:
+        s = A(c) | s
+    return s.optimize()
+
+def sigmastar(fsa):
+    return (sigma(fsa).star).optimize()
 
 # Utility function that outputs all strings of an fsa
 
@@ -53,18 +76,21 @@ def list_string_set(acceptor):
 # functions for determining the border and generating adversial pairs
 ################
 
-# defining edit distance transducer
-edits = zero
-for x in list(alpha): edits = T(x,"") | edits  # deletion
-for x in list(alpha): edits = T("",x) | edits  # insertion
-for x in list(alpha):
-    for y in list(alpha):
-        if x != y:
-            edits = T(x,y) | edits             # substitution
-edits.optimize()
-editExactly1 = sigmaStar + edits + sigmaStar
-# a transducer that produces all strings that are within 1 edit of its input string
-editExactly1.optimize()
+# defining edit distance transducer given an alphabet
+def editExactly1(fsa):
+    chars = alph(fsa)
+    ss = sigmastar(fsa)
+    edits = zero
+    for x in chars: edits = T(x,"") | edits  # deletion
+    for x in chars: edits = T("",x) | edits  # insertion
+    for x in chars:
+        for y in chars:
+            if x != y:
+                edits = T(x,y) | edits       # substitution
+    edits.optimize()
+    edit1transducer = ss + edits + ss
+    # a transducer that produces all strings that are within 1 edit of its input string
+    return edit1transducer.optimize()
 
 def border(fsa,n):
     '''
@@ -72,11 +98,15 @@ def border(fsa,n):
     the fst converts strings of length n in the language to "border" strings,
     which are 1 edit off from being in the language
     '''
-    cofsa = pynini.difference(sigmaStar,fsa)
+    chars = alph(fsa)
+    s = sigma(fsa)
+    ss = sigmastar(fsa)
+    editTransducer = editExactly1(chars)
+    cofsa = pynini.difference(ss,fsa)
     cofsa.optimize()
-    bpairs = fsa @ editExactly1 @ cofsa     # this is the key insight which gives entire border
+    bpairs = fsa @ editTransducer @ cofsa     # this is the key insight which gives entire border
     bpairs.optimize()
-    sigmaN = pynini.closure(sigma,n,n)
+    sigmaN = pynini.closure(s,n,n)
     sigmaN.optimize()
     bpairsN = sigmaN @ bpairs               # here we limit the border to input words of length=n
     bpairsN.optimize()
@@ -146,9 +176,10 @@ def by_len(ex, f, count):
 # with length from min_len to max_len
 
 def get_pos_string(fsa, min_len, max_len):
+    s = sigma(fsa)
     fsa_dict = {}
     for i in range(min_len, max_len + 1):
-        fsa_dict[i] = pynini.intersect(fsa, pynini.closure(sigma, i, i))
+        fsa_dict[i] = pynini.intersect(fsa, pynini.closure(s, i, i))
         # print(list_string_set(fsa_dict[i]))
     return fsa_dict
 
@@ -157,9 +188,10 @@ def get_pos_string(fsa, min_len, max_len):
 # of an fsa with length from min_len to max_len
 
 def get_neg_string(fsa, min_len, max_len):
+    s = sigma(fsa)
     fsa_dict = {}
     for i in range(min_len, max_len + 1):
-        fsa_dict[i] = pynini.difference(pynini.closure(sigma, i, i), fsa)
+        fsa_dict[i] = pynini.difference(pynini.closure(s, i, i), fsa)
         # print(list_string_set(fsa_dict[i]))
     return fsa_dict
 
@@ -361,9 +393,9 @@ def construct_all():
     return True'''
 
 
-############################################
-####main body (util functions finished)#####
-############################################
+# ############################################
+# ####main body (util functions finished)#####
+# ############################################
 
 
 path_to_library = pathlib.Path(__file__).parent.absolute().parent
@@ -425,3 +457,5 @@ for x in tags:
     print("Finished", x)
 
 print("Finished!")
+
+
