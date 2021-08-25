@@ -10,7 +10,7 @@ trap abort SIGINT
 # ------------------ PARAMETERS TO EDIT -----------------------
 # -------------------------------------------------------------
 UNIVERSAL_ARGS=( --batch-size 64 --epochs 30 --embed-dim 100 )
-rnn_type="simple" # simple / gru / lstm
+rnn_type="lstm" # simple / gru / lstm
 # -------------------------------------------------------------
 
 

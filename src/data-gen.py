@@ -66,7 +66,7 @@ def sigmastar(fsa):
 
 def list_string_set(acceptor):
     my_list = []
-    paths = acceptor.paths()
+    paths = acceptor.paths(input_token_type="utf8", output_token_type="utf8")
     for s in paths.ostrings():
         my_list.append(s)
     my_list.sort(key=len)
@@ -101,7 +101,7 @@ def border(fsa,n):
     chars = alph(fsa)
     s = sigma(fsa)
     ss = sigmastar(fsa)
-    editTransducer = editExactly1(chars)
+    editTransducer = editExactly1(fsa)
     cofsa = pynini.difference(ss,fsa)
     cofsa.optimize()
     bpairs = fsa @ editTransducer @ cofsa     # this is the key insight which gives entire border

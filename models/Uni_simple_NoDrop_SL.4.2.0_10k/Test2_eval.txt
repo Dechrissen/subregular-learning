@@ -1,8 +1,0 @@
-Prediction file: models/Uni_simple_NoDrop_SL.4.2.0_10k/Test2_pred.txt
-TPR: 1.0
-FPR: 0.057599999999999985
-Accuracy: 0.9712
-Error rate: 0.0288
-Precision: 0.9455370650529501
-F-score: 0.9720062208398135
-AUC: 0.9731
