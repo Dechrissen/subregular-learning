@@ -113,7 +113,7 @@ def border(fsa,n):
     return bpairsN
 
 
-def build (border, lang, lang_name, n):
+def build (border, lang, lang_name, n, length):
     '''
     A function that creates the adv_data files that are in /data_gen/ ;
     It gets the set of "border" strings from `border()`
@@ -128,10 +128,12 @@ def build (border, lang, lang_name, n):
     n : int
         length of the strings used to generate the border strings
     '''
+    tests = {'short':'3', 'long':'4'}
+    test  = tests[length]
     path_to_library = str(pathlib.Path(__file__).parent.absolute().parent)
-    test3_files = [path_to_library+"/data_gen/100k/"+lang_name+"_Test3.txt",
-                   path_to_library+"/data_gen/10k/"+lang_name+"_Test3.txt",
-                   path_to_library+"/data_gen/1k/"+lang_name+"_Test3.txt"]
+    test3_files = [path_to_library+"/data_gen/100k/"+lang_name+"_Test" + test + ".txt",
+                   path_to_library+"/data_gen/10k/"+lang_name+"_Test" + test + ".txt",
+                   path_to_library+"/data_gen/1k/"+lang_name+"_Test" + test + ".txt"]
     f = [open(test3_files[0], "w+"),
          open(test3_files[1], "w+"),
          open(test3_files[2], "w+")]
@@ -149,9 +151,9 @@ def build (border, lang, lang_name, n):
 
     return count
 
-def create_adversarial_examples(pos_dict, fsa, lang_name, min_len, max_len):
-    for i in range(ls_min_len,ls_max_len+1):
-        c = build(border,fsa,lang_name, i)
+def create_adversarial_examples(pos_dict, fsa, lang_name, min_len, max_len, length):
+    for i in range(min_len,max_len+1):
+        c = build(border,fsa,lang_name, i, length=length)
     return c
 
 def by_len(ex, f, count):
@@ -441,6 +443,8 @@ for x in tags:
     pos_dict, neg_dict = create_data_no_duplicate(dir_name + "_Test1.txt", pos_dict, neg_dict, ss_min_len, ss_max_len, test1_pos_num)
     prune(x + "_Test1.txt", dir_name + "_Test1.txt")
 
+    # creat test_3 (short adversarial examples)
+    create_adversarial_examples(pos_dict, my_fsa, x, ss_min_len, ss_max_len, length='short')
 
     # generate long strings
     pos_dict = get_pos_string(my_fsa, ls_min_len, ls_max_len)
@@ -450,9 +454,8 @@ for x in tags:
     create_data_no_duplicate(dir_name + "_Test2.txt", pos_dict, neg_dict, ls_min_len, ls_max_len, test2_pos_num)
     prune(x + "_Test2.txt", dir_name + "_Test2.txt")
 
-
-    # create test_3 (adversarial examples)
-    create_adversarial_examples(pos_dict, my_fsa, x, ls_min_len, ls_max_len)
+    # create test_4 (long adversarial examples)
+    create_adversarial_examples(pos_dict, my_fsa, x, ls_min_len, ls_max_len, length='long')
 
     print("Finished", x)
 
