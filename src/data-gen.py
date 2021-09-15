@@ -92,7 +92,7 @@ def editExactly1(fsa):
     # a transducer that produces all strings that are within 1 edit of its input string
     return edit1transducer.optimize()
 
-def border(fsa,n):
+def border(pos_dict, neg_dict, fsa,n):
     '''
     A function that takes an fsa and produces an fst;
     the fst converts strings of length n in the language to "border" strings,
@@ -106,14 +106,16 @@ def border(fsa,n):
     cofsa.optimize()
     bpairs = fsa @ editTransducer @ cofsa     # this is the key insight which gives entire border
     bpairs.optimize()
-    sigmaN = pynini.closure(s,n,n)
-    sigmaN.optimize()
-    bpairsN = sigmaN @ bpairs               # here we limit the border to input words of length=n
+    pos_availN = pos_dict[n]
+    pos_availN.optimize()
+    neg_availN = neg_dict[n] + neg_dict[n-1] + neg_dict[n+1]
+    neg_availN.optimize()
+    bpairsN = pos_availN @ bpairs @ neg_availN               # here we limit the border to input words of length=n
     bpairsN.optimize()
     return bpairsN
 
 
-def build (lang, lang_name, n, length):
+def build (pos_dict, neg_dict, lang, lang_name, n, length):
     '''
     A function that creates the adv_data files that are in /data_gen/ ;
     It gets the set of "border" strings from `border()`
@@ -121,12 +123,14 @@ def build (lang, lang_name, n, length):
 
     Inputs:
     -------
-    border : fst
-        the fsa that recognizes border strings
+    pos_dict
+    neg_dict
     lang : fst
         the fsa that recognizes the language in question
+    lang_name
     n : int
         length of the strings used to generate the border strings
+    length
     '''
     tests = {'short':'3', 'long':'4'}
     test  = tests[length]
@@ -144,16 +148,16 @@ def build (lang, lang_name, n, length):
     for i in range(5):
         # writes 2*xk/10 random strings to the files in f
         # border(lang, n) creates border pairs for length n
-        by_len(border(lang, n), f, count)
+        by_len(border(pos_dict, neg_dict, lang, n), f, count)
 
     for i in range(3):
         f[i].close()
 
     return count
 
-def create_adversarial_examples(fsa, lang_name, min_len, max_len, length):
+def create_adversarial_examples(pos_dict, neg_dict, fsa, lang_name, min_len, max_len, length):
     for i in range(min_len,max_len+1):
-        c = build(fsa,lang_name, i, length=length)
+        c = build(pos_dict, neg_dict, fsa,lang_name, i, length=length)
     return c
 
 def by_len(ex, f, count):
@@ -444,7 +448,7 @@ for x in tags:
     prune(x + "_Test1.txt", dir_name + "_Test1.txt")
 
     # creat test_3 (short adversarial examples)
-    create_adversarial_examples(my_fsa, x, ss_min_len, ss_max_len, length='short')
+    create_adversarial_examples(pos_dict, neg_dict, my_fsa, x, ss_min_len, ss_max_len, length='short')
 
     # generate long strings
     pos_dict = get_pos_string(my_fsa, ls_min_len, ls_max_len)
@@ -455,7 +459,7 @@ for x in tags:
     prune(x + "_Test2.txt", dir_name + "_Test2.txt")
 
     # create test_4 (long adversarial examples)
-    create_adversarial_examples(my_fsa, x, ls_min_len, ls_max_len, length='long')
+    create_adversarial_examples(pos_dict, neg_dict, my_fsa, x, ls_min_len, ls_max_len, length='long')
 
     print("Finished", x)
 
