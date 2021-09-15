@@ -430,8 +430,8 @@ for x in tags:
 
 
     #FIRST - set up dictionary
-    pos_dict = get_pos_string(my_fsa, ss_min_len, ss_max_len)
-    neg_dict = get_neg_string(my_fsa, ss_min_len, ss_max_len)
+    pos_dict = get_pos_string(my_fsa, ss_min_len-1, ss_max_len+1)
+    neg_dict = get_neg_string(my_fsa, ss_min_len-1, ss_max_len+1)
 
 
     # create training data with duplicates
@@ -451,8 +451,8 @@ for x in tags:
     create_adversarial_examples(pos_dict, neg_dict, my_fsa, x, ss_min_len, ss_max_len, length='short')
 
     # generate long strings
-    pos_dict = get_pos_string(my_fsa, ls_min_len, ls_max_len)
-    neg_dict = get_neg_string(my_fsa, ls_min_len, ls_max_len)
+    pos_dict = get_pos_string(my_fsa, ls_min_len-1, ls_max_len+1)
+    neg_dict = get_neg_string(my_fsa, ls_min_len-1, ls_max_len+1)
 
     # create test_2 (no duplicates)
     create_data_no_duplicate(dir_name + "_Test2.txt", pos_dict, neg_dict, ls_min_len, ls_max_len, test2_pos_num)
