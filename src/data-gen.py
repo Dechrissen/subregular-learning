@@ -108,7 +108,7 @@ def border(pos_dict, neg_dict, fsa,n):
     bpairs.optimize()
     pos_availN = pos_dict[n]
     pos_availN.optimize()
-    neg_availN = neg_dict[n] + neg_dict[n-1] + neg_dict[n+1]
+    neg_availN = neg_dict[n] | neg_dict[n-1] | neg_dict[n+1]
     neg_availN.optimize()
     bpairsN = pos_availN @ bpairs @ neg_availN               # here we limit the border to input words of length=n
     bpairsN.optimize()
