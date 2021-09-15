@@ -131,12 +131,12 @@ def build (border, lang, lang_name, n, length):
     tests = {'short':'3', 'long':'4'}
     test  = tests[length]
     path_to_library = str(pathlib.Path(__file__).parent.absolute().parent)
-    test3_files = [path_to_library+"/data_gen/100k/"+lang_name+"_Test" + test + ".txt",
+    test_files = [path_to_library+"/data_gen/100k/"+lang_name+"_Test" + test + ".txt",
                    path_to_library+"/data_gen/10k/"+lang_name+"_Test" + test + ".txt",
                    path_to_library+"/data_gen/1k/"+lang_name+"_Test" + test + ".txt"]
-    f = [open(test3_files[0], "w+"),
-         open(test3_files[1], "w+"),
-         open(test3_files[2], "w+")]
+    f = [open(test_files[0], "w+"),
+         open(test_files[1], "w+"),
+         open(test_files[2], "w+")]
 
     count = 0
 
