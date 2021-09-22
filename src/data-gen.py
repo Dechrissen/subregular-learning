@@ -17,6 +17,10 @@ import numpy as np
 import random
 import pathlib
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--lang', type=str, required=True)
+args = parser.parse_args()
+x = args.lang
 
 def A(s):
     return pynini.acceptor(s, token_type="utf8")
@@ -410,59 +414,53 @@ tags = open(path_to_library / pathlib.Path("tags.txt"))
 tags = tags.readlines()
 
 # define hyper-parameters
-for x in tags:
-    print('\nStarting on', x)
-    my_fsa = pynini.Fst.read(str(path_to_library) + "/src/fstlib/fst_format/" + x[:-1] + ".fst")
-    x = x[:-1]
-    ss_min_len = 10
-    ss_max_len = 19
-    train_pos_num = 5000
-    dev_pos_num = 5000
+print('\nStarting on', x)
+my_fsa = pynini.Fst.read(str(path_to_library) + "/src/fstlib/fst_format/" + x + ".fst")
+ss_min_len = 10
+ss_max_len = 19
+train_pos_num = 5000
+dev_pos_num = 5000
 
-    test1_pos_num = 5000
-    test2_pos_num = 2500
-    test3_pos_num = 5000
+test1_pos_num = 5000
+test2_pos_num = 2500
+test3_pos_num = 5000
 
-    ls_min_len = 31
-    ls_max_len = 50
+ls_min_len = 31
+ls_max_len = 50
 
-    dir_name = str(path_to_library)+"/data_gen/100k/" + x
+dir_name = str(path_to_library)+"/data_gen/100k/" + x
 
 
-    #FIRST - set up dictionary
-    pos_dict = get_pos_string(my_fsa, ss_min_len-1, ss_max_len+1)
-    neg_dict = get_neg_string(my_fsa, ss_min_len-1, ss_max_len+1)
+#FIRST - set up dictionary
+pos_dict = get_pos_string(my_fsa, ss_min_len-1, ss_max_len+1)
+neg_dict = get_neg_string(my_fsa, ss_min_len-1, ss_max_len+1)
 
 
-    # create training data with duplicates
-    # start with a file that has 100k words. from there, prune to have 10k and 1k from that file.
-    pos_dict, neg_dict = \
-    create_data_with_duplicate(dir_name + "_Training.txt", pos_dict, neg_dict, ss_min_len, ss_max_len, train_pos_num, 1)
-    prune(x + "_Training.txt", dir_name + "_Training.txt")
+# create training data with duplicates
+# start with a file that has 100k words. from there, prune to have 10k and 1k from that file.
+pos_dict, neg_dict = \
+create_data_with_duplicate(dir_name + "_Training.txt", pos_dict, neg_dict, ss_min_len, ss_max_len, train_pos_num, 1)
+prune(x + "_Training.txt", dir_name + "_Training.txt")
 
-    # create dev and test_1 (no duplicates, no overlap in train/dev/test data)
-    pos_dict, neg_dict = create_data_no_duplicate(dir_name + "_Dev.txt", pos_dict, neg_dict, ss_min_len, ss_max_len, dev_pos_num)
-    prune(x + "_Dev.txt", dir_name + "_Dev.txt")
+# create dev and test_1 (no duplicates, no overlap in train/dev/test data)
+pos_dict, neg_dict = create_data_no_duplicate(dir_name + "_Dev.txt", pos_dict, neg_dict, ss_min_len, ss_max_len, dev_pos_num)
+prune(x + "_Dev.txt", dir_name + "_Dev.txt")
 
-    pos_dict, neg_dict = create_data_no_duplicate(dir_name + "_Test1.txt", pos_dict, neg_dict, ss_min_len, ss_max_len, test1_pos_num)
-    prune(x + "_Test1.txt", dir_name + "_Test1.txt")
+pos_dict, neg_dict = create_data_no_duplicate(dir_name + "_Test1.txt", pos_dict, neg_dict, ss_min_len, ss_max_len, test1_pos_num)
+prune(x + "_Test1.txt", dir_name + "_Test1.txt")
 
-    # creat test_3 (short adversarial examples)
-    create_adversarial_examples(pos_dict, neg_dict, my_fsa, x, ss_min_len, ss_max_len, length='short')
+# creat test_3 (short adversarial examples)
+create_adversarial_examples(pos_dict, neg_dict, my_fsa, x, ss_min_len, ss_max_len, length='short')
 
-    # generate long strings
-    pos_dict = get_pos_string(my_fsa, ls_min_len-1, ls_max_len+1)
-    neg_dict = get_neg_string(my_fsa, ls_min_len-1, ls_max_len+1)
+# generate long strings
+pos_dict = get_pos_string(my_fsa, ls_min_len-1, ls_max_len+1)
+neg_dict = get_neg_string(my_fsa, ls_min_len-1, ls_max_len+1)
 
-    # create test_2 (no duplicates)
-    create_data_no_duplicate(dir_name + "_Test2.txt", pos_dict, neg_dict, ls_min_len, ls_max_len, test2_pos_num)
-    prune(x + "_Test2.txt", dir_name + "_Test2.txt")
+# create test_2 (no duplicates)
+create_data_no_duplicate(dir_name + "_Test2.txt", pos_dict, neg_dict, ls_min_len, ls_max_len, test2_pos_num)
+prune(x + "_Test2.txt", dir_name + "_Test2.txt")
 
-    # create test_4 (long adversarial examples)
-    create_adversarial_examples(pos_dict, neg_dict, my_fsa, x, ls_min_len, ls_max_len, length='long')
+# create test_4 (long adversarial examples)
+create_adversarial_examples(pos_dict, neg_dict, my_fsa, x, ls_min_len, ls_max_len, length='long')
 
-    print("Finished", x)
-
-print("Finished!")
-
-
+print("Finished", x)
