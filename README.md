@@ -173,7 +173,7 @@ Shibata, the researchers are based at Stony Brook University.
 - [Emily Peterson (Ling, CompLing MA 2020)](https://github.com/emkp)
 - Chihiro Shibata (Professor, Tokyo University of Technology CS)
 - [Cody St. Clair (Ling MA 2020)](https://github.com/cody-stclair)
-- [Sam Van Der Poel (current AMS MA)](https://github.com/samvanderpoel)
+- [Sam van der Poel (current AMS MA)](https://github.com/samvanderpoel)
 - Rahul Verma (CS, MS 2018)
 
 Most recently, this repository is a continuation by Derek Andersen of the work done by Peterson, St. Clair, and Chau [here](https://github.com/emkp/CSE538_FinalProject). A summary of the results from their work is in `/docs/2020_report.pdf`. They themselves forked [Kostyszyn's repo](https://github.com/kkostyszyn/SBFST_2019). Kostyszyn inherited the code from Gao, and Verma originated the code base for the project.
