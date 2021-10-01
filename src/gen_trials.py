@@ -7,8 +7,8 @@ if __name__ == "__main__":
 	
 	print("Generating list....")
 	for tag in f:
-		for length in ['1', '10', '100']:
-			for model in ['RNN', 'LSTM', 'GRU']:
+		for length in ['1k', '10k', '100k']:
+			for model in ['simple', 'lstm', 'gru']:
 				output_file.write(tag[:-1] + " " + length + " " + model + "\n")
 				
 	output_file.close()
