@@ -31,7 +31,7 @@ elif datagen:
         data100 = [s.split('_')[0] for s in os.listdir(os.path.join(cwd, 'data_gen/100k'))]
         langs_not_done = []
         for l in langs:
-            if data1.count(l) != 5 or data10.count(l) != 5 or data100.count(l) != 5:
+            if data1.count(l) != 6 or data10.count(l) != 6 or data100.count(l) != 6:
                 langs_not_done.append(l)
         out = [l + '\n' for l in langs_not_done]
         f.seek(0)
