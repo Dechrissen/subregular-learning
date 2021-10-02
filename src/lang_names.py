@@ -1,7 +1,7 @@
 """
 Performs one of two tasks:
     - writes language names to tags.txt for which an fst exists in src/fstlib/fst_format
-      (supply argument --allfst)
+      (supply no argument)
     - writes language names to tags.txt for which data generation is not compelete
       (supply argument --datagen)
 """
@@ -10,19 +10,16 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--allfst', dest='allfst', action='store_true')
 parser.add_argument('--datagen', dest='datagen', action='store_true')
-parser.set_defaults(allfst=False, datagen=False)
+parser.set_defaults(datagen=False)
 args = parser.parse_args()
-allfst = args.allfst
 datagen = args.datagen
 
-if allfst:
-    with open('tags.txt', 'w') as f:
-        lang_names = sorted([filename[:-4] for filename in os.listdir("src/fstlib/fst_format/")])
-        f.write('\n'.join(lang_names))
-        f.write('\n')
-elif datagen:
+with open('tags.txt', 'w') as f:
+    lang_names = sorted([filename[:-4] for filename in os.listdir("src/fstlib/fst_format/")])
+    f.write('\n'.join(lang_names))
+    f.write('\n')
+if datagen:
     cwd = os.getcwd()
     with open('tags.txt', 'r+') as f:
         langs = [l[:-1] for l in f.readlines()]
@@ -37,5 +34,3 @@ elif datagen:
         f.seek(0)
         f.writelines(out)
         f.truncate()
-else:
-    Warning('No argument supplied.')
