@@ -19,12 +19,14 @@ args = parser.parse_args()
 datagen = args.datagen
 train = args.train
 
-with open('tags.txt', 'w') as f:
+fname = 'traintags.txt' if train else 'tags.txt'
+
+with open(fname, 'w') as f:
     lang_names = sorted([filename[:-4] for filename in os.listdir("src/fstlib/fst_format/")])
     out = [l + '\n' for l in lang_names]
     f.writelines(out)
 cwd = os.getcwd()
-with open('tags.txt', 'r+') as f:
+with open(fname, 'r+') as f:
     langs = [l[:-1] for l in f.readlines()]
     data1   = [s.split('_')[0] for s in os.listdir(os.path.join(cwd, 'data_gen/1k'))]
     data10  = [s.split('_')[0] for s in os.listdir(os.path.join(cwd, 'data_gen/10k'))]
