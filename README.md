@@ -22,7 +22,7 @@ The workflow of this codebase was tested on Linux systems using Conda, available
 First, install Conda. Next, download this repository with the green 'Code' button or via `git`:
 
 ```cmd
-git clone https://github.com/Dechrissen/subregular-learning.git
+git clone https://github.com/heinz-jeffrey/subregular-learning.git
 ```
 Create a new environment <environment_name> (call it `subreg`, for example) like below, and activate the environment. The environment can be closed when you're finished with `conda deactivate`.
 ```cmd
