@@ -171,7 +171,7 @@ Shibata, the researchers are based at Stony Brook University.
 - [Dakotah Lambert (Ling, current PhD)](https://github.com/vvulpes0)
 - [Kalina Kostyszyn (Ling, current PhD)](https://github.com/kkostyszyn)
 - [Emily Peterson (Ling, CompLing MA 2020)](https://github.com/emkp)
-- Chihiro Shibata (Professor, Tokyo University of Technology CS)
+- Chihiro Shibata (Professor, Hosei University)
 - [Cody St. Clair (Ling MA 2020)](https://github.com/cody-stclair)
 - [Sam van der Poel (current AMS MA)](https://github.com/samvanderpoel)
 - Rahul Verma (CS, MS 2018)
