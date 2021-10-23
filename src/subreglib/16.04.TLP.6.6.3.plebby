@@ -1,0 +1,3 @@
+:import "syms16.plebby"
+[a,b,c,d]/\{~<a a a a a a,b b b b b b,c c c c c c,d d d d d d,a a a a a a,b b b b b b>,\/{<a b a b a b,b a b a b a,a b a b a b,b a b a b a,a b a b a b,b a b a b a>,<c d c d c d,d c d c d c,c d c d c d,d c d c d c,c d c d c d,d c d c d c>}}
+:writeATT "../fstlib/att_format/16.04.TLP.6.6.3.att" _ _ it

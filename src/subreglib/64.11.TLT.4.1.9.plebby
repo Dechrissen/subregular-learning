@@ -1,0 +1,3 @@
+:import "syms64.plebby"
+[a,b,c,d,e,f,g,h,i,j,k]/\{%|<a a a>,~/\{\/{~~\/{<a a a a>},~\/{<a b a b>,<b a b a>,<c d c d>,<d c d c>,<e f e f>,<f e f e>}},\/{~~\/{<a b a b>,<b a b a>,<c d c d>,<d c d c>,<e f e f>,<f e f e>},~\/{<a a a a>}}}}
+:writeATT "../fstlib/att_format/64.11.TLT.4.1.9.att" _ _ it
