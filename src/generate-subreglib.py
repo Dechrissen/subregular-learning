@@ -308,7 +308,7 @@ def main():
         # Star-Free
         sf3=("@(|%<" + symbols[base] + ">,"
              + gapAlt(base,2,base)
-             + ",%|<" + symbols[base] + ">")
+             + ",%|<" + symbols[base] + ">)")
         writeFile(sigma,sigma,"SF",0,0,0,parityFlipShort(base+1))
         writeFile(sigma,sigma,"SF",0,0,1,parityFlipLong(base+1))
         writeFile(sigma,sigma,"SF",0,0,2,dxbb2(base))
