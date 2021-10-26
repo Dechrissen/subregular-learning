@@ -273,7 +273,7 @@ def dxbb2(base):
     for i in range(0,base,2):
         x = "%||%<" + symbols[i] + ">"
         y = "%||%<" + symbols[i+1] + ">"
-        xystar = "*%||%<" + symbols[i] + "," + symbols[i+1] + ">"
+        xystar = "*%||%<" + symbols[i] + " " + symbols[i+1] + ">"
         a.append("@(%s,*@(%s,%s,%s))" % (dot,x,xystar,y))
     return union(*a)
 
