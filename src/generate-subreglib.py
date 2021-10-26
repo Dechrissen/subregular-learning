@@ -33,14 +33,14 @@ def universalOCP(syms, width=2, sep=" "):
     consisting of all the same symbol,
     for the given number of symbols.
 
-     syms: the number of symbols
+     syms: the number of symbols (times two)
     width: the size of the factor
       sep: " " for successor or "," for general precedence
     """
     if syms == 0:
         return "<>"
     a=[]
-    for i in range(syms):
+    for i in range(0,syms,2):
         a.append("<" + sep.join(width*[symbols[i]]) + ">")
     return "~\\/{" + ",".join(a) + "}"
 
@@ -483,7 +483,9 @@ def main():
                               k,","))
 
                 # (Tier-Based) Locally Threshold Testable
-                for t in [3,5]:
+                for t in [2,3,5]:
+                    if (k == 6 and t != 2) or (k != 2 and t == 5):
+                        continue
                     writeFile(sigma,tau,"LTT",k,t,0,
                               leastn(t,ak(k)))
                     writeFile(sigma,tau,"LTT",k,t,1,
