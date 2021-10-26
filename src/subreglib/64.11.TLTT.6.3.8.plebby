@@ -1,3 +1,0 @@
-:import "syms64.plebby"
-[a,b,c,d,e,f,g,h,i,j,k]/\{%|<a a a a a>,\/{/\{\/{<a b a b a b>,<c d c d c d>,<e f e f e f>},~@(\/{<a b a b a b>,<c d c d c d>,<e f e f e f>},\/{<a b a b a b>,<c d c d c d>,<e f e f e f>})},@(\/{<a b a b a b>,<c d c d c d>,<e f e f e f>},\/{<a b a b a b>,<c d c d c d>,<e f e f e f>},\/{<a b a b a b>,<c d c d c d>,<e f e f e f>})}}
-:writeATT "../fstlib/att_format/64.11.TLTT.6.3.8.att" _ _ it

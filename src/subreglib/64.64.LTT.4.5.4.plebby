@@ -1,3 +1,0 @@
-:import "syms64.plebby"
-/\{@(<a a a a>,<a a a a>,<a a a a>,<a a a a>,<a a a a>),~@(\/{<a b a b>,<c d c d>,<e f e f>},\/{<a b a b>,<c d c d>,<e f e f>},\/{<a b a b>,<c d c d>,<e f e f>},\/{<a b a b>,<c d c d>,<e f e f>},\/{<a b a b>,<c d c d>,<e f e f>})}
-:writeATT "../fstlib/att_format/64.64.LTT.4.5.4.att" _ _ it

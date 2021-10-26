@@ -209,18 +209,12 @@ def gapAlt(syms,k,j=None):
     return "~<" + ",".join((j*list(map(lambda x:" ".join(k*[x]),
                                       symbols[:syms])))[:j]) + ">"
 
-def altGapAlt(syms,k):
+def lp(xs):
     """
-    Require (ab)^(k/2) followed by (ba)^(k/2), cycled,
-    restricted to k-many blocks
-    OR (cd)^(k/2) followed by (dc)^(k/2), as above, etc
+    xs: a list of lists
+    each inner list is a substring part and they are separated by gaps
     """
-    a=[]
-    for i in range(0,syms,2):
-        x=" ".join((k//2)*[symbols[i],symbols[i+1]])
-        y=" ".join((k//2)*[symbols[i+1],symbols[i]])
-        a.append("<" + ",".join((k//2)*[x,y]) + ">")
-    return "\\/{" + ",".join(a) + "}"
+    return "<" + ",".join(list(map(lambda s: " ".join(s), xs))) + ">"
 
 def equalAmodB(base,a,b):
     """
@@ -307,13 +301,13 @@ def main():
         
         # Star-Free
         sf3=("@(|%<" + symbols[base] + ">,"
-             + gapAlt(base,2,base)
+             + gapAlt(2,2,base)
              + ",%|<" + symbols[base] + ">)")
         writeFile(sigma,sigma,"SF",0,0,0,parityFlipShort(base+1))
         writeFile(sigma,sigma,"SF",0,0,1,parityFlipLong(base+1))
         writeFile(sigma,sigma,"SF",0,0,2,dxbb2(base))
         writeFile(sigma,sigma,"SF",0,0,3,sf3)
-        writeFile(sigma,sigma,"SF",0,0,4,union(dxbb2(base),sf3))
+        writeFile(sigma,sigma,"SF",0,0,4,union(dxbb2(2),sf3))
         writeFile(sigma,sigma,"SF",0,0,5,
                   boundaryCondition(parityFlipShort(base+1),2))
         writeFile(sigma,sigma,"SF",0,0,6,
@@ -323,7 +317,7 @@ def main():
         writeFile(sigma,sigma,"SF",0,0,8,
                   boundaryCondition(sf3,2))
         writeFile(sigma,sigma,"SF",0,0,9,
-                  boundaryCondition(union(dxbb2(base),sf3),2))
+                  boundaryCondition(union(dxbb2(2),sf3),2))
 
         # Regular: even-x along with something from each other class
         evenX = equalAmodB(base,0,2)
@@ -337,42 +331,42 @@ def main():
                   intersection(evenX, halfAlternation(base,2,","))) # SP
         writeFile(sigma,sigma,"Reg",0,0,3,
                   intersection(evenX,
-                               union(fullAlternation(base,2," "),
+                               union(fullAlternation(1,2," "),
                                      universalOCP(base,2," ")))) # LT
         writeFile(sigma,sigma,"Reg",0,0,4,
                   intersection(
                       evenX,
                       tierify(sigma,base,
-                              union(fullAlternation(base,2," "),
+                              union(fullAlternation(1,2," "),
                                     universalOCP(base,2," "))))) # TLT
         writeFile(sigma,sigma,"Reg",0,0,5,
                   intersection(evenX,
-                               union(fullAlternation(base,2,","),
+                               union(fullAlternation(1,2,","),
                                      universalOCP(base,2,",")))) # PT
         writeFile(sigma,sigma,"Reg",0,0,6,
                   intersection(evenX,leastn(3,altk(base,2)))) # LTT (no TLTT)
         writeFile(sigma,sigma,"Reg",0,0,7,
-                  intersection(evenX,altGapAlt(base,2))) # LPT
+                  intersection(evenX,gapAlt(base,2))) # LPT
         writeFile(sigma,sigma,"Reg",0,0,8,
                   intersection(evenX,
                                tierify(sigma,base,
-                                       altGapAlt(base,2)))) # TLPT
+                                       gapAlt(base,2)))) # TLPT
         writeFile(sigma,sigma,"Reg",0,0,9,
-                  intersection(evenX,union(dxbb2(base),sf3))) # SF
+                  intersection(evenX,union(dxbb2(2),sf3))) # SF
 
         for tau in [sigma, base, 2*base-1]:
             for k in [2, 4, 6]:
                 # (Tier-Based) Strictly Local
                 writeFile(sigma,tau,"SL",k,1,0,universalOCP(1,k," "))
                 writeFile(sigma,tau,"SL",k,1,1,halfAlternation(base,k," "))
-                writeFile(sigma,tau,"SL",k,1,2,fullAlternation(base,k," "))
+                writeFile(sigma,tau,"SL",k,1,2,fullAlternation(1,k," "))
                 writeFile(sigma,tau,"SL",k,1,3,universalOCP(base,k," "))
                 writeFile(sigma,tau,"SL",k,1,4,
                           boundaryCondition(universalOCP(1,k," "),k))
                 writeFile(sigma,tau,"SL",k,1,5,
                           boundaryCondition(halfAlternation(base,k," "),k))
                 writeFile(sigma,tau,"SL",k,1,6,
-                          boundaryCondition(fullAlternation(base,k," "),k))
+                          boundaryCondition(fullAlternation(1,k," "),k))
                 writeFile(sigma,tau,"SL",k,1,7,
                           boundaryCondition(universalOCP(base,k," "),k))
                 writeFile(sigma,tau,"SL",k,1,8,
@@ -383,14 +377,14 @@ def main():
                 # Strictly Piecewise
                 writeFile(sigma,tau,"SP",k,1,0,universalOCP(1,k,","))
                 writeFile(sigma,tau,"SP",k,1,1,halfAlternation(base,k,","))
-                writeFile(sigma,tau,"SP",k,1,2,fullAlternation(base,k,","))
+                writeFile(sigma,tau,"SP",k,1,2,fullAlternation(1,k,","))
                 writeFile(sigma,tau,"SP",k,1,3,universalOCP(base,k,","))
                 writeFile(sigma,tau,"SP",k,1,4,
                           boundaryCondition(universalOCP(1,k,","),k,","))
                 writeFile(sigma,tau,"SP",k,1,5,
                           boundaryCondition(halfAlternation(base,k,","),k,","))
                 writeFile(sigma,tau,"SP",k,1,6,
-                          boundaryCondition(fullAlternation(base,k,","),k,","))
+                          boundaryCondition(fullAlternation(1,k,","),k,","))
                 writeFile(sigma,tau,"SP",k,1,7,
                           boundaryCondition(universalOCP(base,k,","),k,","))
                 writeFile(sigma,tau,"SP",k,1,8,
@@ -406,14 +400,14 @@ def main():
                           implication("~"+universalOCP(1,k," "),
                                       "~"+halfAlternation(base,k," ")))
                 writeFile(sigma,tau,"LT",k,1,2,
-                          union(fullAlternation(base,k," "),
+                          union(fullAlternation(1,k," "),
                                 universalOCP(base,k," ")))
                 writeFile(sigma,tau,"LT",k,1,3,
-                          biimplication(fullAlternation(base,k," "),
-                                        universalOCP(base,k," ")))
+                          implication(fullAlternation(1,k," "),
+                                      universalOCP(base,k," ")))
                 writeFile(sigma,tau,"LT",k,1,4,
                           "~"+biimplication(universalOCP(1,k," "),
-                                            fullAlternation(base,k," ")))
+                                            fullAlternation(1,k," ")))
                 writeFile(sigma,tau,"LT",k,1,5,
                           boundaryCondition(
                               implication("~"+universalOCP(1,k," "),
@@ -426,18 +420,18 @@ def main():
                               k," "))
                 writeFile(sigma,tau,"LT",k,1,7,
                           boundaryCondition(
-                              union(fullAlternation(base,k," "),
+                              union(fullAlternation(1,k," "),
                                     universalOCP(base,k," ")),
                               k," "))
                 writeFile(sigma,tau,"LT",k,1,8,
                           boundaryCondition(
-                              biimplication(fullAlternation(base,k," "),
-                                            universalOCP(base,k," ")),
+                              implication(fullAlternation(1,k," "),
+                                          universalOCP(base,k," ")),
                               k," "))
                 writeFile(sigma,tau,"LT",k,1,9,
                           boundaryCondition(
                               "~"+biimplication(universalOCP(1,k," "),
-                                                fullAlternation(base,k," ")),
+                                                fullAlternation(1,k," ")),
                               k," "))
 
                 # Piecewise Testable
@@ -448,14 +442,14 @@ def main():
                           implication("~"+universalOCP(1,k,","),
                                       "~"+halfAlternation(base,k,",")))
                 writeFile(sigma,tau,"PT",k,1,2,
-                          union(fullAlternation(base,k,","),
+                          union(fullAlternation(1,k,","),
                                 universalOCP(base,k,",")))
                 writeFile(sigma,tau,"PT",k,1,3,
-                          biimplication(fullAlternation(base,k,","),
-                                        universalOCP(base,k,",")))
+                          implication(fullAlternation(1,k,","),
+                                      universalOCP(base,k,",")))
                 writeFile(sigma,tau,"PT",k,1,4,
                           "~"+biimplication(universalOCP(1,k,","),
-                                            fullAlternation(base,k,",")))
+                                            fullAlternation(1,k,",")))
                 writeFile(sigma,tau,"PT",k,1,5,
                           boundaryCondition(
                               implication("~"+universalOCP(1,k,","),
@@ -468,18 +462,18 @@ def main():
                               k,","))
                 writeFile(sigma,tau,"PT",k,1,7,
                           boundaryCondition(
-                              union(fullAlternation(base,k,","),
+                              union(fullAlternation(1,k,","),
                                     universalOCP(base,k,",")),
                               k,","))
                 writeFile(sigma,tau,"PT",k,1,8,
                           boundaryCondition(
-                              biimplication(fullAlternation(base,k,","),
-                                            universalOCP(base,k,",")),
+                              implication(fullAlternation(1,k,","),
+                                          universalOCP(base,k,",")),
                               k,","))
                 writeFile(sigma,tau,"PT",k,1,9,
                           boundaryCondition(
                               "~"+biimplication(universalOCP(1,k,","),
-                                                fullAlternation(base,k,",")),
+                                                fullAlternation(1,k,",")),
                               k,","))
 
                 # (Tier-Based) Locally Threshold Testable
@@ -493,10 +487,10 @@ def main():
                     writeFile(sigma,tau,"LTT",k,t,2,
                               leastnOr1(t,ak(k)))
                     writeFile(sigma,tau,"LTT",k,t,3,
-                              leastnOr1(t,altk(base,k)))
+                              leastnOr1(t,altk(2,k)))
                     writeFile(sigma,tau,"LTT",k,t,4,
                               intersection(leastn(t,ak(k)),
-                                           "~"+leastn(t,altk(base,k))))
+                                           "~"+leastn(t,altk(2,k))))
                     writeFile(sigma,tau,"LTT",k,t,5,
                               boundaryCondition(leastn(t,ak(k)),k))
                     writeFile(sigma,tau,"LTT",k,t,6,
@@ -504,35 +498,51 @@ def main():
                     writeFile(sigma,tau,"LTT",k,t,7,
                               boundaryCondition(leastnOr1(t,ak(k)),k))
                     writeFile(sigma,tau,"LTT",k,t,8,
-                              boundaryCondition(leastnOr1(t,altk(base,k)),k))
+                              boundaryCondition(leastnOr1(t,altk(2,k)),k))
                     writeFile(sigma,tau,"LTT",k,t,9,
                               boundaryCondition(
                                   intersection(leastn(t,ak(k)),
-                                               "~"+leastn(t,altk(base,k))),k))
+                                               "~"+leastn(t,altk(2,k))),k))
 
                 # (Tier-Based) Locally Piecewise-Testable
-                writeFile(sigma,tau,"LP",k,k,0,gapAlt(base,k))
-                writeFile(sigma,tau,"LP",k,k,1,altGapAlt(base,k))
-                writeFile(sigma,tau,"LP",k,k,2,
-                          union(gapAlt(base,k),altGapAlt(base,k)))
-                writeFile(sigma,tau,"LP",k,k,3,
-                          intersection(gapAlt(base,k),altGapAlt(base,k)))
-                writeFile(sigma,tau,"LP",k,k,4,
-                          implication(gapAlt(base,k),altGapAlt(base,k)))
-                writeFile(sigma,tau,"LP",k,k,5,
-                          boundaryCondition(gapAlt(base,k),k))
-                writeFile(sigma,tau,"LP",k,k,6,
-                          boundaryCondition(altGapAlt(base,k),k))
-                writeFile(sigma,tau,"LP",k,k,7,
+                j = 2
+                if (k == 6):
+                    j = 3
+                a = symbols[0]
+                b = symbols[1]
+                c = symbols[2]
+                d = symbols[3]
+                if (base < 4):
+                    c = a
+                    d = b
+                writeFile(sigma,tau,"LP",k,j,0,
+                          gapAlt(2,2,j))
+                writeFile(sigma,tau,"LP",k,j,1,
+                          "~"+lp((j*[[b], [a,a]])[:j+1]))
+                writeFile(sigma,tau,"LP",k,j,2,
+                          lp(j*[[a,a]]))
+                writeFile(sigma,tau,"LP",k,j,3,
+                          lp((j*[[a,b],[c,d]])[:j]))
+                writeFile(sigma,tau,"LP",k,j,4,
+                          implication(
+                              lp((j*[[a,b],[b,a]])[:j]),
+                              lp(([[b,a]]+j*[[a,b]])[:j])))
+                writeFile(sigma,tau,"LP",k,j,0,
+                          boundaryCondition(gapAlt(2,2,j),1))
+                writeFile(sigma,tau,"LP",k,j,1,
                           boundaryCondition(
-                              union(gapAlt(base,k),altGapAlt(base,k)),k))
-                writeFile(sigma,tau,"LP",k,k,8,
-                          boundaryCondition(intersection(
-                              gapAlt(base,k),altGapAlt(base,k)),k))
-                writeFile(sigma,tau,"LP",k,k,9,
+                              "~"+lp((j*[[b], [a,a]])[:j+1]),1))
+                writeFile(sigma,tau,"LP",k,j,2,
                           boundaryCondition(
-                              implication(gapAlt(base,k),
-                                          altGapAlt(base,k)),k))
+                              lp(j*[[a,a]]),1))
+                writeFile(sigma,tau,"LP",k,j,3,
+                          boundaryCondition(
+                              lp((j*[[a,b],[c,d]])[:j]),1))
+                writeFile(sigma,tau,"LP",k,j,4,
+                          boundaryCondition(
+                              implication(
+                                  lp((j*[[a,b],[b,a]])[:j]),
+                                  lp(([[b,a]]+j*[[a,b]])[:j])),1))
 
 if __name__ == "__main__":
     main()

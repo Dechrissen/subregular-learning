@@ -1,3 +1,0 @@
-:import "syms64.plebby"
-[a,b,c,d,e,f,g,h,i,j,k]\/{<a b a b,b a b a,a b a b,b a b a>,<c d c d,d c d c,c d c d,d c d c>,<e f e f,f e f e,e f e f,f e f e>}
-:writeATT "../fstlib/att_format/64.11.TLP.4.4.1.att" _ _ it

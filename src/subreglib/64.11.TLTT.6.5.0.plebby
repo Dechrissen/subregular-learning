@@ -1,3 +1,0 @@
-:import "syms64.plebby"
-[a,b,c,d,e,f,g,h,i,j,k]@(<a a a a a a>,<a a a a a a>,<a a a a a a>,<a a a a a a>,<a a a a a a>)
-:writeATT "../fstlib/att_format/64.11.TLTT.6.5.0.att" _ _ it
