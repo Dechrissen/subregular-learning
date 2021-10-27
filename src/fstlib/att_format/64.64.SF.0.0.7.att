@@ -1,0 +1,20 @@
+0	8	a	a
+1	2	c	c
+2	1	d	d
+2	3	c	c
+3	2	d	d
+4	5	e	e
+5	4	f	f
+5	6	e	e
+6	5	f	f
+7	9	a	a
+8	2	c	c
+8	5	e	e
+8	9	a	a
+9	7	b	b
+9	10	a	a
+10	9	b	b
+1
+4
+7
+8

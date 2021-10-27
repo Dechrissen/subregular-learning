@@ -1,0 +1,29 @@
+7	4	a	a
+7	4	b	b
+7	4	c	c
+7	4	d	d
+7	4	e	e
+7	4	f	f
+7	4	g	g
+7	4	h	h
+7	4	i	i
+7	4	j	j
+7	4	k	k
+7	4	l	l
+7	4	m	m
+7	4	n	n
+7	4	o	o
+7	4	p	p
+0	1	c	c
+1	0	d	d
+1	2	c	c
+2	1	d	d
+3	5	a	a
+4	1	c	c
+4	5	a	a
+5	3	b	b
+5	6	a	a
+6	5	b	b
+0
+3
+4

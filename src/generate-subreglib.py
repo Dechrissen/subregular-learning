@@ -364,7 +364,7 @@ def main():
                 writeFile(sigma,tau,"SL",k,1,4,
                           boundaryCondition(universalOCP(1,k," "),k))
                 writeFile(sigma,tau,"SL",k,1,5,
-                          boundaryCondition(halfAlternation(base,k," "),k))
+                          boundaryCondition(halfAlternation(1,k," "),k))
                 writeFile(sigma,tau,"SL",k,1,6,
                           boundaryCondition(fullAlternation(1,k," "),k))
                 writeFile(sigma,tau,"SL",k,1,7,
@@ -382,7 +382,7 @@ def main():
                 writeFile(sigma,tau,"SP",k,1,4,
                           boundaryCondition(universalOCP(1,k,","),k,","))
                 writeFile(sigma,tau,"SP",k,1,5,
-                          boundaryCondition(halfAlternation(base,k,","),k,","))
+                          boundaryCondition(halfAlternation(1,k,","),k,","))
                 writeFile(sigma,tau,"SP",k,1,6,
                           boundaryCondition(fullAlternation(1,k,","),k,","))
                 writeFile(sigma,tau,"SP",k,1,7,

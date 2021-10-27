@@ -12,6 +12,7 @@
 # updated 3 December 2020
 #
 import pynini
+import argparse
 import functools
 import numpy as np
 import random
