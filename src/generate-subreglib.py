@@ -127,7 +127,7 @@ def notEndA(width=2,sep=" "):
     """
     g = "~|%%<%s>" % sep.join((width-1) * [symbols[0]])
     if sep == ",":
-        g = "~<%s>" % ([symbols[2]] + [sep.join((width-1) * [symbols[0]])])
+        g = "~<%s>" % (sep.join([symbols[2]] + (width-1) * [symbols[0]]))
     return g
 
 def endB(width=2,sep=" "):
@@ -332,7 +332,7 @@ def main():
         writeFile(sigma,sigma,"Reg",0,0,3,
                   intersection(evenX,
                                union(fullAlternation(1,2," "),
-                                     universalOCP(base,2," ")))) # LT
+                                     universalOCP(2,2," ")))) # LT
         writeFile(sigma,sigma,"Reg",0,0,4,
                   intersection(
                       evenX,
@@ -342,7 +342,7 @@ def main():
         writeFile(sigma,sigma,"Reg",0,0,5,
                   intersection(evenX,
                                union(fullAlternation(1,2,","),
-                                     universalOCP(base,2,",")))) # PT
+                                     universalOCP(2,2,",")))) # PT
         writeFile(sigma,sigma,"Reg",0,0,6,
                   intersection(evenX,leastn(3,altk(base,2)))) # LTT (no TLTT)
         writeFile(sigma,sigma,"Reg",0,0,7,
@@ -398,13 +398,13 @@ def main():
                                       "~"+halfAlternation(1,k," ")))
                 writeFile(sigma,tau,"LT",k,1,1,
                           implication("~"+universalOCP(1,k," "),
-                                      "~"+halfAlternation(base,k," ")))
+                                      "~"+halfAlternation(2,k," ")))
                 writeFile(sigma,tau,"LT",k,1,2,
                           union(fullAlternation(1,k," "),
-                                universalOCP(base,k," ")))
+                                universalOCP(2,k," ")))
                 writeFile(sigma,tau,"LT",k,1,3,
                           implication(fullAlternation(1,k," "),
-                                      universalOCP(base,k," ")))
+                                      universalOCP(2,k," ")))
                 writeFile(sigma,tau,"LT",k,1,4,
                           "~"+biimplication(universalOCP(1,k," "),
                                             fullAlternation(1,k," ")))
@@ -416,17 +416,17 @@ def main():
                 writeFile(sigma,tau,"LT",k,1,6,
                           boundaryCondition(
                               implication("~"+universalOCP(1,k," "),
-                                          "~"+halfAlternation(base,k," ")),
+                                          "~"+halfAlternation(2,k," ")),
                               k," "))
                 writeFile(sigma,tau,"LT",k,1,7,
                           boundaryCondition(
                               union(fullAlternation(1,k," "),
-                                    universalOCP(base,k," ")),
+                                    universalOCP(2,k," ")),
                               k," "))
                 writeFile(sigma,tau,"LT",k,1,8,
                           boundaryCondition(
                               implication(fullAlternation(1,k," "),
-                                          universalOCP(base,k," ")),
+                                          universalOCP(2,k," ")),
                               k," "))
                 writeFile(sigma,tau,"LT",k,1,9,
                           boundaryCondition(
@@ -440,13 +440,13 @@ def main():
                                       "~"+halfAlternation(1,k,",")))
                 writeFile(sigma,tau,"PT",k,1,1,
                           implication("~"+universalOCP(1,k,","),
-                                      "~"+halfAlternation(base,k,",")))
+                                      "~"+halfAlternation(2,k,",")))
                 writeFile(sigma,tau,"PT",k,1,2,
                           union(fullAlternation(1,k,","),
-                                universalOCP(base,k,",")))
+                                universalOCP(2,k,",")))
                 writeFile(sigma,tau,"PT",k,1,3,
                           implication(fullAlternation(1,k,","),
-                                      universalOCP(base,k,",")))
+                                      universalOCP(2,k,",")))
                 writeFile(sigma,tau,"PT",k,1,4,
                           "~"+biimplication(universalOCP(1,k,","),
                                             fullAlternation(1,k,",")))
@@ -458,17 +458,17 @@ def main():
                 writeFile(sigma,tau,"PT",k,1,6,
                           boundaryCondition(
                               implication("~"+universalOCP(1,k,","),
-                                          "~"+halfAlternation(base,k,",")),
+                                          "~"+halfAlternation(2,k,",")),
                               k,","))
                 writeFile(sigma,tau,"PT",k,1,7,
                           boundaryCondition(
                               union(fullAlternation(1,k,","),
-                                    universalOCP(base,k,",")),
+                                    universalOCP(2,k,",")),
                               k,","))
                 writeFile(sigma,tau,"PT",k,1,8,
                           boundaryCondition(
                               implication(fullAlternation(1,k,","),
-                                          universalOCP(base,k,",")),
+                                          universalOCP(2,k,",")),
                               k,","))
                 writeFile(sigma,tau,"PT",k,1,9,
                           boundaryCondition(

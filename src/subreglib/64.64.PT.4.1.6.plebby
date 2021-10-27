@@ -1,3 +1,3 @@
 :import "syms64.plebby"
-/\{~<c,a,a,a>,\/{~~~\/{<a,a,a,a>},~~\/{<a,b,a,b>,<c,d,c,d>,<e,f,e,f>}}}
+/\{~<c,a,a,a>,\/{~~~\/{<a,a,a,a>},~~\/{<a,b,a,b>}}}
 :writeATT "../fstlib/att_format/64.64.PT.4.1.6.att" _ _ it
