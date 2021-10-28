@@ -23,8 +23,28 @@
 6	6	c	c
 6	6	d	d
 6	7	a	a
-7	7	a	a
 7	7	b	b
 7	7	c	c
 7	7	d	d
-7
+7	8	a	a
+8	7	b	b
+8	8	c	c
+8	8	d	d
+8	9	a	a
+9	7	b	b
+9	9	c	c
+9	9	d	d
+9	10	a	a
+10	7	b	b
+10	10	c	c
+10	10	d	d
+10	11	a	a
+11	11	a	a
+11	11	b	b
+11	11	c	c
+11	11	d	d
+3
+4
+5
+6
+11
