@@ -37,7 +37,8 @@ with open(fname, 'r+') as f:
                 langs_to_write.append(l)
         elif train and data1.count(l) == 6 and data10.count(l) == 6 and data100.count(l) == 6:
                 langs_to_write.append(l)
-    out = [l + '\n' for l in langs_to_write]
-    f.seek(0)
-    f.writelines(out)
-    f.truncate()
+    if datagen or train:
+        out = [l + '\n' for l in langs_to_write]
+        f.seek(0)
+        f.writelines(out)
+        f.truncate()
