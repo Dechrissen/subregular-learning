@@ -33,14 +33,14 @@ def universalOCP(syms, width=2, sep=" "):
     consisting of all the same symbol,
     for the given number of symbols.
 
-     syms: the number of symbols (times two)
+     syms: the number of symbols
     width: the size of the factor
       sep: " " for successor or "," for general precedence
     """
     if syms == 0:
         return "<>"
     a=[]
-    for i in range(0,syms,2):
+    for i in range(syms):
         a.append("<" + sep.join(width*[symbols[i]]) + ">")
     return "~\\/{" + ",".join(a) + "}"
 
@@ -146,12 +146,20 @@ def union(*args):
     """
     Satisfied if any of the given expressions are satisfied
     """
+    if len(args) == 0:
+        return "~<>"
+    if len(args) == 1:
+        return args[0]
     return "\\/{" + ",".join(args) + "}"
 
 def intersection(*args):
     """
     Satisfied if all of the given expressions are satisfied
     """
+    if len(args) == 0:
+        return "<>"
+    if len(args) == 1:
+        return args[0]
     return "/\\{" + ",".join(args) + "}"
 
 def implication(a, b):
@@ -187,12 +195,11 @@ def leastn(n,expr):
     """
     return "@(" + ",".join(n*[expr]) + ")"
 
-def leastnOr1(n,expr):
+def leastnOr0(n,expr):
     """
-    The given expression occurs exactly once, or at least n times,
-    nothing in between.
+    The given expression occurs at least n times, or not at all.
     """
-    return union(intersection(expr,"~"+leastn(2,expr)),leastn(n,expr))
+    return union("~" + expr,leastn(n,expr))
 
 def gapAlt(syms,k,j=None):
     """
@@ -277,6 +284,43 @@ def dxbb2(base):
         a.append("@(%s,*@(%s,%s,%s))" % (dot,x,xystar,y))
     return union(*a)
 
+def piecewise(k,i):
+    """
+    Return the i'th k-(co)strictly piecewise language
+    """
+    a = symbols[0]
+    b = symbols[1]
+    c = symbols[2]
+    d = symbols[3]
+    x = [lp(k//2*[[a],[b]])]
+    y = [[lp(k//2*[[c],[d]])],
+         [lp(k//2*[[b],[c]]),lp(k//2*[[c],[d]])],
+         [lp(k//2*[[b],[a]]),lp(k//2*[[c],[d]])],
+         [lp(k//2*[[b],[a]]),lp(k//2*[[b],[c]]),lp(k//2*[[c],[d]])],
+         [lp(k//2*[[c],[a]]),lp(k//2*[[d],[c]])]]
+    x = x + (y[i%5])
+    if i > 4:
+        x.append(lp(k*[[d]]))
+    return union(*x)
+
+def piecewiseTest(k,i):
+    """
+    Return the i'th k-piecewise testable language
+    """
+    a = symbols[0]
+    b = symbols[1]
+    c = symbols[2]
+    d = symbols[3]
+    x = [lp([[a],[b]])]
+    y = [[lp(k//2*[[c],[d]])],
+         [lp(k//2*[[b],[c]]),lp(k//2*[[c],[d]])],
+         [lp(k//2*[[b],[a]]),lp(k//2*[[c],[d]])],
+         [lp(k//2*[[b],[a]]),lp(k//2*[[b],[c]]),lp(k//2*[[c],[d]])],
+         [lp(k//2*[[c],[a]]),lp(k//2*[[d],[c]])]]
+    if i > 4:
+        x.append(lp([[d],[d]]))
+    return implication(union(*x),union(*(y[i%5])))
+
 def main():
     """
     write files representing constraints
@@ -328,7 +372,7 @@ def main():
                                tierify(sigma,base+1,
                                        halfAlternation(base,2," ")))) # TSL
         writeFile(sigma,sigma,"Reg",0,0,2,
-                  intersection(evenX, halfAlternation(base,2,","))) # SP
+                  intersection(evenX, "~"+piecewise(2,0))) # SP
         writeFile(sigma,sigma,"Reg",0,0,3,
                   intersection(evenX,
                                union(fullAlternation(1,2," "),
@@ -356,6 +400,14 @@ def main():
 
         for tau in [sigma, base, 2*base-1]:
             for k in [2, 4, 6]:
+                a = symbols[0]
+                b = symbols[1]
+                c = symbols[2]
+                d = symbols[3]
+                if (base < 4):
+                    c = a
+                    d = b
+
                 # (Tier-Based) Strictly Local
                 writeFile(sigma,tau,"SL",k,1,0,universalOCP(1,k," "))
                 writeFile(sigma,tau,"SL",k,1,1,halfAlternation(base,k," "))
@@ -375,22 +427,8 @@ def main():
                           boundaryCondition(endB(k, " "),k))
 
                 # Strictly Piecewise
-                writeFile(sigma,tau,"SP",k,1,0,universalOCP(1,k,","))
-                writeFile(sigma,tau,"SP",k,1,1,halfAlternation(base,k,","))
-                writeFile(sigma,tau,"SP",k,1,2,fullAlternation(1,k,","))
-                writeFile(sigma,tau,"SP",k,1,3,universalOCP(base,k,","))
-                writeFile(sigma,tau,"SP",k,1,4,
-                          boundaryCondition(universalOCP(1,k,","),k,","))
-                writeFile(sigma,tau,"SP",k,1,5,
-                          boundaryCondition(halfAlternation(1,k,","),k,","))
-                writeFile(sigma,tau,"SP",k,1,6,
-                          boundaryCondition(fullAlternation(1,k,","),k,","))
-                writeFile(sigma,tau,"SP",k,1,7,
-                          boundaryCondition(universalOCP(base,k,","),k,","))
-                writeFile(sigma,tau,"SP",k,1,8,
-                          boundaryCondition(notEndA(k, ","),k,","))
-                writeFile(sigma,tau,"SP",k,1,9,
-                          boundaryCondition(endB(k, ","),k,","))
+                for i in range(10):
+                  writeFile(sigma,tau,"SP",k,1,i,"~"+piecewise(k,i))
 
                 # (Tier-Based) Locally Testable
                 writeFile(sigma,tau,"LT",k,1,0,
@@ -435,46 +473,8 @@ def main():
                               k," "))
 
                 # Piecewise Testable
-                writeFile(sigma,tau,"PT",k,1,0,
-                          implication("~"+universalOCP(1,k,","),
-                                      "~"+halfAlternation(1,k,",")))
-                writeFile(sigma,tau,"PT",k,1,1,
-                          implication("~"+universalOCP(1,k,","),
-                                      "~"+halfAlternation(2,k,",")))
-                writeFile(sigma,tau,"PT",k,1,2,
-                          union(fullAlternation(1,k,","),
-                                universalOCP(2,k,",")))
-                writeFile(sigma,tau,"PT",k,1,3,
-                          implication(fullAlternation(1,k,","),
-                                      universalOCP(2,k,",")))
-                writeFile(sigma,tau,"PT",k,1,4,
-                          "~"+biimplication(universalOCP(1,k,","),
-                                            fullAlternation(1,k,",")))
-                writeFile(sigma,tau,"PT",k,1,5,
-                          boundaryCondition(
-                              implication("~"+universalOCP(1,k,","),
-                                          "~"+halfAlternation(1,k,",")),
-                              k,","))
-                writeFile(sigma,tau,"PT",k,1,6,
-                          boundaryCondition(
-                              implication("~"+universalOCP(1,k,","),
-                                          "~"+halfAlternation(2,k,",")),
-                              k,","))
-                writeFile(sigma,tau,"PT",k,1,7,
-                          boundaryCondition(
-                              union(fullAlternation(1,k,","),
-                                    universalOCP(2,k,",")),
-                              k,","))
-                writeFile(sigma,tau,"PT",k,1,8,
-                          boundaryCondition(
-                              implication(fullAlternation(1,k,","),
-                                          universalOCP(2,k,",")),
-                              k,","))
-                writeFile(sigma,tau,"PT",k,1,9,
-                          boundaryCondition(
-                              "~"+biimplication(universalOCP(1,k,","),
-                                                fullAlternation(1,k,",")),
-                              k,","))
+                for i in range(10):
+                    writeFile(sigma,tau,"PT",k,1,i,piecewiseTest(k,i))
 
                 # (Tier-Based) Locally Threshold Testable
                 for t in [2,3,5]:
@@ -485,9 +485,9 @@ def main():
                     writeFile(sigma,tau,"LTT",k,t,1,
                               "~"+leastn(t,altk(base,k)))
                     writeFile(sigma,tau,"LTT",k,t,2,
-                              leastnOr1(t,ak(k)))
+                              leastnOr0(t,ak(k)))
                     writeFile(sigma,tau,"LTT",k,t,3,
-                              leastnOr1(t,altk(2,k)))
+                              leastnOr0(t,altk(2,k)))
                     writeFile(sigma,tau,"LTT",k,t,4,
                               intersection(leastn(t,ak(k)),
                                            "~"+leastn(t,altk(2,k))))
@@ -496,9 +496,9 @@ def main():
                     writeFile(sigma,tau,"LTT",k,t,6,
                               boundaryCondition("~"+leastn(t,altk(base,k)),k))
                     writeFile(sigma,tau,"LTT",k,t,7,
-                              boundaryCondition(leastnOr1(t,ak(k)),k))
+                              boundaryCondition(leastnOr0(t,ak(k)),k))
                     writeFile(sigma,tau,"LTT",k,t,8,
-                              boundaryCondition(leastnOr1(t,altk(2,k)),k))
+                              boundaryCondition(leastnOr0(t,altk(2,k)),k))
                     writeFile(sigma,tau,"LTT",k,t,9,
                               boundaryCondition(
                                   intersection(leastn(t,ak(k)),
@@ -508,41 +508,36 @@ def main():
                 j = 2
                 if (k == 6):
                     j = 3
-                a = symbols[0]
-                b = symbols[1]
-                c = symbols[2]
-                d = symbols[3]
-                if (base < 4):
-                    c = a
-                    d = b
                 writeFile(sigma,tau,"LP",k,j,0,
                           gapAlt(2,2,j))
                 writeFile(sigma,tau,"LP",k,j,1,
                           "~"+lp((j*[[b], [a,a]])[:j+1]))
                 writeFile(sigma,tau,"LP",k,j,2,
-                          lp(j*[[a,a]]))
+                          lp((j*[[a,b],[d,c]])[:j]))
                 writeFile(sigma,tau,"LP",k,j,3,
-                          lp((j*[[a,b],[c,d]])[:j]))
+                          union(lp(j*[[a,a]]),
+                                lp((j*[[a,b],[d,c]])[:j])))
                 writeFile(sigma,tau,"LP",k,j,4,
                           implication(
                               lp((j*[[a,b],[b,a]])[:j]),
                               lp(([[b,a]]+j*[[a,b]])[:j])))
-                writeFile(sigma,tau,"LP",k,j,0,
-                          boundaryCondition(gapAlt(2,2,j),1))
-                writeFile(sigma,tau,"LP",k,j,1,
+                writeFile(sigma,tau,"LP",k,j,5,
+                          boundaryCondition(gapAlt(2,2,j),2))
+                writeFile(sigma,tau,"LP",k,j,6,
                           boundaryCondition(
-                              "~"+lp((j*[[b], [a,a]])[:j+1]),1))
-                writeFile(sigma,tau,"LP",k,j,2,
+                              "~"+lp((j*[[b], [a,a]])[:j+1]),2))
+                writeFile(sigma,tau,"LP",k,j,7,
                           boundaryCondition(
-                              lp(j*[[a,a]]),1))
-                writeFile(sigma,tau,"LP",k,j,3,
+                              lp((j*[[a,b],[d,c]])[:j]),2))
+                writeFile(sigma,tau,"LP",k,j,8,
                           boundaryCondition(
-                              lp((j*[[a,b],[c,d]])[:j]),1))
-                writeFile(sigma,tau,"LP",k,j,4,
+                              union(lp(j*[[a,a]]),
+                                    lp((j*[[a,b],[d,c]])[:j])),2))
+                writeFile(sigma,tau,"LP",k,j,9,
                           boundaryCondition(
                               implication(
                                   lp((j*[[a,b],[b,a]])[:j]),
-                                  lp(([[b,a]]+j*[[a,b]])[:j])),1))
+                                  lp(([[b,a]]+j*[[a,b]])[:j])),2))
 
 if __name__ == "__main__":
     main()

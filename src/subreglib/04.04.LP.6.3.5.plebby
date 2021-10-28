@@ -1,0 +1,3 @@
+:import "syms04.plebby"
+/\{%|<a>,~<a a,b b,a a>}
+:writeATT "../fstlib/att_format/04.04.LP.6.3.5.att" _ _ it

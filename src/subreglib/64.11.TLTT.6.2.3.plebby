@@ -1,3 +1,3 @@
 :import "syms64.plebby"
-[a,b,c,d,e,f,g,h,i,j,k]\/{/\{\/{<a b a b a b>},~@(\/{<a b a b a b>},\/{<a b a b a b>})},@(\/{<a b a b a b>},\/{<a b a b a b>})}
+[a,b,c,d,e,f,g,h,i,j,k]\/{~<a b a b a b>,@(<a b a b a b>,<a b a b a b>)}
 :writeATT "../fstlib/att_format/64.11.TLTT.6.2.3.att" _ _ it
