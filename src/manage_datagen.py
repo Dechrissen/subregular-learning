@@ -36,4 +36,7 @@ for lang in lang_names:
         fnames = ['data_gen/' + size + '/' + lang + '_' + suffix + '.txt' \
                   for size in sizes for suffix in file_suffixes]
         for f in fnames:
-            os.remove(f)
+            try:
+                os.remove(f)
+            except:
+                continue
