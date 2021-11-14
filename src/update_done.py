@@ -9,7 +9,7 @@ rnn_types = ['gru', 'lstm', 'simple']
 sizes = ['1k', '10k', '100k']
 
 langs = set([model.split('_')[3] for model in os.listdir('models')])
-print(langs)
+# print(langs)
 
 with open('src/langs_done.txt', 'w') as f:
     for lang in langs:
@@ -18,7 +18,11 @@ with open('src/langs_done.txt', 'w') as f:
                       for rnn in rnn_types for size in sizes]:
             moddir = 'models/' + model
             if os.path.exists(moddir):
-                complete = False if 'Test1_roc.png' not in os.listdir(moddir) else True
+                if 'Test1_roc.png' not in os.listdir(moddir):
+                    complete = False
+                    os.system('rm -r ' + moddir)
+                else:
+                    complete = True
             else:
                 complete = False
             if not complete:
