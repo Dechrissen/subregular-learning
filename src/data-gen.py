@@ -14,7 +14,7 @@
 import pynini
 import argparse
 import functools
-import numpy as np
+#import numpy as np
 import random
 import pathlib
 

@@ -21,13 +21,12 @@ with open('src/langs_done.txt', 'w') as f:
                 if 'Test1_roc.png' not in os.listdir(moddir):
                     complete = False
                     os.system('rm -r ' + moddir)
-                else:
-                    complete = True
             else:
                 complete = False
             if not complete:
                 break
         if complete:
+            # it is important for the script src/lang_names.py that
+            # each lang be followed by a newline character
             f.write(lang + '\n')
-        else:
-            continue
+

@@ -1,13 +1,15 @@
 """
 Performs one of three tasks:
-    - writes language names to tags.txt for which an fst exists in src/fstlib/fst_format
+    - writes language names for which an fst exists in src/fstlib/fst_format
       (supply neither --datagen nor --train)
-    - writes language names to tags.txt for which data generation is not compelete
+    - writes language names for which data generation is not compelete
       (supply --datagen)
-    - writes language names to tags.txt for which data generation is complete
+    - writes language names for which data generation is complete
       (supply --train)
 The argument --avoid can be used to specify the path of a text file whose lines
-indicate language names that should not be include in the output of this script.
+indicate language names that should not be included in the output of this script.
+(Typically, this will be src/langs_done.txt) The 'avoid' file should have a
+trailing newline character, i.e. each lang must be followed by a newline char.
 """
 
 import os
@@ -31,7 +33,7 @@ file_suffixes = ['Dev','Test1','Test2','Test3','Test4','Training']
 sizes = {'1k':10**3, '10k':10**4, '100k':10**5}
 
 if not (dtgen or train):
-    with open('tags.txt', 'w') as f:
+    with open('/dev/stdout', 'w') as f:
         out = [l + '\n' for l in lang_names if l not in avoid]
         f.writelines(out)
 else:
@@ -52,6 +54,7 @@ else:
                         break
                 if inc:
                     break
-            if (dtgen     and inc and lang not in avoid) or \
+            if (dtgen and     inc and lang not in avoid) or \
                (train and not inc and lang not in avoid):
                 f.write(lang + '\n')
+

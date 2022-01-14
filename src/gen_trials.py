@@ -2,10 +2,10 @@ if __name__ == "__main__":
 	print("Opening files....")
 	output_file = open("model_list.txt", "w+", encoding="utf8")
 	
-	f = open("../traintags.txt", "r", encoding="utf8")
+	f = open("train_tags.txt", "r", encoding="utf8")
 	f = f.readlines()
 	
-	print("Generating list....")
+	print("Generating list...")
 	for tag in f:
 		for length in ['1k', '10k', '100k']:
 			for model in ['simple', 'lstm', 'gru']:
@@ -13,3 +13,4 @@ if __name__ == "__main__":
 				
 	output_file.close()
 	print("Done!")
+
