@@ -143,35 +143,35 @@ def create_data_with_duplicate(name, pos_dict, neg_dict, min_len, max_len, num):
         pos_fsa = \
             pynini.randgen(pos_dict[i], npath=num, seed=0, select="uniform", max_length=2147483647, weighted=False)
 
-            # write them into the files
-            count = 0
-            for ele in list_string_set(pos_fsa):
-                f[0].write(ele + "\t" + "TRUE\n")
-                if count % factor == 0:
-                    f[1].write(ele + "\t" + "TRUE\n")
-                if count % (factor*factor) == 0:
-                    f[2].write(ele + "\t" + "TRUE\n")
-                count = count +1
-                
-            # update the pos_dict by subtracting the strings in pos_fsa
-            pos_dict[i] = pynini.difference(pos_dict[i], pos_fsa)
+        # write them into the files
+        count = 0
+        for ele in list_string_set(pos_fsa):
+            f[0].write(ele + "\t" + "TRUE\n")
+            if count % factor == 0:
+                f[1].write(ele + "\t" + "TRUE\n")
+            if count % (factor*factor) == 0:
+                f[2].write(ele + "\t" + "TRUE\n")
+            count = count +1
 
-            # get num strings of length i from the neg_dict
-            neg_fsa = \
-                pynini.randgen(neg_dict[i], npath=num, seed=0, select="uniform", max_length=2147483647, weighted=False)
+        # update the pos_dict by subtracting the strings in pos_fsa
+        pos_dict[i] = pynini.difference(pos_dict[i], pos_fsa)
 
-            # write them into the files
-            count = 0
-            for ele in list_string_set(neg_fsa):
-                f[0].write(ele + "\t" + "FALSE\n")
-                if count % factor == 0:
-                    f[1].write(ele + "\t" + "FALSE\n")
-                if count % (factor*factor) == 0:
-                    f[2].write(ele + "\t" + "FALSE\n")
-                count = count + 1
+        # get num strings of length i from the neg_dict
+        neg_fsa = \
+            pynini.randgen(neg_dict[i], npath=num, seed=0, select="uniform", max_length=2147483647, weighted=False)
 
-            # update the neg_dict by subtracting the strings in neg_fsa
-            neg_dict[i] = pynini.difference(neg_dict[i], neg_fsa)
+        # write them into the files
+        count = 0
+        for ele in list_string_set(neg_fsa):
+            f[0].write(ele + "\t" + "FALSE\n")
+            if count % factor == 0:
+                f[1].write(ele + "\t" + "FALSE\n")
+            if count % (factor*factor) == 0:
+                f[2].write(ele + "\t" + "FALSE\n")
+            count = count + 1
+
+        # update the neg_dict by subtracting the strings in neg_fsa
+        neg_dict[i] = pynini.difference(neg_dict[i], neg_fsa)
 
     for i in range(3):
         f[i].close()            
@@ -246,15 +246,15 @@ def create_data_no_duplicate(name, pos_dict, neg_dict, min_len, max_len, num):
 
         # write positive results to file, stopping at stopping number
         count = 0
-            for ele in pos_results:
-                f[0].write(ele + "\t" + "TRUE\n")
-                if count % factor == 0:
-                    f[1].write(ele + "\t" + "TRUE\n")
-                if count % (factor*factor) == 0:
-                    f[2].write(ele + "\t" + "TRUE\n")
-                count = count +1
-                if counter == stop:
-                    break
+        for ele in pos_results:
+            f[0].write(ele + "\t" + "TRUE\n")
+            if count % factor == 0:
+                f[1].write(ele + "\t" + "TRUE\n")
+            if count % (factor*factor) == 0:
+                f[2].write(ele + "\t" + "TRUE\n")
+            count = count +1
+            if count == stop:
+                break
 
         # write negative results to file, stopping at stopping number
         count = 0
@@ -265,7 +265,7 @@ def create_data_no_duplicate(name, pos_dict, neg_dict, min_len, max_len, num):
             if count % (factor*factor) == 0:
                 f[2].write(ele + "\t" + "FALSE\n")
             count = count +1
-            if counter == stop:
+            if count == stop:
                 break
 
     for i in range(3):
@@ -323,7 +323,7 @@ def create_adversarial_examples(pos_dict, neg_dict, border_fst, min_len, max_len
          open(test_files[2], "w+")]
 
     for n in range(min_len,max_len+1):
-        bpairsN = border(fst, pos_dict, neg_dict, n)
+        bpairsN = border(border_fst, pos_dict, neg_dict, n)
         random_examples=pynini.randgen(bpairsN, npath=largedata, seed=0, select="uniform", max_length=2147483647, weighted=False)
         ps = random_examples.paths(input_token_type="utf8", output_token_type="utf8")
 
@@ -331,6 +331,7 @@ def create_adversarial_examples(pos_dict, neg_dict, border_fst, min_len, max_len
         # maybe a better approach is to generate positive strings with create_data_no_duplicate
         # and then find a negative string which is 1 away (then each pair is distinct even if some negative strings occur twice)
         
+        count = 0
         while not ps.done():
             if ps.istring() and ps.ostring():
                 f[0].write(ps.istring() + "\tTRUE\n")
