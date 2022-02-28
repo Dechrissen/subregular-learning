@@ -322,10 +322,10 @@ def create_adversarial_examples(pos_dict, neg_dict, border_fst, min_len, max_len
          open(test_files[1], "w+"),
          open(test_files[2], "w+")]
 
-    numtogen = {'short':largedata / num_ss, 'long':largedata / num_ls}
+    numtogen = {'short':largedata / num_ss , 'long':largedata / num_ls}
     for n in range(min_len,max_len+1):
         bpairsN = border(border_fst, pos_dict, neg_dict, n)
-        random_examples=pynini.randgen(bpairsN, npath=numtogen[length], seed=0, select="uniform", max_length=2147483647, weighted=False)
+        random_examples=pynini.randgen(bpairsN, npath=numtogen[length] / 2, seed=0, select="uniform", max_length=2147483647, weighted=False)
         ps = random_examples.paths(input_token_type="utf8", output_token_type="utf8")
 
         # CONCERN: These test items could contain duplicates because random_examples may contain duplicates...
