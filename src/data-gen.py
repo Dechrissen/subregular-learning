@@ -322,9 +322,10 @@ def create_adversarial_examples(pos_dict, neg_dict, border_fst, min_len, max_len
          open(test_files[1], "w+"),
          open(test_files[2], "w+")]
 
+    numtogen = {'short':largedata / num_ss, 'long':largedata / num_ls}
     for n in range(min_len,max_len+1):
         bpairsN = border(border_fst, pos_dict, neg_dict, n)
-        random_examples=pynini.randgen(bpairsN, npath=largedata, seed=0, select="uniform", max_length=2147483647, weighted=False)
+        random_examples=pynini.randgen(bpairsN, npath=numtogen[length], seed=0, select="uniform", max_length=2147483647, weighted=False)
         ps = random_examples.paths(input_token_type="utf8", output_token_type="utf8")
 
         # CONCERN: These test items could contain duplicates because random_examples may contain duplicates...
@@ -391,13 +392,13 @@ pos_dict_after_train, neg_dict_after_train = \
 
 # create dev and testSR (no duplicates, no overlap with train,dev,test data)
 pos_dict_after_dev, neg_dict_after_dev = \
-    create_data_no_duplicate("_Dev.txt", pos_dict_after_train, neg_dict_after_train, ss_min_len, ss_max_len, dev_pos_num)
+    create_data_no_duplicate("_Dev", pos_dict_after_train, neg_dict_after_train, ss_min_len, ss_max_len, dev_pos_num)
 
-create_data_no_duplicate("_TestSR.txt", pos_dict_after_dev, neg_dict_after_dev, ss_min_len, ss_max_len, testSR_pos_num)
+create_data_no_duplicate("_TestSR", pos_dict_after_dev, neg_dict_after_dev, ss_min_len, ss_max_len, testSR_pos_num)
 
 # create testLR (no duplicates, no overlap in train,dev,test data)
 # no overlap with shorter data sets guaranteed by disjoint set of string lengths
-create_data_no_duplicate("_TestLR.txt", pos_dict_ls, neg_dict_ls, ls_min_len, ls_max_len, testLR_pos_num)
+create_data_no_duplicate("_TestLR", pos_dict_ls, neg_dict_ls, ls_min_len, ls_max_len, testLR_pos_num)
 
 # create testSA (short adversarial examples, disjoint from train,dev data; may overlap with testSR)
 create_adversarial_examples(pos_dict_after_dev, neg_dict_after_dev, bpairs, ss_min_len, ss_max_len, length='short')
