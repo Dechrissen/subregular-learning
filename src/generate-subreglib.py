@@ -270,19 +270,17 @@ def dxbb2(base):
     """
     The language BB2=(a(ab)*b)* of Krebs et al (2020)
     extended in two ways:
-    1) it is prepended by . (as in, a singular occurrence of any symbol)
-    2) it is unioned with other symbol pairs up to (base)
-       e.g. (c(cd)*d)* etc
+    1) it is prepended by . (as in, a singular occurrence of a or b)
+    2) it is made tier-based
     """
     nonempty="~%||%<>"
     dot=intersection(nonempty,"~"+leastn(2,nonempty))
-    a=[]
-    for i in range(0,base,2):
-        x = "%||%<" + symbols[i] + ">"
-        y = "%||%<" + symbols[i+1] + ">"
-        xystar = "*%||%<" + symbols[i] + " " + symbols[i+1] + ">"
-        a.append("@(%s,*@(%s,%s,%s))" % (dot,x,xystar,y))
-    return union(*a)
+    x = "%||%<" + symbols[0] + ">"
+    y = "%||%<" + symbols[1] + ">"
+    xystar = "*%||%<" + symbols[0] + " " + symbols[1] + ">"
+    a = "@(%s,*@(%s,%s,%s))" % (dot,x,xystar,y)
+    tiered = "[%s,%s]%s" % (symbols[0], symbols[1], a)
+    return tiered
 
 def piecewise(k,i):
     """
