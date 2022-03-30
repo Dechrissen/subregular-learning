@@ -18,12 +18,11 @@ class MainModel(models.Model):
         self.rnn_type = rnn_type
         self.embeddings = layers.Embedding(vocab_size, embed_dim)
 
-        if rnn_type == "stackrnn":
-            rnn_cells = [
-                layers.LSTMCell(embed_dim, dropout=dropout)
-                for _ in range(2)
-            ]
-            stacked_lstm = layers.StackedRNNCells(rnn_cells)
+        rnn_cells = [
+            layers.LSTMCell(embed_dim, dropout=dropout)
+            for _ in range(2)
+        ]
+        stacked_lstm = layers.StackedRNNCells(rnn_cells)
 
         rnn_layers = {
             "lstm":layers.LSTM(embed_dim, dropout=dropout),
@@ -44,7 +43,7 @@ class MainModel(models.Model):
         self.linear_layer = layers.Dense(2)
         self.softmax_layer = layers.Softmax()
 
-    def __call__(self, inputs, value=None, training=False):
+    def call(self, inputs, training=False):
         out = self.embeddings(inputs)
         out = self.rnn_layer(out, training=training)
         out = self.linear_layer(out)
