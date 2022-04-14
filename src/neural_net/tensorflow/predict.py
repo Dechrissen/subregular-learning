@@ -25,7 +25,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     model_dir = dirname(args.model_dir)
     vocab_file = model_dir + '/vocab.txt'
-    test_name = basename(args.data_file)[-9:-4]
+    test_name = basename(args.data_file)[-10:-4]
 
     vocabulary = load_vocab(vocab_file)
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     #model = keras.models.load_model(model_dir)
     config = load_model_config(model_dir + '/config.txt')
     model = MainModel(**config)
-    #model.compile(optimizer=keras.optimizers.Adam(), loss=keras.losses.BinaryCrossentropy(), metrics
+    #model.compile(optimizer=keras.optimizers.Adam(), loss=keras.losses.BinaryCrossentropy(), metrics)
     model.load_weights(model_dir + '/checkpoint.ckpt')
 
     predictions = model.predict(x_padded)

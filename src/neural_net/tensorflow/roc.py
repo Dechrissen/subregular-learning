@@ -23,7 +23,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     model_dir = dirname(args.model_dir)
     vocab_file = model_dir + '/vocab.txt'
-    test_name = basename(args.data_file)[-9:-4]
+    test_name = basename(args.data_file)[-10:-4]
 
     vocabulary = load_vocab(vocab_file)
 

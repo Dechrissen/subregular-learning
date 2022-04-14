@@ -5,24 +5,22 @@ Updated 1 December 2020
 import argparse
 import os.path as path
 import matplotlib.pyplot as plt
-from sklearn.metrics import auc
+from sklearn.metrics import auc, brier_score_loss
 import numpy as np
 import sys
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--predict-file', type=str, required=True)
+    args = parser.parse_args()
 
     # it is assumed that predict_file is in the format [model name]_pred.txt
-    	# and that this file is inside the model directory already
+    # and that this file is inside the model directory already
     # this script saves the output in a file named [model name]_eval.txt
-    	# inside the model directory
-    
-    args = parser.parse_args()
+    # inside the model directory
     
     with open(args.predict_file, 'r') as f:
         lines = f.readlines()
-        
     lines = [l.strip().split('\t')[1:] for l in lines]
         
     # https://www.kdnuggets.com/2017/04/must-know-evaluate-binary-classifier.html
@@ -46,26 +44,31 @@ if __name__ == "__main__":
             if pred == 'FALSE':
                 TN += 1
                 
-    # True Positive Rate (TPR) aka Hit Rate aka Recall aka Sensitivity = TP / (TP + FN)
+    # True Positive Rate (TPR) aka Recall aka Sensitivity = TP/(TP+FN)
     if TP+FN==0:
         TPR=1
     else:
         TPR = TP/(TP+FN)
-    # False Positive Rate(FPR) aka False Alarm Rate = 1 - Specificity = 1 - (TN / (TN + FP))
+
+    # False Positive Rate(FPR) aka False Alarm Rate = 1-Specificity
     if TN+FP==0:
         FPR=1
     else:
         FPR = FP / (TN + FP)
-    # Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+    # Accuracy
     accuracy = (TP + TN) / (TP + TN + FP + FN)
-    # Error Rate = 1 – accuracy or (FP + FN) / (TP + TN + FP + FN)
-    error_rate = (FP + FN) / (TP + TN + FP + FN)
+
+    # Error Rate = (FP + FN) / (TP + TN + FP + FN)
+    error_rate = 1- accuracy
+
     # Precision = TP / (TP + FP)
     if TP+FP==0:
         precision=1
     else:
         precision = TP / (TP + FP)
-    # F-measure: 2 / ( (1 / Precision) + (1 / Recall) )
+
+    # F-score = 2 / ( (1 / Precision) + (1 / Recall) )
     if TP+FP+FN==0:
         F_score=1
     else:
@@ -80,7 +83,9 @@ if __name__ == "__main__":
     tpr = []
     fpr = []
     for thresh in np.linspace(0, 1, num=100):
-        sys.stdout.write("\rROC: Working on threshold " + str(thresh // 0.01 / 100) + ' / 1.00 ')
+        sys.stdout.write(
+            f"\rROC: Working on threshold {thresh//0.01/100} / 1.00 "
+        )
         sys.stdout.flush()
         preds = probs[:, 0] > thresh
         TP = sum(preds & true_labels)
@@ -97,7 +102,8 @@ if __name__ == "__main__":
             fpr += [FP/(FP+TN)]
     sys.stdout.write("\rROC: done" + 30*' ' + '\n')
     AUC = abs(round(auc(fpr, tpr), 5))
-    #print('AUC: ', AUC)
+    
+    brier = brier_score_loss(true_labels.astype(int), probs[:, 0])
 
     fig, ax = plt.subplots()
     for i in np.linspace(0,1,num=11):
@@ -113,17 +119,20 @@ if __name__ == "__main__":
     test_name = model_name.split('/')[2]
     ax.set(xlabel='False Positive Rate', ylabel='True Positive Rate',
            title='ROC Curve for ' + ' '.join(split_lines) + ' ' + test_name)
-    fig.savefig(model_name[:-5] + test_name + '_roc' + '.png', dpi=500)
+    fig.savefig(model_name[:-6] + test_name + '_roc' + '.png', dpi=500)
     
     eval_file = args.predict_file.replace('_pred.txt', '_eval.txt')
-    message = 'Prediction file: '+args.predict_file+'\n' + \
-              'TPR: '+str(TPR)+'\n' + \
-              'FPR: '+str(FPR)+'\n' + \
-              'Accuracy: '+str(accuracy)+'\n' + \
-              'Error rate: '+str(error_rate)+'\n' + \
-              'Precision: '+str(precision)+'\n' + \
-              'F-score: '+str(F_score)+'\n' + \
-              'AUC: '+str(AUC)+'\n'
+    message = (
+        f"Prediction file:  {args.predict_file}\n"
+        f"TPR:              {TPR}\n"
+        f"FPR:              {FPR}\n"
+        f"Accuracy:         {accuracy}\n"
+        f"Error rate:       {error_rate}\n"
+        f"Precision:        {precision}\n"
+        f"F-score:          {F_score}\n"
+        f"AUC:              {AUC}\n"
+        f"Brier score loss: {brier}\n"
+    )
     print(message)
     print("Evaluations stored in", eval_file)
 
