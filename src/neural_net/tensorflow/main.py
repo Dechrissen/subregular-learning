@@ -23,6 +23,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     model_path = path.dirname(args.output_dir)
+    print("MODEL PATH: ", model_path)
     vocab_file = model_path + '/vocab.txt'
     config_file = model_path + '/config.txt'
 
@@ -30,8 +31,11 @@ if __name__ == "__main__":
 
     vocabulary, x_train, y_train = parse_dataset(args.train_data, vocabulary)
     vocabulary, x_val, y_val = parse_dataset(args.val_data, vocabulary)
+    max_length = max(
+        [len(item) for item in x_train] + [len(item) for item in x_val]
+    )
 
-    tf.random.set_seed(333)
+    tf.random.set_seed(1234)
 
     x_train = tf.constant(pad_data(x_train, vocabulary))
     x_val = tf.constant(pad_data(x_val, vocabulary))
@@ -40,6 +44,7 @@ if __name__ == "__main__":
 
     config = {
         'vocab_size': len(vocabulary),
+        'max_length': max_length,
         'embed_dim': args.embed_dim,
         'dropout': args.dropout,
         'rnn_type': args.rnn_type,

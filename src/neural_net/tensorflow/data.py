@@ -1,7 +1,7 @@
 def save_vocab(fname, vocabulary):
     with open(fname, 'w') as f:
         for key in vocabulary:
-            f.write(key + '\t' + str(vocabulary[key]) + '\n')
+            f.write(f"{key}\t{vocabulary[key]}\n")
 
 def load_vocab(fname):
     vocabulary = {}
@@ -28,7 +28,7 @@ def parse_dataset(fname, vocabulary={'pad': 0}):
     return vocabulary, x_items, y_items
 
 def pad_data(dataset, vocabulary):
-    max_length = max([len(item) for item in dataset])
+    max_length = 64 # max([len(item) for item in dataset])
     padded_dataset = []
     for item in dataset:
         padded_dataset.append(item + [vocabulary['pad']]*(max_length - len(item)))
