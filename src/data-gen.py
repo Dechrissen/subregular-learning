@@ -356,6 +356,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     x = args.lang # name of the language
 
+    if not os.path.exists("data_gen"):
+        os.mkdir("data_gen")
     if not os.path.exists("data_gen/Small"):
         os.mkdir("data_gen/Small")
     if not os.path.exists("data_gen/Mid"):
