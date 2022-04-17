@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     model_dir = dirname(args.model_dir)
-    vocab_file = model_dir + '/vocab.txt'
+    vocab_file = f"{model_dir}/vocab.txt"
     test_name = basename(args.data_file)[-10:-4]
 
     vocabulary = load_vocab(vocab_file)
@@ -31,11 +31,11 @@ if __name__ == "__main__":
     x_padded = tf.constant(pad_data(x_data, vocabulary))
     true_labels = np.array(y_data)[:, 0] == 1.0
 
-    config = load_model_config(model_dir + '/config.txt')
+    config = load_model_config(f"{model_dir}/config.txt")
     model = MainModel(**config)
-    model.load_weights(model_dir + '/checkpoint.ckpt')
+    model.load_weights(f"{model_dir}/checkpoint.ckpt")
     predictions = model.predict(x_padded)
-    #np.savetxt("predictions.csv", predictions, delimiter=",")
+    # np.savetxt("predictions.csv", predictions, delimiter=",")
     
     tpr = []
     fpr = []
