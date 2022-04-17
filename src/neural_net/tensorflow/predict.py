@@ -1,7 +1,7 @@
 import argparse
 import tensorflow as tf
 import tensorflow.keras as keras
-from os.path import dirname, basename
+from os.path import basename, dirname, join
 import json
 from model import MainModel
 from data import *
@@ -24,8 +24,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     model_dir = dirname(args.model_dir)
-    vocab_file = model_dir + '/vocab.txt'
-    test_name = basename(args.data_file)[-9:-4]
+    vocab_file = f"{model_dir}/vocab.txt"
+    test_name = basename(args.data_file)[-10:-4]
 
     vocabulary = load_vocab(vocab_file)
 
@@ -38,10 +38,14 @@ if __name__ == "__main__":
     true_labels = tf.math.argmax(y_data, axis=1)
 
     #model = keras.models.load_model(model_dir)
-    config = load_model_config(model_dir + '/config.txt')
+    config = load_model_config(f"{model_dir}/config.txt")
     model = MainModel(**config)
-    #model.compile(optimizer=keras.optimizers.Adam(), loss=keras.losses.BinaryCrossentropy(), metrics
-    model.load_weights(model_dir + '/checkpoint.ckpt')
+    # model.compile(
+    #     optimizer=keras.optimizers.Adam(),
+    #     loss=keras.losses.BinaryCrossentropy(),
+    #     metrics
+    # )
+    model.load_weights(f"{model_dir}/checkpoint.ckpt")
 
     predictions = model.predict(x_padded)
     category_predictions = tf.math.argmax(predictions, axis=1)
@@ -51,8 +55,8 @@ if __name__ == "__main__":
             string = indices_to_text(x_data[i], index_to_char)
             true_label = 'TRUE' if true_labels[i] == 0 else 'FALSE'
             predicted_label = 'TRUE' if category_predictions[i] == 0 else 'FALSE'
-            f.write(string + '\t' + true_label + '\t' + predicted_label + '\n')
+            f.write(f"{string}\t{true_label}\t{predicted_label}\n")
 
-    with open(model_dir + "/" + test_name + "_probs.txt", 'w') as f:
+    with open(join(model_dir, f"{test_name}_probs.txt"), 'w') as f:
         for i in range(len(predictions)):
-            f.write(str(predictions[i, 0]) + ' ' + str(predictions[i, 1]) + '\n')
+            f.write(f"{predictions[i, 0]} {predictions[i, 1]}\n")
