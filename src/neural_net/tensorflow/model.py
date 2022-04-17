@@ -38,7 +38,6 @@ class MainModel(Model):
     def __init__(
         self,
         vocab_size,
-        max_length,
         embed_dim=100,
         dropout=0.2,
         rnn_type="simple",

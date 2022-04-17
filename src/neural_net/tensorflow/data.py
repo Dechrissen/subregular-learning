@@ -28,7 +28,7 @@ def parse_dataset(fname, vocabulary={'pad': 0}):
     return vocabulary, x_items, y_items
 
 def pad_data(dataset, vocabulary):
-    max_length = 64 # max([len(item) for item in dataset])
+    max_length = 64 # PREV: max([len(item) for item in dataset])
     padded_dataset = []
     for item in dataset:
         padded_dataset.append(item + [vocabulary['pad']]*(max_length - len(item)))

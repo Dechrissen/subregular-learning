@@ -44,7 +44,6 @@ if __name__ == "__main__":
 
     config = {
         'vocab_size': len(vocabulary),
-        'max_length': max_length,
         'embed_dim': args.embed_dim,
         'dropout': args.dropout,
         'rnn_type': args.rnn_type,
