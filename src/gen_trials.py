@@ -1,16 +1,12 @@
 if __name__ == "__main__":
-	print("Opening files....")
-	output_file = open("model_list.txt", "w+", encoding="utf8")
-	
-	f = open("train_tags.txt", "r", encoding="utf8")
-	f = f.readlines()
-	
-	print("Generating list...")
-	for tag in f:
-		for length in ['1k', '10k', '100k']:
-			for model in ['simple', 'lstm', 'gru']:
-				output_file.write(tag[:-1] + " " + length + " " + model + "\n")
+    output_file = open("model_list.txt", "w+", encoding="utf8")
+
+    tags = open("tags.txt", "r", encoding="utf8").readlines()
+    for tag in tags:
+        for length in ['Small', 'Mid', 'Large']:
+            for model in ["gru", "lstm", "simple", "stackedrnn", "transformer"]:
+                output_file.write(f"{tag[:-1]} {length} {model}\n")
 				
-	output_file.close()
-	print("Done!")
+    output_file.close()
+    print("Done!")
 
