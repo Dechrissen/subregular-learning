@@ -8,6 +8,9 @@ Args:
     --action:
         all_fst:
             lang names with an .fst file in src/fstlib/fst_format/
+        all_langs:
+            lang names with an .fst or with data in data_gen
+            (includes complementary languages)
         data_gen_done:
             lang names for which data generation is complete
         train_done:
@@ -29,12 +32,23 @@ if __name__ == "__main__":
         if args.avoid_file is not None else []
     )
 
-    if args.action == "all_fst":
+    if args.action == "all_fst" or args.action == "all_langs":
         fst_names = sorted([
             filename.replace(".fst", "")
             for filename in os.listdir("src/fstlib/fst_format/")
         ])
-        langs_out = [f"{l}" for l in fst_names if l not in avoid]
+        langs_out = sorted(f"{l}" for l in fst_names if l not in avoid)
+
+        if args.action == "all_langs":
+            small_files = [f for f in os.listdir("data_gen/Small")]
+            mid_files = [f for f in os.listdir("data_gen/Mid")]
+            large_files = [f for f in os.listdir("data_gen/Large")]
+            langs_with_data = sorted(
+                set(f.split("_")[0] for f in small_files) |
+                set(f.split("_")[0] for f in mid_files) |
+                set(f.split("_")[0] for f in large_files)
+            )
+            langs_out = sorted(set(langs_out + langs_with_data))
 
     elif args.action == "data_gen_done":
         small_files = [
