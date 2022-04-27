@@ -1,60 +1,110 @@
-"""
-Performs one of three tasks:
-    - writes language names for which an fst exists in src/fstlib/fst_format
-      (supply neither --datagen nor --train)
-    - writes language names for which data generation is not compelete
-      (supply --datagen)
-    - writes language names for which data generation is complete
-      (supply --train)
-The argument --avoid can be used to specify the path of a text file whose lines
-indicate language names that should not be included in the output of this script.
-(Typically, this will be src/langs_done.txt) The 'avoid' file should have a
-trailing newline character, i.e. each lang must be followed by a newline char.
-"""
-
-import os
 import argparse
+import os, sys
+from itertools import product
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--datagen', dest='datagen', action='store_true')
-parser.add_argument('--train', dest='train', action='store_true')
-parser.add_argument('--avoid', type=str)
-parser.set_defaults(datagen=False, train=False, avoid=None)
-args = parser.parse_args()
-dtgen = args.datagen
-train = args.train
-avoid = args.avoid
+"""
+Print language names satisfying a certain property
+Args:
+    --action:
+        all_fst:
+            lang names with an .fst file in src/fstlib/fst_format/
+        data_gen_done:
+            lang names for which data generation is complete
+        train_done:
+            lang names for which training & eval is complete
+    --avoid:
+        a file whose lines are language names not to print
+"""
 
-avoid = open(avoid, 'r').readlines() if avoid is not None else []
-avoid = [l[:-1] for l in avoid]
 
-lang_names = sorted([filename[:-4] for filename in os.listdir("src/fstlib/fst_format/")])
-file_suffixes = ['Dev','Test1','Test2','Test3','Test4','Training']
-sizes = {'1k':10**3, '10k':10**4, '100k':10**5}
+if __name__ == "__main__":
 
-if not (dtgen or train):
-    with open('/dev/stdout', 'w') as f:
-        out = [l + '\n' for l in lang_names if l not in avoid]
-        f.writelines(out)
-else:
-    cwd = os.getcwd()
-    with open('/dev/stdout', 'w') as f:
-        langs_to_write = []
-        for lang in lang_names:
-            inc = False
-            for suffix in file_suffixes:
-                for size in sizes:
-                    fname = 'data_gen/' + size + '/' + lang + '_' + suffix + '.txt'
-                    if not os.path.exists(fname):
-                        inc = True
-                        break
-                    nlines = len(open(fname, 'r').readlines())
-                    if nlines != sizes[size]:
-                        inc = True
-                        break
-                if inc:
-                    break
-            if (dtgen and     inc and lang not in avoid) or \
-               (train and not inc and lang not in avoid):
-                f.write(lang + '\n')
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--action", default="data_gen_done")
+    parser.add_argument("--avoid_file", type=str, default=None)
+    args = parser.parse_args()
 
+    avoid = (
+        [l.strip() for l in open(args.avoid_file, "r").readlines()]
+        if args.avoid_file is not None else []
+    )
+
+    if args.action == "all_fst":
+        fst_names = sorted([
+            filename.replace(".fst", "")
+            for filename in os.listdir("src/fstlib/fst_format/")
+        ])
+        langs_out = [f"{l}" for l in fst_names if l not in avoid]
+
+    elif args.action == "data_gen_done":
+        small_files = [
+            f
+            for f in os.listdir("data_gen/Small")
+            if len(open(f"data_gen/Small/{f}", "r").readlines()) == 1e3
+        ]
+        mid_files = [
+            f
+            for f in os.listdir("data_gen/Mid")
+            if len(open(f"data_gen/Mid/{f}", "r").readlines()) == 1e4
+        ]
+        large_files = [
+            f
+            for f in os.listdir("data_gen/Large")
+            if len(open(f"data_gen/Large/{f}", "r").readlines()) == 1e5
+        ]
+
+        langs_with_data = sorted(
+            set(f.split("_")[0] for f in small_files) |
+            set(f.split("_")[0] for f in mid_files) |
+            set(f.split("_")[0] for f in large_files)
+        )
+
+        langs_out = []
+        f_types = ["Dev", "TestSR", "TestSA", "TestLR", "TestLA", "Train"]
+        for lang in langs_with_data:
+            files = [f"{lang}_{f_type}.txt" for f_type in f_types]
+            all_files_complete = all(
+                [f in small_files for f in files] +
+                [f in mid_files for f in files] +
+                [f in large_files for f in files]
+            )
+            if all_files_complete and lang not in avoid:
+                langs_out.append(lang)
+
+    elif args.action == "train_done":
+        directions = ["Uni"]
+        network_types = [
+            "simple",
+            "gru",
+            "lstm",
+            "stackedrnn",
+            "transformer"
+        ]
+        drops = ["NoDrop"]
+        sizes = ["Small", "Mid", "Large"]
+        model_grid = product(directions, network_types, drops, sizes)
+
+        langs_with_models = sorted(
+            set(f.split("_")[3] for f in os.listdir("models"))
+        )
+        for lang in langs_with_models:
+            test_types = ["SR", "SA", "LR", "LA"]
+            model_complete = lambda model: all(
+                f"Test{test}_eval.txt" in os.listdir(f"models/{model}")
+                if os.path.exists(f"models/{model}") else False
+                for test in test_types
+            )
+
+            model_list = [
+                f"{direction}_{network_type}_{drop}_{lang}_{size}"
+                for direction, network_type, drop, size in model_grid
+            ]
+            langs_out = []
+            if (
+                all(model_complete(model) for model in model_list) and
+                lang not in avoid
+            ):
+                langs_out.append(lang)
+
+    with open("/dev/stdout", "w") as f:
+            f.write("\n".join(langs_out) + "\n")
