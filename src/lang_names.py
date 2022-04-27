@@ -87,6 +87,7 @@ if __name__ == "__main__":
         langs_with_models = sorted(
             set(f.split("_")[3] for f in os.listdir("models"))
         )
+        langs_out = []
         for lang in langs_with_models:
             test_types = ["SR", "SA", "LR", "LA"]
             model_complete = lambda model: all(
@@ -99,7 +100,6 @@ if __name__ == "__main__":
                 f"{direction}_{network_type}_{drop}_{lang}_{size}"
                 for direction, network_type, drop, size in model_grid
             ]
-            langs_out = []
             if (
                 all(model_complete(model) for model in model_list) and
                 lang not in avoid
