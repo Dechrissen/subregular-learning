@@ -96,20 +96,20 @@ if __name__ == "__main__":
         ]
         drops = ["NoDrop"]
         sizes = ["Small", "Mid", "Large"]
-        model_grid = product(directions, network_types, drops, sizes)
+
+        test_types = ["SR", "SA", "LR", "LA"]
+        model_complete = lambda model: all(
+            f"Test{test}_eval.txt" in os.listdir(f"models/{model}")
+            if os.path.exists(f"models/{model}") else False
+            for test in test_types
+        )
 
         langs_with_models = sorted(
             set(f.split("_")[3] for f in os.listdir("models"))
         )
         langs_out = []
         for lang in langs_with_models:
-            test_types = ["SR", "SA", "LR", "LA"]
-            model_complete = lambda model: all(
-                f"Test{test}_eval.txt" in os.listdir(f"models/{model}")
-                if os.path.exists(f"models/{model}") else False
-                for test in test_types
-            )
-
+            model_grid = product(directions, network_types, drops, sizes)
             model_list = [
                 f"{direction}_{network_type}_{drop}_{lang}_{size}"
                 for direction, network_type, drop, size in model_grid
