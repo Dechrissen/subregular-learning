@@ -121,4 +121,4 @@ if __name__ == "__main__":
                 langs_out.append(lang)
 
     with open("/dev/stdout", "w") as f:
-            f.write("\n".join(langs_out) + "\n")
+            f.write("\n".join(langs_out))
