@@ -16,7 +16,7 @@ class TransformerBlock(layers.Layer):
             dropout=dropout
         )
         self.ffn = Sequential([
-            layers.Dense(ff_dim, activation="tanh"), 
+            layers.Dense(ff_dim, activation="relu"), 
             layers.Dense(embed_dim),
         ])
         self.layernorm1 = layers.LayerNormalization(epsilon=1e-6)
@@ -49,23 +49,23 @@ class MainModel(Model):
         self.rnn_type = rnn_type
         self.embeddings = layers.Embedding(vocab_size, embed_dim)
 
-        # TRANSFORMER
-        if rnn_type == "transformer":
-            self.pos_emb = layers.Embedding(self.max_length, embed_dim)
-            self.transformer_block = TransformerBlock(
-                embed_dim=embed_dim,
-                num_heads=2,
-                ff_dim=100,
-                dropout=0.0
-            )
-            self.pooling = layers.GlobalAveragePooling1D()
-
         # STACKED RNN
         rnn_cells = [
             layers.LSTMCell(embed_dim, dropout=dropout)
             for _ in range(2)
         ]
         stacked_lstm = layers.StackedRNNCells(rnn_cells)
+
+        # TRANSFORMER
+        if rnn_type == "transformer":
+            self.pos_emb = layers.Embedding(self.max_length, embed_dim)
+            self.transformer_block = TransformerBlock(
+                embed_dim=embed_dim,
+                num_heads=2,
+                ff_dim=128,
+                dropout=0.2
+            )
+            self.pooling = layers.GlobalAveragePooling1D()
 
         rnn_layers = {
             "lstm":layers.LSTM(embed_dim, dropout=dropout),
