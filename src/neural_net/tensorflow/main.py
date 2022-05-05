@@ -8,14 +8,16 @@ tf.get_logger().setLevel("ERROR")
 import tensorflow.keras as keras
 from tensorflow.keras.callbacks import TensorBoard
 from transformers import (
-    DefaultFlowCallback,
-    DistilBertConfig,
+    BertConfig,
     TFBertForSequenceClassification,
+    DistilBertConfig,
     TFDistilBertForSequenceClassification
 )
 
 from data import *
 from model import MainModel
+from predict_direct import predict
+from eval_direct import evaluate_predictions
 
 
 if __name__ == "__main__":
@@ -37,7 +39,7 @@ if __name__ == "__main__":
     vocabulary = {"pad": 0}
     vocabulary, x_train, y_train = parse_dataset(args.train_data, vocabulary)
     vocabulary, x_val, y_val = parse_dataset(args.val_data, vocabulary)
-    vocab_file = f"{model_path}/vocab.txt"
+    vocab_file = os.path.join(model_path, "vocab.txt")
     save_vocab(vocab_file, vocabulary)
 
     max_length = 64
@@ -52,10 +54,10 @@ if __name__ == "__main__":
         config = {
             "vocab_size":len(vocabulary),
             "max_position_embeddings":max_length,
-            "n_layers":2,
+            "n_layers":4,
             "n_heads":4,
             "dim":128,
-            "hidden_dim":128,
+            "hidden_dim":256,
             "dropout":args.dropout,
             "attention_dropout":args.dropout,
             "seq_classif_dropout":args.dropout
@@ -80,7 +82,12 @@ if __name__ == "__main__":
     model.compile(
         optimizer=keras.optimizers.Adam(learning_rate=2e-5),
         loss=keras.losses.BinaryCrossentropy(),
-        metrics=[keras.metrics.BinaryAccuracy()]
+        # loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        metrics=[
+            keras.metrics.BinaryAccuracy(),
+            keras.metrics.MeanSquaredError(),
+            keras.metrics.MeanAbsoluteError()
+        ]
     )
 
     checkpoint_path = os.path.join(model_path, "checkpoint.ckpt")
@@ -107,5 +114,19 @@ if __name__ == "__main__":
         callbacks=callbacks
     )
 
+    if args.rnn_type == "distilbert":
+        model.save_pretrained(f"./{model_path}")
+
     total_time = (datetime.now()-time_now).total_seconds()
     print(f"TOTAL TRAINING TIME IN SECONDS: {total_time}")
+
+    lang = model_path.split("/")[-1].split("_")[3]
+    test_size = "Large"
+    test_types = ["SR", "SA", "LR", "LA"]
+    data_files = [
+        os.path.join("data_gen", test_size, f"{lang}_Test{test_type}.txt")
+        for test_type in test_types
+    ]
+    for test_type, data_file in zip(test_types, data_files):
+        predict(model, model_path, data_file, f"Test{test_type}", vocabulary)
+        evaluate_predictions(f"{model_path}/Test{test_type}_pred.txt")
