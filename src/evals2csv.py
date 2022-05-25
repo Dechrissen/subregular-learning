@@ -57,27 +57,30 @@ for test in tests:
 
     with open(csv_fname, "a", newline="\n") as f:
         writer = csv.writer(f)
-        writer.writerows([[
-            alph,
-            tier,
-            lang_class,
-            k,
-            j,
-            lang_i,
-            direction,
-            network_type,
-            drop,
-            train_set_size,
-            test_type,
-            tests[test]["TP"],
-            tests[test]["FP"],
-            tests[test]["TN"],
-            tests[test]["FN"],
-            tests[test]["TPR"],
-            tests[test]["FPR"],
-            tests[test]["Precision"],
-            tests[test]["F-score"],
-            tests[test]["Accuracy"],
-            tests[test]["AUC"],
-            tests[test]["Brier"]
-        ]])
+        try:
+            writer.writerows([[
+                alph,
+                tier,
+                lang_class,
+                k,
+                j,
+                lang_i,
+                direction,
+                network_type,
+                drop,
+                train_set_size,
+                test_type,
+                tests[test]["TP"],
+                tests[test]["FP"],
+                tests[test]["TN"],
+                tests[test]["FN"],
+                tests[test]["TPR"],
+                tests[test]["FPR"],
+                tests[test]["Precision"],
+                tests[test]["F-score"],
+                tests[test]["Accuracy"],
+                tests[test]["AUC"],
+                tests[test]["Brier"]
+            ]])
+        except KeyError:
+            pass
