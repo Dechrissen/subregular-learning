@@ -173,7 +173,7 @@ The following researchers have all contributed to the development of this projec
 - Paul Fodor (Professor of Instruction, CS)
 - Tiantian Gao (CS, PhD 2019)
 - [Jeffrey Heinz (Professor, Linguistics & IACS)](http://jeffreyheinz.net/)
-- [Dakotah Lambert (Ling, current PhD)](https://github.com/vvulpes0)
+- [Dakotah Lambert (postdoc LABEX MILYON)](https://github.com/vvulpes0)
 - [Kalina Kostyszyn (Ling, current PhD)](https://github.com/kkostyszyn)
 - [Emily Peterson (Ling, CompLing MA 2020)](https://github.com/emkp)
 - Chihiro Shibata (Professor, Hosei University)
