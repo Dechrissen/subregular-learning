@@ -135,7 +135,7 @@ python src/neural_net/tensorflow/eval.py --predict-file models/Uni_gru_NoDrop_16
 which produces an evaluation file recording various test metrics including accuracy, F-score, precision, and Brier score, among others.
 
 # Managing language names
-With support for 1980 regular languages and thousands of neural models, tracking the progress of languages and models throughout the data generation, training, and evaluation process in an organized way is crucial. The script `src/lang_names.py` accomplishes this by printing to stdout those language names satisfying a certain condition. The condition under which to print language names is specified with the argument `--action`, which has the following options:
+With support for 1800 regular languages and thousands of neural models, tracking the progress of languages and models throughout the data generation, training, and evaluation process in an organized way is crucial. The script `src/lang_names.py` accomplishes this by printing to stdout those language names satisfying a certain condition. The condition under which to print language names is specified with the argument `--action`, which has the following options:
 - `--action all_fst`: print language names having an associated .fst file in `src/fstlib/fst_format`
 - `--action all_langs`: print language names having an associated .fst file as well as any langauges with data in `data_gen` (this includes completmentary languages e.g. coSL, coSP, etc.)
 - `--action data_gen_done`: prints languages names for which data generation is complete
