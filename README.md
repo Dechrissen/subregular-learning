@@ -172,9 +172,9 @@ python src/evals2csv.py
 
 # Acknowledgements
 
-This repository is a continuation of work reported by [Avcu et al. (2017)](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjggda6gaTuAhVRElkFHcpJD4kQFjACegQIBhAC&url=http%3A%2F%2Fprojects.illc.uva.nl%2FLaCo%2Fclclab%2Fmedia%2Fpdfs%2F2017%2Fvelhoen2017.pdf&usg=AOvVaw3YNi86XUzp5U_I1sKb6u_I). The code here evolved from Andersen's [repository](https://github.com/Dechrissen/subregular-learning), which in turn inherited from Peterson, St. Clair, and Chau's work [here](https://github.com/emkp/CSE538_FinalProject) as well as Kostyszyn's [repository](https://github.com/kkostyszyn/SBFST_2019).
+The code here evolved from Andersen's [repository](https://github.com/Dechrissen/subregular-learning), who organized and maintained code that was mostly developed by Gao, Kostyszyn, and Verma, and tested and used by Chau, Peterson, and St. Clair in earlier stages of the research.
 
-The latest installment of this work is supervised by Jeffrey Heinz, with primary contributions from Kalina Kostyszyn, Dakotah Lambert, and Sam van der Poel.
+The latest installment of this work is supervised by Jeffrey Heinz, with primary contributions from Kalina Kostyszyn, Dakotah Lambert, and Sam van der Poel. 
 
 The following researchers have all contributed to the development of this project.
 
