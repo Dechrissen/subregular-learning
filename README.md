@@ -172,9 +172,7 @@ python src/evals2csv.py
 
 # Acknowledgements
 
-The code here evolved from Andersen's [repository](https://github.com/Dechrissen/subregular-learning), who organized and maintained code that was mostly developed by Gao, Kostyszyn, and Verma, and tested and used by Chau, Peterson, and St. Clair in earlier stages of the research.
-
-The latest installment of this work is supervised by Jeffrey Heinz, with primary contributions from Kalina Kostyszyn, Dakotah Lambert, and Sam van der Poel. 
+This code was forked from Andersen's [repository](https://github.com/Dechrissen/subregular-learning), who organized and maintained code that was mostly developed by Gao, Kostyszyn, and Verma, and tested and used by Chau, Peterson, and St. Clair under supervision by Heinz, Fodor, and Shibata. Updates in this repository were made by Kostyszyn, Lambert, and van der Poel under the supervision of Heinz, Fodor, and Shibata.
 
 The following researchers have all contributed to the development of this project.
 
