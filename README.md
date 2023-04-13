@@ -17,11 +17,12 @@ MLRegTest train, development, and test sets are available under the same license
 
 ## Contents
 1. [Setup](#setup)
-2. [Data generation](#data-generation)
-3. [Neural networks](#neural-networks)
-4. [Managing language names](#managing-language-names)
-5. [Collecting evaluations](#collecting-evaluations)
-6. [Adding new languages](#adding-new-languages)
+2. [Languages](#languages)
+3. [Data generation](#data-generation)
+4. [Neural networks](#neural-networks)
+5. [Managing language names](#managing-language-names)
+6. [Collecting evaluations](#collecting-evaluations)
+7. [Analysis](#analysis)
 
 # Setup
 This codebase was tested on Linux using [Conda](https://www.anaconda.com/products/individual). Clone and cd into this repository:
@@ -46,11 +47,28 @@ conda activate subreg
 conda install -c conda-forge pynini=2.1.2
 ```
 
+# Languages
+
+`src/subreglib` contains `.plebby` files that can be used with
+`plebby`, which is a command-line program included in [The Language
+Toolkit](https://github.com/vvulpes0/Language-Toolkit-2) by Dakotah
+Lambert. Each file specifies the acceptors for various languages and,
+after being run via `plebby`, outputs `.att` files for each
+language. A usage guide for `plebby` is
+[here](https://github.com/vvulpes0/Language-Toolkit-2/blob/master/docs/plebbyGuide.txt). For
+more info about the organization of `.plebby` files for use in this
+library, refer to the README in `src/subreglib` .
+
+
 # Data generation
-Data for each language is generated according to an FSA (in the form of an `.fst` file) of a given subregular language. The process of data generation is outlined in the following three steps.
+
+Data for each language is generated according to an FSA (in the form
+of an `.fst` file) of a given subregular language. The process of data
+generation is outlined in the following three steps.
 
 ## 1 - `.att` files
-Provide a file encoding the possible transitions in a given subregular language in the form of an `.att` file (example below). One file per language should be placed in the `/src/fstlib/att_format` directory.
+Provide a file encoding the possible transitions in a given subregular language in the form of an `.att` file (example below). 
+One file per language should be placed in the `/src/fstlib/att_format` directory.
 ```
 0   0   b   b
 0   0   c   c
@@ -168,9 +186,9 @@ bash src/collect_evals.sh
 python src/evals2csv.py
 ```
 
-# Adding new languages
+# Analysis
 
-`src/subreglib` contains `.plebby` files that can be used with `plebby`, included in [The Language Toolkit](https://github.com/vvulpes0/Language-Toolkit-2) by Dakotah Lambert. Each file specifies the acceptors for various languages and, after being run via `plebby`, outputs `.att` files for each language. A usage guide for `plebby` is [here](https://github.com/vvulpes0/Language-Toolkit-2/blob/master/docs/plebbyGuide.txt). For more info about the organization of `.plebby` files for use in this library, refer to the README in `src/subreglib` .
+The `analysis` folder includes an `analysis.R` file, the `all_evals.csv`, and a `counts.tsv` file which has information about the size of the automaton representations of the 1,800 languages. The `analysis.R` includes the R code which conducts the statistical analysis reported in the paper as well as generating the visualizations used.
 
 # Acknowledgements
 
