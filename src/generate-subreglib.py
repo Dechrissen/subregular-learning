@@ -397,6 +397,17 @@ def main():
                   intersection(evenX,union(dxbb2(2),sf3))) # SF
 
         for tau in [sigma, base, 2*base-1]:
+            ###
+            # Remove the 04.02.T* languages
+            # -- D.L.
+            ###
+            if tau == 2 and sigma == 4:
+                continue
+            ###
+            # ^ Without this if:continue,
+            # there should be 1620 plebby files
+            # with it, there should be 1470
+            ###
             for k in [2, 4, 6]:
                 a = symbols[0]
                 b = symbols[1]
@@ -536,6 +547,14 @@ def main():
                               implication(
                                   lp((j*[[a,b],[b,a]])[:j]),
                                   lp(([[b,a]]+j*[[a,b]])[:j])),2))
+                ########################
+                # NOTICE:
+                # Some 04.02.T* are not sufficiently distinct from
+                # others, due to the small salient alphabet.
+                # We won't use the 04.02.T* in the analysis,
+                # as these few belong to multiple incomparable classes.
+                # -- D.L.
+                ########################
 
 if __name__ == "__main__":
     main()

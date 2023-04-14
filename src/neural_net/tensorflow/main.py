@@ -7,12 +7,6 @@ import tensorflow as tf
 tf.get_logger().setLevel("ERROR")
 import tensorflow.keras as keras
 from tensorflow.keras.callbacks import TensorBoard
-from transformers import (
-    BertConfig,
-    TFBertForSequenceClassification,
-    DistilBertConfig,
-    TFDistilBertForSequenceClassification
-)
 
 from data import *
 from model import MainModel
@@ -26,10 +20,10 @@ if __name__ == "__main__":
     parser.add_argument("--val-data", type=str, required=True)
     parser.add_argument("--output-dir", type=str, required=True)
     parser.add_argument("--batch-size", type=int, default=64)
-    parser.add_argument("--epochs", type=int, default=10)
+    parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--embed-dim", type=int, default=100)
     parser.add_argument("--dropout", type=float, default=0.2)
-    parser.add_argument("--rnn-type", type=str, default="simple")
+    parser.add_argument("--rnn-type", type=str, required=True)
     parser.add_argument("--bidi", type=bool, default=False)
     args = parser.parse_args()
 
@@ -50,30 +44,14 @@ if __name__ == "__main__":
     y_train = tf.constant(y_train)
     y_val = tf.constant(y_val)
 
-    if args.rnn_type == "distilbert":
-        config = {
-            "vocab_size":len(vocabulary),
-            "max_position_embeddings":max_length,
-            "n_layers":4,
-            "n_heads":4,
-            "dim":128,
-            "hidden_dim":256,
-            "dropout":args.dropout,
-            "attention_dropout":args.dropout,
-            "seq_classif_dropout":args.dropout
-        }
-        distilbertconfig = DistilBertConfig(**config)
-        model = TFDistilBertForSequenceClassification(distilbertconfig)
-        # model = TFDistilBertForSequenceClassification.from_pretrained("distilbert-base-uncased")
-    else:
-        config = {
-            "vocab_size":len(vocabulary),
-            "embed_dim":args.embed_dim,
-            "dropout":args.dropout,
-            "rnn_type":args.rnn_type,
-            "bidi":args.bidi
-        }
-        model = MainModel(**config)
+    config = {
+        "vocab_size":len(vocabulary),
+        "embed_dim":args.embed_dim,
+        "dropout":args.dropout,
+        "rnn_type":args.rnn_type,
+        "bidi":args.bidi
+    }
+    model = MainModel(**config)
 
     config_file = f"{model_path}/config.json"
     with open(config_file, "w") as f:
@@ -82,7 +60,6 @@ if __name__ == "__main__":
     model.compile(
         optimizer=keras.optimizers.Adam(learning_rate=2e-5),
         loss=keras.losses.BinaryCrossentropy(),
-        # loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         metrics=[
             keras.metrics.BinaryAccuracy(),
             keras.metrics.MeanSquaredError(),
@@ -113,9 +90,6 @@ if __name__ == "__main__":
         validation_data=(x_val, y_val),
         callbacks=callbacks
     )
-
-    if args.rnn_type == "distilbert":
-        model.save_pretrained(f"./{model_path}")
 
     total_time = (datetime.now()-time_now).total_seconds()
     print(f"TOTAL TRAINING TIME IN SECONDS: {total_time}")

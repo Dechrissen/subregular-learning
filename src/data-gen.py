@@ -78,9 +78,9 @@ def make_string_dict(fsa, min_len, max_len, sigma):
 # This may be duplicates.
 def create_data_with_duplicate(name, pos_dict, neg_dict, min_len, max_len, num):
 
-    test_files = [dirLarge + x + name + ".txt",
-                  dirMid   + x + name + ".txt",
-                  dirSmall + x + name + ".txt"]
+    test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
+                  os.path.join(dirMid, f"{x}{name}.txt"),
+                  os.path.join(dirSmall, f"{x}{name}.txt")]
     f = [open(test_files[0], "w+"),
          open(test_files[1], "w+"),
          open(test_files[2], "w+")]
@@ -179,9 +179,9 @@ def rand_gen_no_duplicate(acceptor, n):
 
 def create_data_no_duplicate(name, pos_dict, neg_dict, min_len, max_len, num):
 
-    test_files = [dirLarge + x + name + ".txt",
-                  dirMid   + x + name + ".txt",
-                  dirSmall + x + name + ".txt"]
+    test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
+                  os.path.join(dirMid, f"{x}{name}.txt"),
+                  os.path.join(dirSmall, f"{x}{name}.txt")]
     f = [open(test_files[0], "w+"),
          open(test_files[1], "w+"),
          open(test_files[2], "w+")]
@@ -258,8 +258,8 @@ def editExactly1(fsa):
     chars = alph(fsa)
     ss = sigmastar(fsa)
     edits = zero
-    for x in chars: edits = T(x,"") | edits  # deletion
-    for x in chars: edits = T("",x) | edits  # insertion
+    for x in chars: edits = T(x, "") | edits  # deletion
+    for x in chars: edits = T("", x) | edits  # insertion
     for x in chars:
         for y in chars:
             if x != y:
@@ -300,9 +300,9 @@ def create_adversarial_examples(
     tests = {'short':'SA', 'long':'LA'}
     test  = tests[length]
     test_files = [
-        f"{dirLarge}{x}_Test{test}.txt",
-        f"{dirMid}{x}_Test{test}.txt",
-        f"{dirSmall}{x}_Test{test}.txt"
+        os.path.join(dirLarge, f"{x}_Test{test}.txt"),
+        os.path.join(dirMid, f"{x}_Test{test}.txt"),
+        os.path.join(dirSmall, f"{x}_Test{test}.txt")
     ]
     f = [
         open(test_files[0], "w+"),
@@ -365,14 +365,10 @@ if __name__ == "__main__":
     if not os.path.exists("data_gen/Large"):
         os.mkdir("data_gen/Large")
 
-    # WHERE EVERYTHING IS
-    # mainDir will have to change depending
-    # on where the subregular-learning library is
-    mainDir = "/gpfs/projects/HeinzGroup/subregular-learning/"
-
-    dirLarge = mainDir + "data_gen/Large/"  
-    dirMid   = mainDir + "data_gen/Mid/"
-    dirSmall = mainDir + "data_gen/Small/"
+    mainDir = os.getcwd()
+    dirLarge = os.path.join(mainDir, "data_gen/Large")
+    dirMid = os.path.join(mainDir, "data_gen/Mid")
+    dirSmall = os.path.join(mainDir, "data_gen/Small")
 
     # lengths of short strings and long strings
     ss_min_len = 20
@@ -408,7 +404,7 @@ if __name__ == "__main__":
 
     # The FSA we analyze and related FSAs
 
-    fstfile = f"{mainDir}src/fstlib/fst_format/{x}.fst"
+    fstfile = os.path.join(mainDir, "src/fstlib/fst_format", f"{x}.fst")
     the_fsa = pynini.Fst.read(fstfile)
     the_chars = alph(the_fsa)
     the_s = sigma(the_fsa)
@@ -417,7 +413,7 @@ if __name__ == "__main__":
     the_cofsa = pynini.difference(the_ss,the_fsa)
     the_cofsa.optimize()
 
-    # this is the key insight which gives entire border for the adversarial test sets
+    # this gives entire border for the adversarial test sets
     bpairs = the_fsa @ editTransducer @ the_cofsa    
     bpairs.optimize()
 
