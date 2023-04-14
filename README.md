@@ -156,6 +156,8 @@ To organize these results nicely into a `.csv` file, run `/evals2csv.py`. This w
 
 ## Acknowledgements
 
+Language class verification, data set creation, and neural nework training and evaluation were completed on the Stony Brook SeaWulf HPC cluster maintained by Research Computing and Cyberinfrastructure, and the [Institute for Advanced Computational Science at Stony Brook University](https://iacs.stonybrook.edu/) and made possible by NSF grant \#1531492.
+
 This repository is the latest installment of work by several
 individuals since 2017 and is a continuation of the work reported by
 [Avcu et
