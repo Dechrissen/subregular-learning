@@ -13,7 +13,7 @@ This work is licensed under a
 This repository provides many regular languages from distinct well-understood subregular language classes, instantiating a benchmark for machine learning models. The desired outcome is to better understand the kinds of sequential patterns neural networks in particular are able to learn successfuly and under what conditions. Some motivation is provided in [Avcu et al. (2017) paper "Subregular Complexity and Deep Learning"](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjggda6gaTuAhVRElkFHcpJD4kQFjACegQIBhAC&url=http%3A%2F%2Fprojects.illc.uva.nl%2FLaCo%2Fclclab%2Fmedia%2Fpdfs%2F2017%2Fvelhoen2017.pdf&usg=AOvVaw3YNi86XUzp5U_I1sKb6u_I).
 The regular languages themselves are based on logical and algebraic structure, forming the subregular language hierarchy (see [Rogers and Pullum 2011](https://link.springer.com/article/10.1007/s10849-011-9140-2) and [Rogers et al. 2013](https://link.springer.com/chapter/10.1007%2F978-3-642-39998-5_6)).
 
-MLRegTest train, development, and test sets are available under the same license at the [OSF](https://osf.io/ksdnm/). The manuscript describing its creation and the experiments we conducted with it has been posted to [arxiv]().
+MLRegTest train, development, and test sets are available under the same license at the [OSF](https://osf.io/ksdnm/). The manuscript describing its creation and the experiments we conducted with it has been posted to [arxiv under the title "MLRegTest: A Benchmark for the Machine Learning of Regular Languages"](http://arxiv.org/abs/2304.07687).
 
 ## Contents
 1. [Setup](#setup)
