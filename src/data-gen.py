@@ -15,11 +15,15 @@ import os
 ################
 
 
-def A(s):
-    return pynini.acceptor(s, token_type="utf8")
+def A(s, token_type='utf8'):
+    # the name of this function varies between pynini versions
+    if hasattr(pynini, 'accep'):
+        return pynini.accep(s, token_type=token_type)
+    return pynini.acceptor(s, token_type=token_type)
 
-def T(upper, lower):
-    return pynini.cross(A(upper), A(lower))
+def T(upper, lower, token_type='utf8'):
+    return pynini.cross(A(upper, token_type=token_type),
+                        A(lower, token_type=token_type))
 
 a = A("a")
 zero = a-a
@@ -38,10 +42,11 @@ def alph(fsa):
     return temp
 
 def sigma(fsa):
-    chars = alph(fsa)
-    s = zero
-    for c in chars:
-        s = A(c) | s
+    syms = fsa.input_symbols()
+    one_letter = [A(x[1],token_type=syms) for x in syms][1:]
+    s = pynini.union(*one_letter)
+    s.set_input_symbols(fsa.input_symbols())
+    s.set_output_symbols(fsa.output_symbols())
     return s.optimize()
 
 def sigmastar(fsa):
@@ -51,8 +56,10 @@ def sigmastar(fsa):
 # the fsa must recognize a finite language
 
 def list_string_set(fsa):
+    isyms=fsa.input_symbols()
+    osyms=fsa.output_symbols()
     my_list = []
-    paths = fsa.paths(input_token_type="utf8", output_token_type="utf8")
+    paths = fsa.paths(input_token_type=isyms, output_token_type=osyms)
     for s in paths.ostrings():
         my_list.append(s)
     my_list.sort(key=len)
@@ -255,16 +262,14 @@ def create_data_no_duplicate(name, pos_dict, neg_dict, min_len, max_len, num):
 
 # defining edit distance transducer given an alphabet
 def editExactly1(fsa):
-    chars = alph(fsa)
-    ss = sigmastar(fsa)
-    edits = zero
-    for x in chars: edits = T(x, "") | edits  # deletion
-    for x in chars: edits = T("", x) | edits  # insertion
-    for x in chars:
-        for y in chars:
-            if x != y:
-                edits = T(x,y) | edits       # substitution
+    syms = fsa.input_symbols()
+    noneps = list(syms)[1:]
+    deletions  = [T(x[1],"",token_type=syms) for x in noneps]
+    insertions = [T("",x[1],token_type=syms) for x in noneps]
+    subs = [T(x[1],y[1],token_type=syms) for x in noneps for y in noneps]
+    edits = pynini.union(*deletions,*insertions,*subs)
     edits.optimize()
+    ss = sigmastar(fsa)
     edit1transducer = ss + edits + ss
     # a transducer that produces all strings that are within
     # 1 edit of its input string
@@ -296,6 +301,8 @@ def create_adversarial_examples(
     # which relates strings x in the_fsa to
     # those strings y in the_cofsa such that
     # string edit distance (x,y) = 1
+    isyms = border_fst.input_symbols()
+    osyms = border_fst.output_symbols()
     
     tests = {'short':'SA', 'long':'LA'}
     test  = tests[length]
@@ -322,8 +329,8 @@ def create_adversarial_examples(
             weighted=False
         )
         ps = random_examples.paths(
-            input_token_type="utf8",
-            output_token_type="utf8"
+            input_token_type=isyms,
+            output_token_type=osyms
         )
 
         # CONCERN: These test items could contain duplicates because
@@ -414,7 +421,7 @@ if __name__ == "__main__":
     the_cofsa.optimize()
 
     # this gives entire border for the adversarial test sets
-    bpairs = the_fsa @ editTransducer @ the_cofsa    
+    bpairs = the_fsa @ editTransducer @ the_cofsa
     bpairs.optimize()
 
 
