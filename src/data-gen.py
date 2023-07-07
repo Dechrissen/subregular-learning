@@ -9,6 +9,7 @@ import random
 import pathlib
 import os
 
+import sys
 
 ################
 # Helper Functions
@@ -65,7 +66,6 @@ def list_string_set(fsa):
     my_list.sort(key=len)
     return my_list
 
-
 # Utility function that gets the strings of an fsa
 # with length from min_len to max_len
 
@@ -83,7 +83,7 @@ def make_string_dict(fsa, min_len, max_len, sigma):
 
 # create {num} random strings of positive/negative examples.
 # This may be duplicates.
-def create_data_with_duplicate(name, pos_dict, neg_dict, min_len, max_len, num):
+def create_data_with_duplicate(name, fsa, min_len, max_len, num):
 
     test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
                   os.path.join(dirMid, f"{x}{name}.txt"),
@@ -92,58 +92,44 @@ def create_data_with_duplicate(name, pos_dict, neg_dict, min_len, max_len, num):
          open(test_files[1], "w+"),
          open(test_files[2], "w+")]
 
+    syms = fsa.input_symbols()
+    noneps = list(syms)[1:]
+    pos_dict = dict()
+    neg_dict = dict()
     for i in range(min_len, max_len + 1):
-        
-        # get num strings of length i from the pos_dict
-        pos_fsa = pynini.randgen(
-            pos_dict[i],
-            npath=num,
-            seed=0,
-            select="uniform",
-            max_length=2147483647,
-            weighted=False
-        )
-
-        # write them into the files
+        pos_strings = []
+        neg_strings = []
+        while len(pos_strings) < num or len(neg_strings) < num:
+            s = random.choices(noneps, k=i)
+            s = ' '.join([x[1] for x in s])
+            if (A(s, token_type=syms) @ fsa).num_states() != 0:
+                if len(pos_strings) < num:
+                    pos_strings.append(s.replace(' ',''))
+            else:
+                if len(neg_strings) < num:
+                    neg_strings.append(s.replace(' ',''))
+        pos_dict[i] = set(pos_strings)
+        neg_dict[i] = set(neg_strings)
         count = 0
-        for ele in list_string_set(pos_fsa):
-            f[0].write(ele + "\t" + "TRUE\n")
+        for ele in pos_strings:
+            f[0].write(ele + '\t' + 'TRUE\n')
             if count % factor == 0:
-                f[1].write(ele + "\t" + "TRUE\n")
+                f[1].write(ele + '\t' + 'TRUE\n')
             if count % (factor*factor) == 0:
-                f[2].write(ele + "\t" + "TRUE\n")
-            count = count +1
-
-        # update the pos_dict by subtracting the strings in pos_fsa
-        pos_dict[i] = pynini.difference(pos_dict[i], pos_fsa)
-
-        # get num strings of length i from the neg_dict
-        neg_fsa = pynini.randgen(
-            neg_dict[i],
-            npath=num,
-            seed=0,
-            select="uniform",
-            max_length=2147483647,
-            weighted=False
-        )
-
-        # write them into the files
+                f[2].write(ele + '\t' + 'TRUE\n')
+            count = count + 1
         count = 0
-        for ele in list_string_set(neg_fsa):
-            f[0].write(ele + "\t" + "FALSE\n")
+        for ele in neg_strings:
+            f[0].write(ele + '\t' + 'FALSE\n')
             if count % factor == 0:
-                f[1].write(ele + "\t" + "FALSE\n")
+                f[1].write(ele + '\t' + 'FALSE\n')
             if count % (factor*factor) == 0:
-                f[2].write(ele + "\t" + "FALSE\n")
+                f[2].write(ele + '\t' + 'FALSE\n')
             count = count + 1
 
-        # update the neg_dict by subtracting the strings in neg_fsa
-        neg_dict[i] = pynini.difference(neg_dict[i], neg_fsa)
-
     for i in range(3):
-        f[i].close()            
+        f[i].close()
     return pos_dict, neg_dict
-
 
 def rand_gen_no_duplicate(acceptor, n):
     rand_list = []
@@ -184,7 +170,7 @@ def rand_gen_no_duplicate(acceptor, n):
 # No duplicates in the dataset.
 
 
-def create_data_no_duplicate(name, pos_dict, neg_dict, min_len, max_len, num):
+def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, num):
 
     test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
                   os.path.join(dirMid, f"{x}{name}.txt"),
@@ -192,66 +178,54 @@ def create_data_no_duplicate(name, pos_dict, neg_dict, min_len, max_len, num):
     f = [open(test_files[0], "w+"),
          open(test_files[1], "w+"),
          open(test_files[2], "w+")]
-    
+
+    syms = fsa.input_symbols()
+    noneps = list(syms)[1:]
+    opos_dict = dict()
+    oneg_dict = dict()
     for i in range(min_len, max_len + 1):
-        #print('\nworking on length '+str(i))
-        
-        # generate positive strings
-        #print('getting positive strings for length '+str(i))
-        acceptor, pos_results = rand_gen_no_duplicate(pos_dict[i], num)
-        amount_pos = len(pos_results)
-        if amount_pos < num:
-            print(
-                f'WARNING: Only {amount_pos}'
-                f'positive strings generated for length {i}'
-            )
-            pos_dict[i] = acceptor
-            
-        # generate negative strings
-        #print('getting negative strings for length '+str(i))
-        acceptor, neg_results = rand_gen_no_duplicate(neg_dict[i], num)
-        amount_neg = len(neg_results)
-        if amount_neg < num:
-            print(
-                f'WARNING: Only {amount_neg}'
-                f'negative strings generated for length {i}'
-            )
-            neg_dict[i] = acceptor
-            
-        # check which of the pos results or neg results is smaller,
-        # and set that to the stopping number
-        if amount_pos > amount_neg:
-            stop = amount_neg
-        else:
-            stop = amount_pos
+        pos_strings = []
+        neg_strings = []
+        while len(pos_strings) < num or len(neg_strings) < num:
+            s = random.choices(noneps, k=i)
+            s = ' '.join([x[1] for x in s])
+            sx = s.replace(' ','')
+            if sx in pos_strings or sx in neg_strings:
+                continue
+            if i in pos_dict and (sx in pos_dict[i] or sx in neg_dict[i]):
+                continue
+            if (A(s, token_type=syms) @ fsa).num_states() != 0:
+                if len(pos_strings) < num:
+                    pos_strings.append(sx)
+            else:
+                if len(neg_strings) < num:
+                    neg_strings.append(sx)
+        opos_dict[i] = pos_dict.get(i,set()).union(pos_strings)
+        oneg_dict[i] = neg_dict.get(i,set()).union(neg_strings)
 
         # write positive results to file, stopping at stopping number
         count = 0
-        for ele in pos_results:
+        for ele in pos_strings:
             f[0].write(ele + "\t" + "TRUE\n")
             if count % factor == 0:
                 f[1].write(ele + "\t" + "TRUE\n")
             if count % (factor*factor) == 0:
                 f[2].write(ele + "\t" + "TRUE\n")
-            count = count +1
-            if count == stop:
-                break
+            count = count + 1
 
         # write negative results to file, stopping at stopping number
         count = 0
-        for ele in neg_results:
+        for ele in neg_strings:
             f[0].write(ele + "\t" + "FALSE\n")
             if count % factor == 0:
                 f[1].write(ele + "\t" + "FALSE\n")
             if count % (factor*factor) == 0:
                 f[2].write(ele + "\t" + "FALSE\n")
-            count = count +1
-            if count == stop:
-                break
+            count = count + 1
 
     for i in range(3):
-        f[i].close()        
-    return pos_dict, neg_dict
+        f[i].close()
+    return opos_dict, oneg_dict
 
 
 
@@ -303,6 +277,7 @@ def create_adversarial_examples(
     # string edit distance (x,y) = 1
     isyms = border_fst.input_symbols()
     osyms = border_fst.output_symbols()
+    noneps = list(isyms)[1:]
     
     tests = {'short':'SA', 'long':'LA'}
     test  = tests[length]
@@ -319,43 +294,38 @@ def create_adversarial_examples(
 
     numtogen = {'short':largedata / num_ss , 'long':largedata / num_ls}
     for n in range(min_len,max_len+1):
-        bpairsN = border(border_fst, pos_dict, neg_dict, n)
-        random_examples=pynini.randgen(
-            bpairsN,
-            npath=numtogen[length]/2,
-            seed=0,
-            select="uniform",
-            max_length=2147483647,
-            weighted=False
-        )
-        ps = random_examples.paths(
-            input_token_type=isyms,
-            output_token_type=osyms
-        )
-
-        # CONCERN: These test items could contain duplicates because
-        # random_examples may contain duplicates... maybe a better
-        # approach is to generate positive strings with create_data_no_duplicate
-        # and then find a negative string which is 1 away (then each pair is
-        # distinct even if some negative strings occur twice)
-        
+        pos_strings = []
+        neg_strings = []
+        num = numtogen[length]
+        while len(pos_strings) < num:
+            s = random.choices(noneps, k=n)
+            s = ' '.join([x[1] for x in s])
+            sx = s.replace(' ','')
+            if sx in pos_strings or sx in pos_dict.get(n,set()):
+                continue
+            avail = A(s, token_type=isyms) @ border_fst
+            if avail.num_states() == 0:
+                continue
+            ps = avail.paths(input_token_type=isyms,
+                             output_token_type=osyms)
+            near = random.choice(list(ps.ostrings()))
+            pos_strings.append(sx)
+            neg_strings.append(near.replace(' ',''))
         count = 0
-        while not ps.done():
-            if ps.istring() and ps.ostring():
-                f[0].write(ps.istring() + "\tTRUE\n")
-                f[0].write(ps.ostring() + "\tFALSE\n")
-                if count % factor == 0:
-                    f[1].write(ps.istring() + "\tTRUE\n")
-                    f[1].write(ps.ostring() + "\tFALSE\n")
-                    if count % (factor*factor) == 0:
-                        f[2].write(ps.istring() + "\tTRUE\n")
-                        f[2].write(ps.ostring() + "\tFALSE\n")
-            ps.next()
+        for i in range(len(pos_strings)):
+            istr = pos_strings[i]
+            ostr = neg_strings[i]
+            f[0].write(istr + "\tTRUE\n")
+            f[0].write(ostr + "\tFALSE\n")
+            if count % factor == 0:
+                f[1].write(istr + "\tTRUE\n")
+                f[1].write(ostr + "\tFALSE\n")
+                if count % (factor*factor) == 0:
+                    f[2].write(istr + "\tTRUE\n")
+                    f[2].write(ostr + "\tFALSE\n")
             count=count+1
-        
     for i in range(3):
         f[i].close()
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -425,24 +395,14 @@ if __name__ == "__main__":
     bpairs.optimize()
 
 
-    # set up dictionary for short strings
-    pos_dict_ss = make_string_dict(the_fsa, ss_min_len-1, ss_max_len+1, the_s)
-    neg_dict_ss = make_string_dict(the_cofsa, ss_min_len-1, ss_max_len+1, the_s)
-
-
-    # set up dictionary for long strings
-    pos_dict_ls = make_string_dict(the_fsa, ls_min_len-1, ls_max_len+1, the_s)
-    neg_dict_ls = make_string_dict(the_cofsa, ls_min_len-1, ls_max_len+1, the_s)
-
-    # Create training data with duplicates
+    # Create training data, allowing duplicates,
     # from the short strings
     # start with a file that has 100k words.
     # From there, prune to have 10k and 1k from that file.
 
     pos_dict_after_train, neg_dict_after_train = create_data_with_duplicate(
         "_Train",
-        pos_dict_ss,
-        neg_dict_ss,
+        the_fsa,
         ss_min_len,
         ss_max_len,
         train_pos_num
@@ -451,6 +411,7 @@ if __name__ == "__main__":
     # create dev and testSR (no duplicates, no overlap with train, dev, test data)
     pos_dict_after_dev, neg_dict_after_dev = create_data_no_duplicate(
         "_Dev",
+        the_fsa,
         pos_dict_after_train,
         neg_dict_after_train,
         ss_min_len,
@@ -460,6 +421,7 @@ if __name__ == "__main__":
 
     create_data_no_duplicate(
         "_TestSR",
+        the_fsa,
         pos_dict_after_dev,
         neg_dict_after_dev,
         ss_min_len,
@@ -472,8 +434,9 @@ if __name__ == "__main__":
     # string lengths
     create_data_no_duplicate(
         "_TestLR",
-        pos_dict_ls,
-        neg_dict_ls,
+        the_fsa,
+        dict(),
+        dict(),
         ls_min_len,
         ls_max_len,
         testLR_pos_num
@@ -492,8 +455,8 @@ if __name__ == "__main__":
 
     # create testLA (long adversarial examples, may overlap with testLR)
     create_adversarial_examples(
-        pos_dict_ls,
-        neg_dict_ls,
+        dict(),
+        dict(),
         bpairs,
         ls_min_len,
         ls_max_len,
