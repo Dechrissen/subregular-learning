@@ -296,7 +296,7 @@ def create_adversarial_examples(
     for n in range(min_len,max_len+1):
         pos_strings = []
         neg_strings = []
-        num = numtogen[length]
+        num = numtogen[length] // 2
         while len(pos_strings) < num:
             s = random.choices(noneps, k=n)
             s = ' '.join([x[1] for x in s])
