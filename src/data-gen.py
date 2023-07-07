@@ -4,17 +4,13 @@
 
 import pynini
 import argparse
-import functools
 import random
 import pathlib
 import os
 
-import sys
-
 ################
 # Helper Functions
 ################
-
 
 def A(s, token_type='utf8'):
     # the name of this function varies between pynini versions
@@ -26,21 +22,8 @@ def T(upper, lower, token_type='utf8'):
     return pynini.cross(A(upper, token_type=token_type),
                         A(lower, token_type=token_type))
 
-a = A("a")
-zero = a-a
-zero.optimize()
-
 # FUNCTIONS that take an fsa and return its alphabet, sigma
 # and sigmastar, respectively
-
-def alph(fsa):
-    symtable = fsa.input_symbols()
-    i = iter(symtable)
-    next(i) # skip over epsilon, ie first entry in symbol table
-    temp = ''
-    for sympair in i:  # table entries are pairs of form (num,symbol)
-        temp = temp + sympair[1]
-    return temp
 
 def sigma(fsa):
     syms = fsa.input_symbols()
@@ -53,29 +36,6 @@ def sigma(fsa):
 def sigmastar(fsa):
     return (sigma(fsa).star).optimize()
 
-# Utility function that outputs all strings of an fsa
-# the fsa must recognize a finite language
-
-def list_string_set(fsa):
-    isyms=fsa.input_symbols()
-    osyms=fsa.output_symbols()
-    my_list = []
-    paths = fsa.paths(input_token_type=isyms, output_token_type=osyms)
-    for s in paths.ostrings():
-        my_list.append(s)
-    my_list.sort(key=len)
-    return my_list
-
-# Utility function that gets the strings of an fsa
-# with length from min_len to max_len
-
-def make_string_dict(fsa, min_len, max_len, sigma):
-    fsa_dict = {}
-    for i in range(min_len, max_len + 1):
-        fsa_dict[i] = pynini.intersect(fsa, pynini.closure(sigma, i, i))
-        # print(list_string_set(fsa_dict[i]))
-    return fsa_dict
-
 # Create {n} random strings from fsa.
 # No duplicates in the results.
 # The output fsa is the difference between the original
@@ -87,25 +47,28 @@ def create_data_with_duplicate(name, fsa, min_len, max_len, num):
 
     test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
                   os.path.join(dirMid, f"{x}{name}.txt"),
-                  os.path.join(dirSmall, f"{x}{name}.txt")]
-    f = [open(test_files[0], "w+"),
-         open(test_files[1], "w+"),
-         open(test_files[2], "w+")]
+                  os.path.join(dirSmall, f"{x}{name}.txt"),
+                  os.path.join(dirLog, f"{x}.txt")]
+    f = [open(x, "w+") for x in test_files]
 
     syms = fsa.input_symbols()
     noneps = list(syms)[1:]
     pos_dict = dict()
     neg_dict = dict()
     for i in range(min_len, max_len + 1):
+        n_pos = 0
+        n_neg = 0
         pos_strings = []
         neg_strings = []
         while len(pos_strings) < num or len(neg_strings) < num:
             s = random.choices(noneps, k=i)
             s = ' '.join([x[1] for x in s])
             if (A(s, token_type=syms) @ fsa).num_states() != 0:
+                n_pos += 1
                 if len(pos_strings) < num:
                     pos_strings.append(s.replace(' ',''))
             else:
+                n_neg += 1
                 if len(neg_strings) < num:
                     neg_strings.append(s.replace(' ',''))
         pos_dict[i] = set(pos_strings)
@@ -115,8 +78,8 @@ def create_data_with_duplicate(name, fsa, min_len, max_len, num):
             f[0].write(ele + '\t' + 'TRUE\n')
             if count % factor == 0:
                 f[1].write(ele + '\t' + 'TRUE\n')
-            if count % (factor*factor) == 0:
-                f[2].write(ele + '\t' + 'TRUE\n')
+                if count % (factor*factor) == 0:
+                    f[2].write(ele + '\t' + 'TRUE\n')
             count = count + 1
         count = 0
         for ele in neg_strings:
@@ -126,58 +89,20 @@ def create_data_with_duplicate(name, fsa, min_len, max_len, num):
             if count % (factor*factor) == 0:
                 f[2].write(ele + '\t' + 'FALSE\n')
             count = count + 1
+        f[3].write('\t'.join([str(i),str(n_pos),str(n_neg)]) + '\n')
 
-    for i in range(3):
+    for i in range(len(f)):
         f[i].close()
     return pos_dict, neg_dict
 
-def rand_gen_no_duplicate(acceptor, n):
-    rand_list = []
-    loop = 10
-    seed = 0
-    for i in range(loop):
-        #print('(alternate) trying to generate random strings ('+str(i)+')')
-        num = int(n + n*i*.01)
-        temp = pynini.randgen(
-            acceptor,
-            npath=num,
-            seed=seed,
-            select='uniform',
-            max_length=2147483647,
-            weighted=False
-        )
-        #print('made new `temp`')
-        temp_list = list_string_set(temp)
-        #print('temp got '+str(len(temp_list))+' random strings')
-        temp_list = list(set(temp_list))
-        #new_strings = [t for t in temp_list if t not in rand_list]
-        #print('got '+str(len(new_strings))+' new strings')
-        for t in temp_list:
-            if t not in rand_list:
-                rand_list.append(t)
-                if len(rand_list)==n:
-                    #print('rand_list now has '+str(len(rand_list))+' strings')
-                    #print('finally got enough strings in rand_list; i='+str(i))
-                    return acceptor, rand_list
-        acceptor = pynini.difference(acceptor, temp)
-        seed += 1
-        #print('rand_list now has '+str(len(rand_list))+' strings')
-        #print('need to add strings to rand_list ('+str(i)+')')
-    #print('finished loop; returning incomplete set')
-    return acceptor, rand_list
-
 # Create {num} positive and negative examples from fsa.
 # No duplicates in the dataset.
-
-
 def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, num):
 
     test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
                   os.path.join(dirMid, f"{x}{name}.txt"),
                   os.path.join(dirSmall, f"{x}{name}.txt")]
-    f = [open(test_files[0], "w+"),
-         open(test_files[1], "w+"),
-         open(test_files[2], "w+")]
+    f = [open(x, "w+") for x in test_files]
 
     syms = fsa.input_symbols()
     noneps = list(syms)[1:]
@@ -223,11 +148,9 @@ def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, nu
                 f[2].write(ele + "\t" + "FALSE\n")
             count = count + 1
 
-    for i in range(3):
+    for i in range(len(f)):
         f[i].close()
     return opos_dict, oneg_dict
-
-
 
 ################
 # functions for determining the border and generating
@@ -248,20 +171,6 @@ def editExactly1(fsa):
     # a transducer that produces all strings that are within
     # 1 edit of its input string
     return edit1transducer.optimize()
-
-
-def border(borderfsa, pos_dict, neg_dict, n):
-    '''
-    A function that takes an fsa and produces an fst;
-    the fst converts strings of length n in the language to "border" strings,
-    which are 1 edit off from being in the language
-    '''
-    neg_dicts = neg_dict[n] | neg_dict[n-1] | neg_dict[n+1]
-    # limit the border to input words of length=n
-    bpairsN = pos_dict[n] @ borderfsa @ neg_dicts
-    bpairsN.optimize()
-    return bpairsN
-
 
 def create_adversarial_examples(
     pos_dict,
@@ -286,11 +195,7 @@ def create_adversarial_examples(
         os.path.join(dirMid, f"{x}_Test{test}.txt"),
         os.path.join(dirSmall, f"{x}_Test{test}.txt")
     ]
-    f = [
-        open(test_files[0], "w+"),
-        open(test_files[1], "w+"),
-        open(test_files[2], "w+")
-    ]
+    f = [open(x, "w+") for x in test_files]
 
     numtogen = {'short':largedata / num_ss , 'long':largedata / num_ls}
     for n in range(min_len,max_len+1):
@@ -324,7 +229,7 @@ def create_adversarial_examples(
                     f[2].write(istr + "\tTRUE\n")
                     f[2].write(ostr + "\tFALSE\n")
             count=count+1
-    for i in range(3):
+    for i in range(len(f)):
         f[i].close()
 
 if __name__ == "__main__":
@@ -341,8 +246,11 @@ if __name__ == "__main__":
         os.mkdir("data_gen/Mid")
     if not os.path.exists("data_gen/Large"):
         os.mkdir("data_gen/Large")
+    if not os.path.exists("data_gen/Log"):
+        os.mkdir("data_gen/Log")
 
     mainDir = os.getcwd()
+    dirLog = os.path.join(mainDir, "data_gen/Log")
     dirLarge = os.path.join(mainDir, "data_gen/Large")
     dirMid = os.path.join(mainDir, "data_gen/Mid")
     dirSmall = os.path.join(mainDir, "data_gen/Small")
@@ -383,8 +291,6 @@ if __name__ == "__main__":
 
     fstfile = os.path.join(mainDir, "src/fstlib/fst_format", f"{x}.fst")
     the_fsa = pynini.Fst.read(fstfile)
-    the_chars = alph(the_fsa)
-    the_s = sigma(the_fsa)
     the_ss = sigmastar(the_fsa)
     editTransducer = editExactly1(the_fsa)
     the_cofsa = pynini.difference(the_ss,the_fsa)
