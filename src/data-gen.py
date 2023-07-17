@@ -36,6 +36,16 @@ def sigma(fsa):
 def sigmastar(fsa):
     return (sigma(fsa).star).optimize()
 
+
+def fill_bucket(fsa, length, n):
+    isyms = fsa.input_symbols()
+    osyms = fsa.output_symbols()
+    a=pynini.intersect(fsa,sigma(fsa)**i)
+    a.optimize()
+    ps = a.paths(input_token_type=isyms,
+                 output_token_type=osyms)
+    return random.choices(list(ps.ostrings()), k=n)
+
 # Create {n} random strings from fsa.
 # No duplicates in the results.
 # The output fsa is the difference between the original
@@ -43,7 +53,7 @@ def sigmastar(fsa):
 
 # create {num} random strings of positive/negative examples.
 # This may be duplicates.
-def create_data_with_duplicate(name, fsa, min_len, max_len, num):
+def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
 
     test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
                   os.path.join(dirMid, f"{x}{name}.txt"),
@@ -65,12 +75,24 @@ def create_data_with_duplicate(name, fsa, min_len, max_len, num):
             s = ' '.join([x[1] for x in s])
             if (A(s, token_type=syms) @ fsa).num_states() != 0:
                 n_pos += 1
-                if len(pos_strings) < num:
+                if n_pos < num:
                     pos_strings.append(s.replace(' ',''))
+                # if there are too many positive strings then
+                # the negative strings are very rare
+                # so we fill the neg bucket 
+                elif n_pos >= (20*num^2):
+                    neg_strings = neg_strings + fill_bucket(cofsa, i, num-n_neg)
+                    n_neg = num
             else:
                 n_neg += 1
-                if len(neg_strings) < num:
+                if n_neg < num:
                     neg_strings.append(s.replace(' ',''))
+                # if there are too many negative strings then
+                # the positive strings are very rare
+                # so we fill the pos bucket 
+                elif n_neg >= (20*num^2):
+                    pos_strings = pos_strings + fill_bucket(fsa, i, num-n_pos)
+                    n_pos = num
         pos_dict[i] = set(pos_strings)
         neg_dict[i] = set(neg_strings)
         count = 0
@@ -122,6 +144,12 @@ def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, nu
             if (A(s, token_type=syms) @ fsa).num_states() != 0:
                 if len(pos_strings) < num:
                     pos_strings.append(sx)
+                elif len(pos_strings) >= (20*num^2):
+                    neg_tmp_strings = set(fill_bucket(cofsa, i, num-len(pos_strings)))
+                    neg_tmp_strings.difference((neg_dict.get(i,set())))
+                    neg_strings = neg_strings +
+                    
+                    
             else:
                 if len(neg_strings) < num:
                     neg_strings.append(sx)
@@ -309,6 +337,7 @@ if __name__ == "__main__":
     pos_dict_after_train, neg_dict_after_train = create_data_with_duplicate(
         "_Train",
         the_fsa,
+        the_cofsa,
         ss_min_len,
         ss_max_len,
         train_pos_num
