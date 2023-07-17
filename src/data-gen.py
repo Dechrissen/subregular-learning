@@ -55,6 +55,7 @@ def fill_bucket(fsa, length, n):
 # This may be duplicates.
 def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
     threshold = 20 * num**2 # not ^ because ^ is xor
+    threshold = 2 * num
     test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
                   os.path.join(dirMid, f"{x}{name}.txt"),
                   os.path.join(dirSmall, f"{x}{name}.txt"),
@@ -74,25 +75,26 @@ def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
             s = random.choices(noneps, k=i)
             s = ' '.join([x[1] for x in s])
             if (A(s, token_type=syms) @ fsa).num_states() != 0:
-                n_pos += 1
                 if n_pos < num:
                     pos_strings.append(s.replace(' ',''))
-                # if there are too many positive strings then
-                # the negative strings are very rare
-                # so we fill the neg bucket 
                 elif n_pos >= threshold:
-                    neg_strings = neg_strings + fill_bucket(cofsa, i, num-n_neg)
+                    # if there are too many positive strings then
+                    # the negative strings are very rare
+                    # so we fill the neg bucket 
+                    neg_strings += fill_bucket(cofsa, i, num-n_neg)
                     n_neg = num
+                n_pos += 1
             else:
-                n_neg += 1
                 if n_neg < num:
                     neg_strings.append(s.replace(' ',''))
-                # if there are too many negative strings then
-                # the positive strings are very rare
-                # so we fill the pos bucket 
                 elif n_neg >= threshold:
-                    pos_strings = pos_strings + fill_bucket(fsa, i, num-n_pos)
+                    # if there are too many negative strings then
+                    # the positive strings are very rare
+                    # so we fill the pos bucket 
+                    pos_strings += fill_bucket(fsa, i, num-n_pos)
                     n_pos = num
+                n_neg += 1
+
         pos_dict[i] = set(pos_strings)
         neg_dict[i] = set(neg_strings)
         count = 0
@@ -121,6 +123,7 @@ def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
 # No duplicates in the dataset.
 def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, num):
     threshold = 20 * num**2 # not ^ because ^ is xor
+    threshold = 2 * num
     test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
                   os.path.join(dirMid, f"{x}{name}.txt"),
                   os.path.join(dirSmall, f"{x}{name}.txt")]
@@ -131,6 +134,8 @@ def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, nu
     opos_dict = dict()
     oneg_dict = dict()
     for i in range(min_len, max_len + 1):
+        n_pos = 0
+        n_neg = 0
         pos_strings = []
         neg_strings = []
         while len(pos_strings) < num or len(neg_strings) < num:
@@ -142,9 +147,9 @@ def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, nu
             if i in pos_dict and (sx in pos_dict[i] or sx in neg_dict[i]):
                 continue
             if (A(s, token_type=syms) @ fsa).num_states() != 0:
-                if len(pos_strings) < num:
+                if n_pos < num:
                     pos_strings.append(sx)
-                elif len(pos_strings) >= threshold:
+                elif n_pos >= threshold:
                     temp = set()
                     ndi = neg_dict.get(i, set())
                     while (len(temp) < num - len(neg_strings)):
@@ -154,10 +159,11 @@ def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, nu
                         new_strings = new_strings.difference(neg_strings)
                         temp = temp.union(new_strings)
                     neg_strings = neg_strings + list(temp)
+                n_pos += 1
             else:
-                if len(neg_strings) < num:
+                if n_neg < num:
                     neg_strings.append(sx)
-                elif len(neg_strings) >= threshold:
+                elif n_neg >= threshold:
                     temp = set()
                     pdi = pos_dict.get(i, set())
                     while (len(temp) < num - len(pos_strings)):
@@ -167,6 +173,7 @@ def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, nu
                         new_strings = new_strings.difference(pos_strings)
                         temp = temp.union(new_strings)
                     pos_strings = pos_strings + list(temp)
+                n_neg += 1
         opos_dict[i] = pos_dict.get(i,set()).union(pos_strings)
         oneg_dict[i] = neg_dict.get(i,set()).union(neg_strings)
 
