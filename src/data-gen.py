@@ -40,11 +40,11 @@ def sigmastar(fsa):
 def fill_bucket(fsa, length, n):
     isyms = fsa.input_symbols()
     osyms = fsa.output_symbols()
-    a=pynini.intersect(fsa,sigma(fsa)**i)
+    a=pynini.intersect(fsa,sigma(fsa)**length)
     a.optimize()
     ps = a.paths(input_token_type=isyms,
                  output_token_type=osyms)
-    return random.choices(list(ps.ostrings()), k=n)
+    return random.choices(list(ps.ostrings()), k=int(n))
 
 # Create {n} random strings from fsa.
 # No duplicates in the results.
@@ -54,7 +54,7 @@ def fill_bucket(fsa, length, n):
 # create {num} random strings of positive/negative examples.
 # This may be duplicates.
 def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
-
+    threshold = 20 * num**2 # not ^ because ^ is xor
     test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
                   os.path.join(dirMid, f"{x}{name}.txt"),
                   os.path.join(dirSmall, f"{x}{name}.txt"),
@@ -80,7 +80,7 @@ def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
                 # if there are too many positive strings then
                 # the negative strings are very rare
                 # so we fill the neg bucket 
-                elif n_pos >= (20*num^2):
+                elif n_pos >= threshold:
                     neg_strings = neg_strings + fill_bucket(cofsa, i, num-n_neg)
                     n_neg = num
             else:
@@ -90,7 +90,7 @@ def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
                 # if there are too many negative strings then
                 # the positive strings are very rare
                 # so we fill the pos bucket 
-                elif n_neg >= (20*num^2):
+                elif n_neg >= threshold:
                     pos_strings = pos_strings + fill_bucket(fsa, i, num-n_pos)
                     n_pos = num
         pos_dict[i] = set(pos_strings)
@@ -120,7 +120,7 @@ def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
 # Create {num} positive and negative examples from fsa.
 # No duplicates in the dataset.
 def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, num):
-
+    threshold = 20 * num**2 # not ^ because ^ is xor
     test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
                   os.path.join(dirMid, f"{x}{name}.txt"),
                   os.path.join(dirSmall, f"{x}{name}.txt")]
@@ -144,15 +144,29 @@ def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, nu
             if (A(s, token_type=syms) @ fsa).num_states() != 0:
                 if len(pos_strings) < num:
                     pos_strings.append(sx)
-                elif len(pos_strings) >= (20*num^2):
-                    neg_tmp_strings = set(fill_bucket(cofsa, i, num-len(pos_strings)))
-                    neg_tmp_strings.difference((neg_dict.get(i,set())))
-                    neg_strings = neg_strings +
-                    
-                    
+                elif len(pos_strings) >= threshold:
+                    temp = set()
+                    ndi = neg_dict.get(i, set())
+                    while (len(temp) < num - len(neg_strings)):
+                        to_gen = num - len(neg_strings) - len(temp)
+                        new_strings = set(fill_bucket(cofsa, i, to_gen))
+                        new_strings = new_strings.difference(ndi)
+                        new_strings = new_strings.difference(neg_strings)
+                        temp = temp.union(new_strings)
+                    neg_strings = neg_strings + list(temp)
             else:
                 if len(neg_strings) < num:
                     neg_strings.append(sx)
+                elif len(neg_strings) >= threshold:
+                    temp = set()
+                    pdi = pos_dict.get(i, set())
+                    while (len(temp) < num - len(pos_strings)):
+                        to_gen = num - len(pos_strings) - len(temp)
+                        new_strings = set(fill_bucket(fsa, i, to_gen))
+                        new_strings = new_strings.difference(pdi)
+                        new_strings = new_strings.difference(pos_strings)
+                        temp = temp.union(new_strings)
+                    pos_strings = pos_strings + list(temp)
         opos_dict[i] = pos_dict.get(i,set()).union(pos_strings)
         oneg_dict[i] = neg_dict.get(i,set()).union(neg_strings)
 
@@ -204,6 +218,7 @@ def create_adversarial_examples(
     pos_dict,
     neg_dict,
     border_fst,
+    border_inv,
     min_len,
     max_len,
     length
@@ -215,7 +230,7 @@ def create_adversarial_examples(
     isyms = border_fst.input_symbols()
     osyms = border_fst.output_symbols()
     noneps = list(isyms)[1:]
-    
+
     tests = {'short':'SA', 'long':'LA'}
     test  = tests[length]
     test_files = [
@@ -225,7 +240,7 @@ def create_adversarial_examples(
     ]
     f = [open(x, "w+") for x in test_files]
 
-    numtogen = {'short':largedata / num_ss , 'long':largedata / num_ls}
+    numtogen = {'short':largedata // num_ss , 'long':largedata // num_ls}
     for n in range(min_len,max_len+1):
         pos_strings = []
         neg_strings = []
@@ -236,14 +251,24 @@ def create_adversarial_examples(
             sx = s.replace(' ','')
             if sx in pos_strings or sx in pos_dict.get(n,set()):
                 continue
-            avail = A(s, token_type=isyms) @ border_fst
-            if avail.num_states() == 0:
+            if sx in neg_strings or sx in neg_dict.get(n,set()):
                 continue
-            ps = avail.paths(input_token_type=isyms,
-                             output_token_type=osyms)
-            near = random.choice(list(ps.ostrings()))
-            pos_strings.append(sx)
-            neg_strings.append(near.replace(' ',''))
+            avail = A(s, token_type=isyms) @ border_fst
+            if avail.num_states() != 0:
+                ps = avail.paths(input_token_type=isyms,
+                                 output_token_type=osyms)
+                near = random.choice(list(ps.ostrings()))
+                pos_strings.append(sx)
+                neg_strings.append(near.replace(' ',''))
+            else:
+                avail = A(s, token_type=isyms) @ border_inv
+                if avail.num_states() == 0:
+                    continue
+                ps = avail.paths(input_token_type=isyms,
+                                 output_token_type=osyms)
+                near = random.choice(list(ps.ostrings()))
+                neg_strings.append(sx)
+                pos_strings.append(near.replace(' ',''))
         count = 0
         for i in range(len(pos_strings)):
             istr = pos_strings[i]
@@ -300,8 +325,8 @@ if __name__ == "__main__":
     largedata = middddata * factor # 100000
 
     # number of positive train and dev strings per length
-    train_pos_num = largedata/(num_ss*2) # 5000
-    dev_pos_num   = largedata/(num_ss*2) # 5000
+    train_pos_num = largedata//(num_ss*2) # 5000
+    dev_pos_num   = largedata//(num_ss*2) # 5000
 
     # test1 ~ testSR which means Short Random
     # test2 ~ testLR which means Long Random
@@ -309,10 +334,10 @@ if __name__ == "__main__":
     # test4 ~ testLA which means Long Adversarial
 
     # number of positive strings by length for the test sets
-    testSR_pos_num = largedata/(num_ss*2) # 5000
-    testLR_pos_num = largedata/(num_ls*2) # 2500
-    testSA_pos_num = largedata/(num_ss*2) # 5000
-    testLA_pos_num = largedata/(num_ls*2) # 2500
+    testSR_pos_num = largedata//(num_ss*2) # 5000
+    testLR_pos_num = largedata//(num_ls*2) # 2500
+    testSA_pos_num = largedata//(num_ss*2) # 5000
+    testLA_pos_num = largedata//(num_ls*2) # 2500
 
 
     # The FSA we analyze and related FSAs
@@ -327,7 +352,9 @@ if __name__ == "__main__":
     # this gives entire border for the adversarial test sets
     bpairs = the_fsa @ editTransducer @ the_cofsa
     bpairs.optimize()
-
+    bpairs_inv = bpairs.copy()
+    bpairs_inv.invert()
+    bpairs_inv.optimize()
 
     # Create training data, allowing duplicates,
     # from the short strings
@@ -383,6 +410,7 @@ if __name__ == "__main__":
         pos_dict_after_dev,
         neg_dict_after_dev,
         bpairs,
+        bpairs_inv,
         ss_min_len,
         ss_max_len,
         length='short'
@@ -393,6 +421,7 @@ if __name__ == "__main__":
         dict(),
         dict(),
         bpairs,
+        bpairs_inv,
         ls_min_len,
         ls_max_len,
         length='long'
