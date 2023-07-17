@@ -55,7 +55,6 @@ def fill_bucket(fsa, length, n):
 # This may be duplicates.
 def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
     threshold = 20 * num**2 # not ^ because ^ is xor
-    threshold = 2 * num
     test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
                   os.path.join(dirMid, f"{x}{name}.txt"),
                   os.path.join(dirSmall, f"{x}{name}.txt"),
@@ -123,7 +122,6 @@ def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
 # No duplicates in the dataset.
 def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, num):
     threshold = 20 * num**2 # not ^ because ^ is xor
-    threshold = 2 * num
     test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
                   os.path.join(dirMid, f"{x}{name}.txt"),
                   os.path.join(dirSmall, f"{x}{name}.txt")]
