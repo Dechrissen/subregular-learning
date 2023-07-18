@@ -1,3 +1,0 @@
-:import "syms64.plebby"
-~<a a,b b,a a>
-:writeATT "../fstlib/att_format/64.64.LP.6.3.0.att" _ _ it

@@ -517,32 +517,32 @@ def main():
                 j = 2
                 if (k == 6):
                     j = 3
-                writeFile(sigma,tau,"LP",k,j,0,
+                writeFile(sigma,tau,"PLT",k,j,0,
                           gapAlt(2,2,j))
-                writeFile(sigma,tau,"LP",k,j,1,
+                writeFile(sigma,tau,"PLT",k,j,1,
                           "~"+lp((j*[[b], [a,a]])[:j+1]))
-                writeFile(sigma,tau,"LP",k,j,2,
+                writeFile(sigma,tau,"PLT",k,j,2,
                           lp((j*[[a,b],[d,c]])[:j]))
-                writeFile(sigma,tau,"LP",k,j,3,
+                writeFile(sigma,tau,"PLT",k,j,3,
                           union(lp(j*[[a,a]]),
                                 lp((j*[[a,b],[d,c]])[:j])))
-                writeFile(sigma,tau,"LP",k,j,4,
+                writeFile(sigma,tau,"PLT",k,j,4,
                           implication(
                               lp((j*[[a,b],[b,a]])[:j]),
                               lp(([[b,a]]+j*[[a,b]])[:j])))
-                writeFile(sigma,tau,"LP",k,j,5,
+                writeFile(sigma,tau,"PLT",k,j,5,
                           boundaryCondition(gapAlt(2,2,j),2))
-                writeFile(sigma,tau,"LP",k,j,6,
+                writeFile(sigma,tau,"PLT",k,j,6,
                           boundaryCondition(
                               "~"+lp((j*[[b], [a,a]])[:j+1]),2))
-                writeFile(sigma,tau,"LP",k,j,7,
+                writeFile(sigma,tau,"PLT",k,j,7,
                           boundaryCondition(
                               lp((j*[[a,b],[d,c]])[:j]),2))
-                writeFile(sigma,tau,"LP",k,j,8,
+                writeFile(sigma,tau,"PLT",k,j,8,
                           boundaryCondition(
                               union(lp(j*[[a,a]]),
                                     lp((j*[[a,b],[d,c]])[:j])),2))
-                writeFile(sigma,tau,"LP",k,j,9,
+                writeFile(sigma,tau,"PLT",k,j,9,
                           boundaryCondition(
                               implication(
                                   lp((j*[[a,b],[b,a]])[:j]),
