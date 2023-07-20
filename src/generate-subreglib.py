@@ -195,11 +195,34 @@ def leastn(n,expr):
     """
     return "@(" + ",".join(n*[expr]) + ")"
 
+def leastnak(n,k):
+    """
+    The k-wide substring of "a" occurs n-many times. Accounts for overlap.
+    """
+    return ''.join(['@(<>,',leastnakhelper(n,k),')'])
+
+def leastnakhelper(n,k):
+    """
+    A helper function for leastnak
+    """
+    if n == 0:
+        return ""
+    if n == 1:
+        return ak(k)
+    return ''.join(["@(","|%<a>,/\\{%|",ak(k-1),",",
+                    leastnakhelper(n-1,k),"}",")"])
+
 def leastnOr0(n,expr):
     """
     The given expression occurs at least n times, or not at all.
     """
     return union("~" + expr,leastn(n,expr))
+
+def leastnakOr0(n,k):
+    """
+    The k-wide substring of a occurs at least n times, or not at all.
+    """
+    return union("~" + ak(k),leastnak(n,k))
 
 def gapAlt(syms,k,j=None):
     """
@@ -490,27 +513,27 @@ def main():
                     if (k == 6 and t != 2) or (k != 2 and t == 5):
                         continue
                     writeFile(sigma,tau,"LTT",k,t,0,
-                              leastn(t,ak(k)))
+                              leastnak(t,k))
                     writeFile(sigma,tau,"LTT",k,t,1,
                               "~"+leastn(t,altk(base,k)))
                     writeFile(sigma,tau,"LTT",k,t,2,
-                              leastnOr0(t,ak(k)))
+                              leastnakOr0(t,k))
                     writeFile(sigma,tau,"LTT",k,t,3,
                               leastnOr0(t,altk(2,k)))
                     writeFile(sigma,tau,"LTT",k,t,4,
-                              intersection(leastn(t,ak(k)),
+                              intersection(leastnak(t,k),
                                            "~"+leastn(t,altk(2,k))))
                     writeFile(sigma,tau,"LTT",k,t,5,
-                              boundaryCondition(leastn(t,ak(k)),k))
+                              boundaryCondition(leastnak(t,k),k))
                     writeFile(sigma,tau,"LTT",k,t,6,
                               boundaryCondition("~"+leastn(t,altk(base,k)),k))
                     writeFile(sigma,tau,"LTT",k,t,7,
-                              boundaryCondition(leastnOr0(t,ak(k)),k))
+                              boundaryCondition(leastnakOr0(t,k),k))
                     writeFile(sigma,tau,"LTT",k,t,8,
                               boundaryCondition(leastnOr0(t,altk(2,k)),k))
                     writeFile(sigma,tau,"LTT",k,t,9,
                               boundaryCondition(
-                                  intersection(leastn(t,ak(k)),
+                                  intersection(leastnak(t,k),
                                                "~"+leastn(t,altk(2,k))),k))
 
                 # (Tier-Based) Locally Piecewise-Testable

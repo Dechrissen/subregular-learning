@@ -1,3 +1,3 @@
 :import "syms16.plebby"
-/\{%|<a>,@(<a a>,<a a>,<a a>)}
+/\{%|<a>,@(<>,@(|%<a>,/\{%|<a>,@(|%<a>,/\{%|<a>,<a a>})}))}
 :writeATT "../fstlib/att_format/16.16.LTT.2.3.5.att" _ _ it
