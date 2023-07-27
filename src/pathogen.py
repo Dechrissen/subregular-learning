@@ -133,15 +133,35 @@ def main():
         pos, neg = create_adversarial_examples(border, i, n, seen)
         write_data(files, factor, pos, 'TRUE')
         write_data(files, factor, neg, 'FALSE')
+        insert_strings(pos_dict, pos)
+        insert_strings(neg_dict, neg)
     close_files(files)
 
     files = open_files('data_gen',id,'TestLA')
     n = to_gen // (2*len(long))
     for i in long:
-        pos, neg = create_adversarial_examples(border, i, n, pynini.Fst())
+        seen = pynini.union(neg_dict.get(i-1,pynini.Fst()),
+                            neg_dict.get(i,pynini.Fst()),
+                            neg_dict.get(i+1,pynini.Fst()),
+                            pos_dict.get(i,pynini.Fst()))
+        pos, neg = create_adversarial_examples(border, i, n, seen)
         write_data(files, factor, pos, 'TRUE')
         write_data(files, factor, neg, 'FALSE')
+        insert_strings(pos_dict, pos)
+        insert_strings(neg_dict, neg)
     close_files(files)
+
+def insert_strings(seen_dict, strings, token_type=None):
+    """Add a collection of strings to a seen-dict"""
+    to_add = dict()
+    for s in strings:
+        x = len(s)
+        if x not in to_add:
+            to_add[x] = []
+        to_add[x].append(A(s, token_type=token_type))
+    for k,v in to_add.items():
+        seen_dict[k] = pynini.union(seen_dict.get(k,pynini.Fst()), *v)
+        seen_dict[k].optimize()
 
 def burdenedDAG(fsa):
     """Create a weighted machine with uniformly distributed paths.
@@ -265,7 +285,7 @@ def create_data_no_duplicate(fsa, size, k, seen):
     mach.set_output_symbols(fsa.output_symbols())
     x = unique_paths(mach, k, select='log_prob', weighted=False)
     s = list(x.paths(output_token_type=fsa.output_symbols()).ostrings())
-    x = unweight(x)|seen
+    x = x | seen
     x.optimize()
     return x, [''.join(w.split(' ')) for w in s]
 
@@ -349,19 +369,28 @@ def unweight(fsa):
 def unique_paths(fsa, n, seed=0, select='uniform',
                  max_length=2147483647,
                  weighted=False, remove_total_weight=False):
-    aut = pynini.randgen(fsa, npath=n, seed=seed, select=select,
-                         max_length=max_length, weighted=weighted,
-                         remove_total_weight=remove_total_weight)
-    aut.optimize()
-    remain = n - len(set(aut.paths().ostrings()))
-    while remain:
-        aut = aut | pynini.randgen(
-            fsa, npath=remain, seed=seed, select=select,
-            max_length=max_length, weighted=weighted,
-            remove_total_weight=remove_total_weight)
+    isyms = fsa.input_symbols()
+    osyms = fsa.output_symbols()
+    ins  = []
+    outs = []
+    remain = n
+    while len(ins) < n:
+        aut = pynini.randgen(fsa, npath=remain, seed=seed, select=select,
+                             max_length=max_length, weighted=weighted,
+                             remove_total_weight=remove_total_weight)
         aut.optimize()
-        remain = n - len(set(aut.paths().ostrings()))
-    return aut
+        path = aut.paths(input_token_type=isyms, output_token_type=osyms)
+        while not path.done():
+            i = path.istring()
+            o = path.ostring()
+            if i not in ins and o not in outs:
+                ins.append(i)
+                outs.append(o)
+            path.next()
+        remain = n - len(ins)
+    return pynini.string_map(zip(ins, outs),
+                             input_token_type=isyms,
+                             output_token_type=osyms)
 
 def open_files(base_dir, id, tag):
     dirLarge = os.path.join(base_dir, 'Large')
