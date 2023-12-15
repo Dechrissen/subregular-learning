@@ -8,6 +8,10 @@ library(effsize)   # provides cohen.d
 cols = c("alph", "tier", "class", "k", "j", "i", "network_type",
          "train_set_size", "test_type", "accuracy", "fscore", "auc", "brier")
 eval = read.csv('all_evals.csv', header=TRUE)[cols]
+
+# removing the experiments involving size 64 alph languages because data is bad
+eval <- filter(eval, alph != 64)
+
 eval$alph = as.factor(eval$alph)
 eval$tier = as.factor(eval$tier)
 eval$class = as.factor(eval$class)
@@ -109,7 +113,7 @@ cohen.d(sa$accuracy, la$accuracy) #$estimate
 
 cnl = c("SL", "SP", "TSL")
 dpl = c("coSL", "coSP", "TcoSL")
-prop = c("LT", "LP", "PT", "TLT", "TLP")
+prop = c("LT", "PLT", "PT", "TLT", "TPLT")
 fo = c("LTT", "TLTT", "SF")
 reg = c("Zp", "Reg")
 data$logic <-
@@ -136,9 +140,33 @@ friedman.test(data.matrix)
 # POST HOC MULTIPLE COMPARISONS ANALYSIS
 frdAllPairsNemenyiTest(data.matrix)
 colMeans(data.matrix)
-# REG IS HARDEST TO LEARN. OTHER LOGICS ARE SIMILAR TO EACH OTHER, BUT SOME
-# COMPARISONS ARE SIGNIFICANT, E.G. PROP IS HARDER TO LEARN THAN DPL.
+# REG IS HARDEST TO LEARN. OTHERS ARE NOT SO CLEAR.
 # ========================================================================
+
+# ========================================================================
+# COHEN'S D FOR LOGICAL LEVELS
+# ========================================================================
+cnl  <- subset(data, data$logic == "CNL")
+dpl  <- subset(data, data$logic == "DPL")
+prop <- subset(data, data$logic == "PROP")
+fo   <- subset(data, data$logic == "FO")
+reg  <- subset(data, data$logic == "REG")
+
+cohen.d(cnl$accuracy, dpl$accuracy) #$estimate
+cohen.d(cnl$accuracy, prop$accuracy)
+cohen.d(cnl$accuracy, fo$accuracy)
+cohen.d(cnl$accuracy, reg$accuracy)
+cohen.d(dpl$accuracy, prop$accuracy)
+cohen.d(dpl$accuracy, fo$accuracy)
+cohen.d(dpl$accuracy, reg$accuracy)
+cohen.d(prop$accuracy, fo$accuracy)
+cohen.d(prop$accuracy, reg$accuracy)
+cohen.d(fo$accuracy, reg$accuracy)
+
+
+
+
+
 
 # ========================================================================
 # DIFFERENCES BETWEEN PROPOSITIONAL LOGICS BY ORDER RELATION
@@ -172,6 +200,22 @@ colMeans(data.matrix)
 # TSUCC & SUCC THE SAME
 # ========================================================================
 
+
+# ========================================================================
+# COHEN'S D FOR ORDERING RELATION
+# ========================================================================
+succ <- subset(data, data$prop == "SUCC")
+prec  <- subset(data, data$prop == "PREC")
+tsucc <- subset(data, data$prop == "TSUCC")
+other   <- subset(data, data$prop == "OTHER")
+
+cohen.d(succ$accuracy, prec$accuracy) #$estimate
+cohen.d(succ$accuracy, tsucc$accuracy)
+cohen.d(succ$accuracy, other$accuracy)
+cohen.d(prec$accuracy, tsucc$accuracy)
+cohen.d(prec$accuracy, other$accuracy)
+cohen.d(tsucc$accuracy, other$accuracy)
+
 # ========================================================================
 # FRIEDMAN TEST FOR ALPHABET SIZES:
 # ========================================================================
@@ -186,6 +230,17 @@ frdAllPairsNemenyiTest(data.matrix)
 colMeans(data.matrix)
 # DIFFICULTY NEARLY IN ASCENDING ORDER: 64 --> 16, 4
 # ========================================================================
+
+# ========================================================================
+# COHEN'S D FOR ALPHABET SIZES
+# ========================================================================
+a64 <- subset(data, data$alph == 64)
+a16 <- subset(data, data$alph == 16)
+a04 <- subset(data, data$alph == 4)
+
+cohen.d(a64$accuracy, a16$accuracy) #$estimate
+cohen.d(a64$accuracy, a04$accuracy)
+cohen.d(a16$accuracy, a04$accuracy)
 
 
 # ========================================================================
@@ -204,7 +259,25 @@ colMeans(data.matrix)
 # SIMPLE RNNs OUTPERFORM GRUs, LSTMs, AND TRANSFORMERS
 # NO SIGNIFICANT DIFFERENCE BETWEEN SIMPLE AND 2layer LSTM
 # ========================================================================
+
+# ========================================================================
+# COHEN'S D FOR NETWORK TYPE
+# ========================================================================
+srnn  <- subset(data, data$network_type == "Simple RNN")
+lstm  <- subset(data, data$network_type == "LSTM")
+gru   <- subset(data, data$network_type == "GRU")
+lstm2 <- subset(data, data$network_type == "2-layer LSTM")
+tran  <- subset(data, data$network_type == "Transformer")
+
+cohen.d(srnn$accuracy, lstm2$accuracy) #$estimate
+cohen.d(lstm2$accuracy, lstm$accuracy)
+cohen.d(lstm$accuracy, gru$accuracy)
+cohen.d(gru$accuracy, tran$accuracy)
+
+cohen.d(srnn$accuracy, gru$accuracy)
+
 # Small Training Set
+# ==================
 df.temp = df[df$train_set_size == "Small",]
 data.matrix = acast(df.temp,
                     alph + class + train_set_size + test_type ~ network_type,
@@ -219,6 +292,18 @@ colMeans(data.matrix)
 # SIMPLE RNNS OUTPERFORM EVERYTHING
 # NO SIGNIFICANT DIFFERENCES AMONG OTHERS
 # ========================================================================
+
+# ========================================================================
+# COHEN'S D FOR NETWORK TYPE (SMALL)
+# ========================================================================
+srnn  <- subset(data, data$network_type == "Simple RNN" & data$train_set_size=="Small")
+lstm  <- subset(data, data$network_type == "LSTM" & data$train_set_size=="Small")
+
+cohen.d(srnn$accuracy, lstm$accuracy) #$estimate
+
+
+
+
 # Mid Training Set
 df.temp = df[df$train_set_size == "Mid",]
 data.matrix = acast(df.temp,
@@ -234,6 +319,20 @@ colMeans(data.matrix)
 # SIMPLE, LSTM, 2LSTM ARE NOT SIGNIFICANTLY DIFFERENT FROM EACH OTHER
 # SIMPLE, LSTM, 2LSTM ARE SIGNIFICANTLY DIFFERENT FROM GRU, TRANSFORMER
 # ========================================================================
+
+# ========================================================================
+# COHEN'S D FOR NETWORK TYPE (MID)
+# ========================================================================
+gru  <- subset(data, data$network_type == "GRU" & data$train_set_size=="Mid")
+lstm  <- subset(data, data$network_type == "LSTM" & data$train_set_size=="Mid")
+tran  <- subset(data, data$network_type == "Transformer" & data$train_set_size=="Mid")
+lstm2  <- subset(data, data$network_type == "2-layer LSTM" & data$train_set_size=="Mid")
+
+cohen.d(gru$accuracy, lstm$accuracy) #$estimate
+cohen.d(gru$accuracy, tran$accuracy) #$estimate
+cohen.d(lstm2$accuracy, lstm$accuracy) #$estimate
+cohen.d(lstm2$accuracy, tran$accuracy) #$estimate
+
 # Large Training Set
 df.temp = df[df$train_set_size == "Large",]
 data.matrix = acast(df.temp,
@@ -247,6 +346,19 @@ frdAllPairsNemenyiTest(data.matrix)
 colMeans(data.matrix)
 # 2LSTM SIGNIFICANTLY DIFFERENT THAN ALL OTHERS
 # ========================================================================
+
+# ========================================================================
+# COHEN'S D FOR NETWORK TYPE (LARGE)
+# ========================================================================
+srnn  <- subset(data, data$network_type == "Simple RNN" & data$train_set_size=="Large")
+lstm  <- subset(data, data$network_type == "LSTM" & data$train_set_size=="Large")
+tran  <- subset(data, data$network_type == "Transformer" & data$train_set_size=="Large")
+lstm2  <- subset(data, data$network_type == "2-layer LSTM" & data$train_set_size=="Large")
+
+cohen.d(lstm2$accuracy, lstm$accuracy) #$estimate
+cohen.d(lstm2$accuracy, tran$accuracy) #$estimate
+cohen.d(lstm2$accuracy, srnn$accuracy) #$estimate
+
 
 
 # DO k VALUES MAKE A DIFFERENCE FOR PROP1 AND PROP2?
@@ -300,7 +412,7 @@ colMeans(data.prop2)
 # ========================================================================
 
 lang.order = c("SL", "coSL", "TSL", "TcoSL", "SP", "coSP", "LT", "TLT",
-               "PT", "LTT", "TLTT", "LP", "TLP", "SF", "Zp", "Reg")
+               "PT", "LTT", "TLTT", "PLT", "TPLT", "SF", "Zp", "Reg")
 size.order = c("Small", "Mid", "Large")
 test.order = c("SR", "LR", "SA", "LA")
 nn.order = c("Simple RNN", "GRU", "LSTM", "2-layer LSTM", "Transformer")
@@ -360,6 +472,18 @@ jpeg("acc_class_test.jpeg", units="in", width=10, height=5, res=300)
 )
 dev.off()
 
+jpeg("acc_class_test_large.jpeg", units="in", width=10, height=5, res=300)
+(
+  ggplot(data[data$train_set_size=="Large",], aes(x=class, y=accuracy, fill=factor(test_type, levels=test.order)))
+  + geom_boxplot(outlier.shape=NA)
+  + scale_fill_discrete(limits=test.order)
+  + scale_x_discrete(limits=lang.order)
+  + ggtitle("Accuracy by Class and Test Type")
+  + theme(plot.title=element_text(hjust=0.5))
+  + labs(x="Language Class", y="Accuracy", fill="Test Type")
+)
+dev.off()
+
 
 jpeg("acc_class_nn.jpeg", units="in", width=12, height=5, res=300)
 (
@@ -385,16 +509,16 @@ jpeg("acc_class_nn_large.jpeg", units="in", width=12, height=5, res=300)
 )
 dev.off()
 
-jpeg("acc_class_dratioclass.jpeg", units="in", width=10, height=5, res=300)
-(
-  ggplot(data, aes(x=class, y=accuracy, fill=factor(d.ratio.class, levels=drc.order)))
-  + geom_boxplot(outlier.shape=NA)
-  + scale_x_discrete(limits=lang.order)
-  + ggtitle("Accuracy by Class and D-Ratio Quartile")
-  + theme(plot.title=element_text(hjust=0.5))
-  + labs(x="Language Class", y="Accuracy", fill="D-Ratio Quartile")
-)
-dev.off()
+#jpeg("acc_class_dratioclass.jpeg", units="in", width=10, height=5, res=300)
+#(
+#  ggplot(data, aes(x=class, y=accuracy, fill=factor(d.ratio.class, levels=drc.order)))
+#  + geom_boxplot(outlier.shape=NA)
+#  + scale_x_discrete(limits=lang.order)
+#  + ggtitle("Accuracy by Class and D-Ratio Quartile")
+#  + theme(plot.title=element_text(hjust=0.5))
+#  + labs(x="Language Class", y="Accuracy", fill="D-Ratio Quartile")
+#)
+#dev.off()
 # ========================================================================
 
 
