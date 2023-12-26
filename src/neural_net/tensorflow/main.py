@@ -4,6 +4,7 @@ import json
 import os
 
 import tensorflow as tf
+
 tf.get_logger().setLevel("ERROR")
 import tensorflow.keras as keras
 from tensorflow.keras.callbacks import TensorBoard
@@ -25,16 +26,17 @@ if __name__ == "__main__":
     parser.add_argument("--dropout", type=float, default=0.2)
     parser.add_argument("--rnn-type", type=str, required=True)
     parser.add_argument("--bidi", type=bool, default=False)
+    parser.add_argument("--short-strings", type=bool, default=False)
     args = parser.parse_args()
 
     model_path = os.path.dirname(args.output_dir)
+    lang = model_path.split("/")[-1].split("_")[3]
     os.makedirs(model_path, exist_ok=True)
 
     vocabulary = {"pad": 0}
     vocabulary, x_train, y_train = parse_dataset(args.train_data, vocabulary)
     vocabulary, x_val, y_val = parse_dataset(args.val_data, vocabulary)
     vocab_file = os.path.join(model_path, "vocab.txt")
-    save_vocab(vocab_file, vocabulary)
 
     max_length = 64
     tf.random.set_seed(1234)
@@ -44,12 +46,23 @@ if __name__ == "__main__":
     y_train = tf.constant(y_train)
     y_val = tf.constant(y_val)
 
+    if args.short_strings:
+        short_string_dir = "../tmp/shortgen/OnlyShort"
+        short_string_file = os.path.join(short_string_dir, f"{lang}_TrainOS.mlrt")
+        vocabulary, x_short, y_short = parse_dataset(short_string_file, vocabulary)
+        x_short = tf.constant(pad_data(x_short, vocabulary))
+        y_short = tf.constant(y_short)
+        x_train = tf.concat([x_short, x_train], axis=0)
+        y_train = tf.concat([y_short, y_train], axis=0)
+
+    save_vocab(vocab_file, vocabulary)
+
     config = {
-        "vocab_size":len(vocabulary),
-        "embed_dim":args.embed_dim,
-        "dropout":args.dropout,
-        "rnn_type":args.rnn_type,
-        "bidi":args.bidi
+        "vocab_size": len(vocabulary),
+        "embed_dim": args.embed_dim,
+        "dropout": args.dropout,
+        "rnn_type": args.rnn_type,
+        "bidi": args.bidi,
     }
     model = MainModel(**config)
 
@@ -63,16 +76,13 @@ if __name__ == "__main__":
         metrics=[
             keras.metrics.BinaryAccuracy(),
             keras.metrics.MeanSquaredError(),
-            keras.metrics.MeanAbsoluteError()
-        ]
+            keras.metrics.MeanAbsoluteError(),
+        ],
     )
 
     checkpoint_path = os.path.join(model_path, "checkpoint.ckpt")
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-        filepath=checkpoint_path,
-        save_weights_only=True,
-        monitor="val_acc",
-        mode="max"
+        filepath=checkpoint_path, save_weights_only=True, monitor="val_acc", mode="max"
     )
 
     time_now = datetime.now()
@@ -88,13 +98,14 @@ if __name__ == "__main__":
         batch_size=args.batch_size,
         epochs=args.epochs,
         validation_data=(x_val, y_val),
-        callbacks=callbacks
+        callbacks=callbacks,
     )
 
-    total_time = (datetime.now()-time_now).total_seconds()
-    print(f"TOTAL TRAINING TIME IN SECONDS: {total_time}")
+    total_time = (datetime.now() - time_now).total_seconds()
+    print(f"TOTAL TRAINING TIME IN SECONDS: {total_time}\n")
 
-    lang = model_path.split("/")[-1].split("_")[3]
+    model.summary()
+
     test_size = "Large"
     test_types = ["SR", "SA", "LR", "LA"]
     data_files = [
