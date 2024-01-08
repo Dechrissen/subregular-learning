@@ -25,6 +25,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--action", default="data_gen_done")
     parser.add_argument("--avoid_file", type=str, default=None)
+    parser.add_argument("--model_dir",  type=str, default="models")
     args = parser.parse_args()
 
     avoid = (
@@ -99,13 +100,13 @@ if __name__ == "__main__":
 
         test_types = ["SR", "SA", "LR", "LA"]
         model_complete = lambda model: all(
-            f"Test{test}_eval.txt" in os.listdir(f"models/{model}")
-            if os.path.exists(f"models/{model}") else False
+            f"Test{test}_eval.txt" in os.listdir(f"{args.model_dir}/{model}")
+            if os.path.exists(f"{args.model_dir}/{model}") else False
             for test in test_types
         )
 
         langs_with_models = sorted(
-            set(f.split("_")[3] for f in os.listdir("models"))
+            set(f.split("_")[3] for f in os.listdir(args.model_dir))
         )
         langs_out = []
         for lang in langs_with_models:
