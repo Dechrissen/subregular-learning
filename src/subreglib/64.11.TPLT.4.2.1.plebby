@@ -1,3 +1,3 @@
 :import "syms64.plebby"
-[a,b,c,d,e,f,g,h,i,j,k]~<b,a a,b>
+[a,b,c,d,e,f,g,h,i,j,k]~<a a a a,b>
 :writeATT "../fstlib/att_format/64.11.TPLT.4.2.1.att" _ _ it

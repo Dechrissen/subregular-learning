@@ -7,15 +7,11 @@
 1	1	a	a
 1	2	b	b
 2	2	a	a
-2	2	c	c
+2	2	b	b
 2	2	d	d
-2	4	b	b
+2	3	c	c
 3	3	a	a
 3	3	b	b
 3	3	c	c
 3	3	d	d
-4	2	c	c
-4	2	d	d
-4	3	a	a
-4	4	b	b
 3

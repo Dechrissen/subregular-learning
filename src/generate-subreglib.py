@@ -74,6 +74,17 @@ def halfAlternation(syms, width=2, sep=" "):
         a.append("<" + sep.join(width//2*[symbols[i],symbols[i+1]]) + ">")
     return "~\\/{" + ",".join(a) + "}"
 
+def halfAlternationB(syms, width=2, sep=" "):
+    """
+    like halfAlternation but one symbol in each pair is symbols[1]
+    """
+    if syms == 0:
+        return "<>"
+    a=[]
+    for i in range(0,syms):
+        a.append("<"+sep.join(width//2*[symbols[1],symbols[i+1]])+">")
+    return "~\\/{" + ",".join(a) + "}"
+
 def tierify(sigma, tau, expr):
     """
     if sigma and tau are inequal, put things on a tier!
@@ -435,6 +446,7 @@ def main():
                 a = symbols[0]
                 b = symbols[1]
                 c = symbols[2]
+                real_c = c
                 d = symbols[3]
                 if (base < 4):
                     c = a
@@ -465,10 +477,10 @@ def main():
                 # (Tier-Based) Locally Testable
                 writeFile(sigma,tau,"LT",k,1,0,
                           implication("~"+universalOCP(1,k," "),
-                                      "~"+halfAlternation(1,k," ")))
+                                      "~"+halfAlternationB(1,k," ")))
                 writeFile(sigma,tau,"LT",k,1,1,
                           implication("~"+universalOCP(1,k," "),
-                                      "~"+halfAlternation(2,k," ")))
+                                      "~"+halfAlternationB(2,k," ")))
                 writeFile(sigma,tau,"LT",k,1,2,
                           union(fullAlternation(1,k," "),
                                 universalOCP(2,k," ")))
@@ -481,12 +493,12 @@ def main():
                 writeFile(sigma,tau,"LT",k,1,5,
                           boundaryCondition(
                               implication("~"+universalOCP(1,k," "),
-                                          "~"+halfAlternation(1,k," ")),
+                                          "~"+halfAlternationB(1,k," ")),
                               k," "))
                 writeFile(sigma,tau,"LT",k,1,6,
                           boundaryCondition(
                               implication("~"+universalOCP(1,k," "),
-                                          "~"+halfAlternation(2,k," ")),
+                                          "~"+halfAlternationB(2,k," ")),
                               k," "))
                 writeFile(sigma,tau,"LT",k,1,7,
                           boundaryCondition(
@@ -540,36 +552,38 @@ def main():
                 j = 2
                 if (k == 6):
                     j = 3
+                c = real_c
                 writeFile(sigma,tau,"PLT",k,j,0,
-                          gapAlt(2,2,j))
+                          "~"+lp([[b],k*[c]]+(j*[[b],[c]])[:j-2]))
                 writeFile(sigma,tau,"PLT",k,j,1,
-                          "~"+lp((j*[[b], [a,a]])[:j+1]))
+                          "~"+lp([k*[a]]+(j-1)*[[b]]))
                 writeFile(sigma,tau,"PLT",k,j,2,
-                          lp((j*[[a,b],[d,c]])[:j]))
+                          lp([(k//2)*[a,b]]+(j-1)*[[c]]))
                 writeFile(sigma,tau,"PLT",k,j,3,
-                          union(lp(j*[[a,a]]),
-                                lp((j*[[a,b],[d,c]])[:j])))
+                          union(lp([k*[b]]),
+                                lp([[c]]+(j-1)*[[a,a]])))
                 writeFile(sigma,tau,"PLT",k,j,4,
                           implication(
-                              lp((j*[[a,b],[b,a]])[:j]),
-                              lp(([[b,a]]+j*[[a,b]])[:j])))
+                              lp(((j-1)*[[a,b]]+[(k//2)*[b,a]])),
+                              lp([[a,c]])))
                 writeFile(sigma,tau,"PLT",k,j,5,
-                          boundaryCondition(gapAlt(2,2,j),2))
+                          boundaryCondition(
+                              "~"+lp([[b],k*[c]]+(j*[[b],[c]])[:j-2])))
                 writeFile(sigma,tau,"PLT",k,j,6,
                           boundaryCondition(
-                              "~"+lp((j*[[b], [a,a]])[:j+1]),2))
+                              "~"+lp([k*[a]]+(j-1)*[[b]])))
                 writeFile(sigma,tau,"PLT",k,j,7,
                           boundaryCondition(
-                              lp((j*[[a,b],[d,c]])[:j]),2))
+                              lp([(k//2)*[a,b]]+(j-1)*[[c]])))
                 writeFile(sigma,tau,"PLT",k,j,8,
                           boundaryCondition(
-                              union(lp(j*[[a,a]]),
-                                    lp((j*[[a,b],[d,c]])[:j])),2))
+                              union(lp([k*[b]]),
+                                    lp([[c]]+(j-1)*[[a,a]]))))
                 writeFile(sigma,tau,"PLT",k,j,9,
                           boundaryCondition(
                               implication(
-                                  lp((j*[[a,b],[b,a]])[:j]),
-                                  lp(([[b,a]]+j*[[a,b]])[:j])),2))
+                                  lp(((j-1)*[[a,b]]+[(k//2)*[b,a]])),
+                                  lp([[a,c]]))))
                 ########################
                 # NOTICE:
                 # Some 04.02.T* are not sufficiently distinct from
