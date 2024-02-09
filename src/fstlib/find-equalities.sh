@@ -1,7 +1,7 @@
 #!/bin/sh
 cd att_format
 for a in *.att; do
-	for b in "${a%%.*}".*PLT.*.att; do
+	for b in "${a%%.*}".*.att; do
 		if [ "$a" '!=' "$b" ]; then
 			printf '%s\n' \
 			":readatt ${a} _ _" \
