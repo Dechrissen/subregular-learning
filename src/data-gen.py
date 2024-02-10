@@ -76,7 +76,7 @@ def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
             if (A(s, token_type=syms) @ fsa).num_states() != 0:
                 if n_pos < num:
                     pos_strings.append(s.replace(' ',''))
-                elif n_pos >= threshold:
+                elif False and n_pos >= threshold:
                     # if there are too many positive strings then
                     # the negative strings are very rare
                     # so we fill the neg bucket 
@@ -86,7 +86,7 @@ def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
             else:
                 if n_neg < num:
                     neg_strings.append(s.replace(' ',''))
-                elif n_neg >= threshold:
+                elif False and n_neg >= threshold:
                     # if there are too many negative strings then
                     # the positive strings are very rare
                     # so we fill the pos bucket 
@@ -147,7 +147,7 @@ def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, nu
             if (A(s, token_type=syms) @ fsa).num_states() != 0:
                 if n_pos < num:
                     pos_strings.append(sx)
-                elif n_pos >= threshold:
+                elif False and n_pos >= threshold:
                     temp = set()
                     ndi = neg_dict.get(i, set())
                     while (len(temp) < num - len(neg_strings)):
@@ -161,7 +161,7 @@ def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, nu
             else:
                 if n_neg < num:
                     neg_strings.append(sx)
-                elif n_neg >= threshold:
+                elif False and n_neg >= threshold:
                     temp = set()
                     pdi = pos_dict.get(i, set())
                     while (len(temp) < num - len(pos_strings)):
@@ -322,7 +322,7 @@ if __name__ == "__main__":
     num_ss = ss_max_len - ss_min_len + 1  # 10 short string lengths
     num_ls = ls_max_len - ls_min_len + 1  # 20 long  string lengths
 
-    base = 1000
+    base = 1000 # set to 50 for testing?
     factor = 10 # 10
 
     smalldata = base               # 1000

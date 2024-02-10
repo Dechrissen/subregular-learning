@@ -69,6 +69,8 @@ def main():
     factor = args.factor
     id = args.id
 
+    print(f'{os.uname()[1]} is handling {id}', flush=True)
+
     to_gen = base * factor * factor
     short = range(20,30)
     long = range(31,51)
@@ -150,6 +152,9 @@ def main():
         insert_strings(pos_dict, pos)
         insert_strings(neg_dict, neg)
     close_files(files)
+    print(f'{id} is done.') 
+
+
 
 def insert_strings(seen_dict, strings, token_type=None):
     """Add a collection of strings to a seen-dict"""
@@ -345,6 +350,8 @@ def editExactly1(fsa):
 
 def unweight(fsa):
     """Return a new fsa with no weights."""
+    if not list(fsa.states()):
+        return fsa
     ofsa = pynini.Fst()
     ofsa.set_input_symbols(fsa.input_symbols())
     ofsa.set_output_symbols(fsa.output_symbols())
