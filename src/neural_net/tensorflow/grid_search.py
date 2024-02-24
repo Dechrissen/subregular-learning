@@ -16,8 +16,6 @@ from keras.models import Sequential, Model
 from keras.utils.layer_utils import count_params
 
 from data import *
-from predict_direct import predict
-from eval_direct import evaluate_predictions
 
 warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 tf.get_logger().setLevel("ERROR")
@@ -208,8 +206,14 @@ def train_eval_model(
     print(f"TOTAL TRAINING TIME IN SECONDS: {total_time}\n")
     model.summary()
 
+    predictions = model.predict(x_test)
+    category_predictions = tf.math.argmax(predictions, axis=1) > 0
+    y_binary = tf.equal(y_test[:, 1], 1.0)
+    correct_preds = category_predictions == y_binary
+    acc = np.mean(tf.cast(correct_preds, tf.float32))
+
     trainable_params = sum(count_params(layer) for layer in model.trainable_weights)
-    h_param_config = {
+    model_config = {
         "model_type": model_type,
         "padding": padding,
         "num_ff_layers": num_ff_layers,
@@ -220,33 +224,11 @@ def train_eval_model(
         "loss": loss,
         "optimizer": optimizer,
         "trainable_params": trainable_params,
+        "accuracy": acc,
     }
     h_param_config_file = os.path.join(model_path, "model_config.yaml")
     with open(h_param_config_file, "w") as file:
-        yaml.dump(h_param_config, file)
-
-    lang = train_data.split("/")[2].split("_")[0]
-    test_size = "Mid"
-    test_types = ["SR", "SA", "LR", "LA"]
-    data_files = [
-        os.path.join("data_gen", test_size, f"{lang}_Test{test_type}.txt")
-        for test_type in test_types
-    ]
-
-    predictions = model.predict(x_test)
-    category_predictions = tf.math.argmax(predictions, axis=1) > 0
-    y_binary = tf.equal(y_test[:, 1], 1.0)
-    correct_preds = category_predictions == y_binary
-    acc = np.mean(tf.cast(correct_preds, tf.float32))
-
-    # for test_type, data_file in zip(test_types, data_files):
-    #     predict(model, model_path, data_file, f"Test{test_type}", vocabulary)
-    #     evaluate_predictions(f"{model_path}/Test{test_type}_pred.txt")
-    #
-    # acc_sr = get_accuracy_from_file(os.path.join(model_path, "TestSR_eval.txt"))
-    # acc_sa = get_accuracy_from_file(os.path.join(model_path, "TestSA_eval.txt"))
-    # acc_lr = get_accuracy_from_file(os.path.join(model_path, "TestLR_eval.txt"))
-    # acc_la = get_accuracy_from_file(os.path.join(model_path, "TestLA_eval.txt"))
+        yaml.dump(model_config, file)
 
     return acc
 
@@ -279,25 +261,27 @@ if __name__ == "__main__":
     parser.add_argument("--bidi", type=bool, default=False)
     args = parser.parse_args()
 
-    # model_type = ["simple", "gru", "lstm", "stackedrnn", "transformer"]
-    # padding = ["end"]
-    # num_ff_layers = [2, 4]
-    # embed_dim = [32, 256]
-    # learning_rate = [0.01, 0.0001]
-    # dropout = [0.1]
-    # epochs = [32, 64]
-    # loss = ["BinaryCrossEntropy", "MeanSquaredError"]
-    # optimizer = ["RMSprop", "Adam", "SGD"]
+    os.makedirs(args.output_dir, exist_ok=True)
 
-    model_type = ["simple", "lstm", "transformer"]
+    model_type = ["simple", "gru", "lstm", "transformer"]
     padding = ["end"]
-    num_ff_layers = [2, 3]
-    embed_dim = [32, 64]
-    learning_rate = [0.001, 0.01]
-    dropout = [0.1]
-    epochs = [32]
+    num_ff_layers = [2, 4]
+    embed_dim = [32, 256]
+    learning_rate = [0.01, 0.0001]
+    dropout = [0.0, 0.1]
+    epochs = [32, 64]
     loss = ["BinaryCrossEntropy", "MeanSquaredError"]
-    optimizer = ["SGD"]
+    optimizer = ["RMSprop", "Adam", "SGD"]
+
+    # model_type = ["simple", "lstm", "transformer"]
+    # padding = ["end"]
+    # num_ff_layers = [2, 3]
+    # embed_dim = [32, 64]
+    # learning_rate = [0.001, 0.01]
+    # dropout = [0.1]
+    # epochs = [32]
+    # loss = ["BinaryCrossEntropy", "MeanSquaredError"]
+    # optimizer = ["SGD"]
 
     hp_arrays = [
         model_type,
@@ -319,7 +303,6 @@ if __name__ == "__main__":
     )
 
     time_now = datetime.now()
-    time_now_format = time_now.strftime("%Y%m%d-%H%M%S")
 
     num_processes = multiprocessing.cpu_count()
     with multiprocessing.Pool(processes=num_processes) as pool:
