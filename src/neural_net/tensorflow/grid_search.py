@@ -210,7 +210,7 @@ def train_eval_model(
     category_predictions = tf.math.argmax(predictions, axis=1) > 0
     y_binary = tf.equal(y_test[:, 1], 1.0)
     correct_preds = category_predictions == y_binary
-    acc = np.mean(tf.cast(correct_preds, tf.float32))
+    acc = float(np.mean(tf.cast(correct_preds, tf.float32)))
 
     trainable_params = sum(count_params(layer) for layer in model.trainable_weights)
     model_config = {
@@ -273,16 +273,6 @@ if __name__ == "__main__":
     loss = ["BinaryCrossEntropy", "MeanSquaredError"]
     optimizer = ["RMSprop", "Adam", "SGD"]
 
-    # model_type = ["simple", "lstm", "transformer"]
-    # padding = ["end"]
-    # num_ff_layers = [2, 3]
-    # embed_dim = [32, 64]
-    # learning_rate = [0.001, 0.01]
-    # dropout = [0.1]
-    # epochs = [32]
-    # loss = ["BinaryCrossEntropy", "MeanSquaredError"]
-    # optimizer = ["SGD"]
-
     hp_arrays = [
         model_type,
         padding,
@@ -335,3 +325,4 @@ if __name__ == "__main__":
         for res in sorted_results:
             row = hp_values(res[0]) + [res[1]]
             writer.writerow(row)
+
