@@ -6,8 +6,8 @@ import os
 import tensorflow as tf
 
 tf.get_logger().setLevel("ERROR")
-import tensorflow.keras as keras
-from tensorflow.keras.callbacks import TensorBoard
+from tensorflow import keras
+from keras.callbacks import TensorBoard
 
 from data import *
 from model import MainModel
@@ -20,18 +20,51 @@ if __name__ == "__main__":
     parser.add_argument("--train-data", type=str, required=True)
     parser.add_argument("--val-data", type=str, required=True)
     parser.add_argument("--output-dir", type=str, required=True)
+    parser.add_argument("--model-type", type=str, required=True)
     parser.add_argument("--batch-size", type=int, default=64)
-    parser.add_argument("--epochs", type=int, default=30)
-    parser.add_argument("--embed-dim", type=int, default=100)
-    parser.add_argument("--dropout", type=float, default=0.2)
-    parser.add_argument("--rnn-type", type=str, required=True)
-    parser.add_argument("--bidi", type=bool, default=False)
     parser.add_argument("--short-strings", type=bool, default=False)
     args = parser.parse_args()
 
     model_path = os.path.dirname(args.output_dir)
     lang = model_path.split("/")[-1].split("_")[3]
     os.makedirs(model_path, exist_ok=True)
+
+    model_types = ["simple", "gru", "lstm", "transformer"]
+    hparams = {
+        "dropout": [0.1, 0.1, 0.0, 0.1],
+        "embed_dim": [32, 32, 256, 256],
+        "epochs": 4 * [64],
+        "learning_rate": [0.0001, 0.01, 0.0001, 0.0001],
+        "loss": 4 * ["BinaryCrossEntropy"],
+        "num_ff_layers": [4, 2, 2, 2],
+        "optimizer": ["Adam", "RMSprop", "RMSprop", "Adam"],
+    }
+    hparams = {
+        model_type: {hparam: hparams[hparam][idx] for hparam in hparams}
+        for idx, model_type in enumerate(model_types)
+    }
+
+    model_type = args.model_type
+    batch_size = args.batch_size
+    dropout = hparams[model_type]["dropout"]
+    embed_dim = hparams[model_type]["embed_dim"]
+    epochs = hparams[model_type]["epochs"]
+    learning_rate = hparams[model_type]["learning_rate"]
+    loss = hparams[model_type]["loss"]
+    num_ff_layers = hparams[model_type]["num_ff_layers"]
+    optimizer = hparams[model_type]["optimizer"]
+
+    losses = {
+        "BinaryCrossEntropy": keras.losses.BinaryCrossentropy(),
+        "MeanSquaredError": keras.losses.MeanSquaredError(),
+    }
+    optimizers = {
+        "RMSprop": keras.optimizers.RMSprop,
+        "Adam": keras.optimizers.Adam,
+        "SGD": keras.optimizers.SGD,
+    }
+    loss = losses[loss]
+    optimizer = optimizers[optimizer](learning_rate=learning_rate)
 
     vocabulary = {"pad": 0}
     vocabulary, x_train, y_train = parse_dataset(args.train_data, vocabulary)
@@ -50,6 +83,7 @@ if __name__ == "__main__":
         short_string_dir = "../tmp/shortgen/OnlyShort"
         short_string_file = os.path.join(short_string_dir, f"{lang}_TrainOS.mlrt")
         vocabulary, x_short, y_short = parse_dataset(short_string_file, vocabulary)
+
         x_short = tf.constant(pad_data(x_short, vocabulary))
         y_short = tf.constant(y_short)
         x_train = tf.concat([x_short, x_train], axis=0)
@@ -58,11 +92,13 @@ if __name__ == "__main__":
     save_vocab(vocab_file, vocabulary)
 
     config = {
+        "model_type": model_type,
+        "dropout": dropout,
+        "embed_dim": embed_dim,
         "vocab_size": len(vocabulary),
-        "embed_dim": args.embed_dim,
-        "dropout": args.dropout,
-        "rnn_type": args.rnn_type,
-        "bidi": args.bidi,
+        "ff_dim": 64,
+        "num_ff_layers": num_ff_layers,
+        "bidi": False,
     }
     model = MainModel(**config)
 
@@ -71,8 +107,8 @@ if __name__ == "__main__":
         json.dump(config, f)
 
     model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=2e-5),
-        loss=keras.losses.BinaryCrossentropy(),
+        optimizer=optimizer,
+        loss=loss,
         metrics=[
             keras.metrics.BinaryAccuracy(),
             keras.metrics.MeanSquaredError(),
@@ -95,8 +131,8 @@ if __name__ == "__main__":
     training_record = model.fit(
         x_train,
         y_train,
-        batch_size=args.batch_size,
-        epochs=args.epochs,
+        batch_size=batch_size,
+        epochs=epochs,
         validation_data=(x_val, y_val),
         callbacks=callbacks,
     )
