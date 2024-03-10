@@ -35,7 +35,7 @@ cd subregular-learning
 Requirements include Python >= 3.6, Tensorflow >= 2.4.0, and Pynini == 2.1.2. To create a conda environment with all necessary libraries, run
 
 ```
-conda env create -f subreg_env.yml
+conda env create -f environment.yml
 conda activate subreg
 ```
 
