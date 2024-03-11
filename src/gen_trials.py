@@ -14,7 +14,7 @@ if __name__ == "__main__":
         for lang in open(langs_file, "r", encoding="utf8").readlines()
     ]
     sizes = ["Small", "Mid", "Large"]
-    network_types = ["simple", "gru", "lstm", "stackedrnn", "transformer"]
+    network_types = ["simple", "gru", "lstm", "transformer"]
     model_grid = product(langs, sizes, network_types)
 
     output_file = open(fname_out, "w+", encoding="utf8")
