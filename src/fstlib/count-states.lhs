@@ -1,3 +1,8 @@
+#!/usr/bin/env cabal
+{- cabal:
+build-depends: base, containers, language-toolkit ^>=1.2.0.1
+-}
+
 > module Main where
 
 > import Data.List (intercalate)
