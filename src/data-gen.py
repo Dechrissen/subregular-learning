@@ -1,427 +1,433 @@
-#
-# A script to generate train/dev/test set
-# goes with /data_gen/ and tags.txt
+# For an input language name, this script generates a training
+# set, dev set, and four test sets, for each size Large, Mid,
+# Small where Small ⊂ Mid ⊂ Large.
 
-# This script has 3 versions of the rand_gen_no_duplicate function:
-	# cody_rand_gen_no_duplicate
-	# alternate_rand_gen_no_duplicate
-	# rand_gen_no_duplicate (the original) (inefficient)
-# Right now it's using alternate_rand_gen_no_duplicate
-# It puts files of sizes 100k, 10k, and 1k strings into a data folder
-
-# updated 3 December 2020
-#
 import pynini
-import functools
-import numpy as np
+import argparse
 import random
 import pathlib
-
-
-def A(s):
-    return pynini.acceptor(s, token_type="utf8")
-
-def T(upper, lower):
-    return pynini.cross(A(upper), A(lower))
-
-a = A("a")
-zero = a-a
-zero.optimize()
-
-# Defining alphabet
-
-alpha = "abcd"
-sigma = zero
-for x in list(alpha):
-    sigma = A(x) | sigma
-sigma.optimize()
-
-# sigmaStar accepts all strings made of the characters in alpha
-sigmaStar = (sigma.star).optimize()
-
-# Utility function that outputs all strings of an fsa
-
-def list_string_set(acceptor):
-    my_list = []
-    paths = acceptor.paths()
-    for s in paths.ostrings():
-        my_list.append(s)
-    my_list.sort(key=len)
-    return my_list
+import os
 
 ################
-# functions for determining the border and generating adversial pairs
+# Helper Functions
 ################
 
-# defining edit distance transducer
-edits = zero
-for x in list(alpha): edits = T(x,"") | edits  # deletion
-for x in list(alpha): edits = T("",x) | edits  # insertion
-for x in list(alpha):
-    for y in list(alpha):
-        if x != y:
-            edits = T(x,y) | edits             # substitution
-edits.optimize()
-editExactly1 = sigmaStar + edits + sigmaStar
-# a transducer that produces all strings that are within 1 edit of its input string
-editExactly1.optimize()
+def A(s, token_type='utf8'):
+    # the name of this function varies between pynini versions
+    if hasattr(pynini, 'accep'):
+        return pynini.accep(s, token_type=token_type)
+    return pynini.acceptor(s, token_type=token_type)
 
-def border(fsa,n):
-    '''
-    A function that takes an fsa and produces an fst;
-    the fst converts strings of length n in the language to "border" strings,
-    which are 1 edit off from being in the language
-    '''
-    cofsa = pynini.difference(sigmaStar,fsa)
-    cofsa.optimize()
-    bpairs = fsa @ editExactly1 @ cofsa     # this is the key insight which gives entire border
-    bpairs.optimize()
-    sigmaN = pynini.closure(sigma,n,n)
-    sigmaN.optimize()
-    bpairsN = sigmaN @ bpairs               # here we limit the border to input words of length=n
-    bpairsN.optimize()
-    return bpairsN
+def T(upper, lower, token_type='utf8'):
+    return pynini.cross(A(upper, token_type=token_type),
+                        A(lower, token_type=token_type))
+
+# FUNCTIONS that take an fsa and return its alphabet, sigma
+# and sigmastar, respectively
+
+def sigma(fsa):
+    syms = fsa.input_symbols()
+    one_letter = [A(x[1],token_type=syms) for x in syms][1:]
+    s = pynini.union(*one_letter)
+    s.set_input_symbols(fsa.input_symbols())
+    s.set_output_symbols(fsa.output_symbols())
+    return s.optimize()
+
+def sigmastar(fsa):
+    return (sigma(fsa).star).optimize()
 
 
-def build (border, lang, lang_name, n):
-    '''
-    A function that creates the adv_data files that are in /data_gen/ ;
-    It gets the set of "border" strings from `border()`
-    and writes them to adv_data files using the function `by_len()`
-
-    Inputs:
-    -------
-    border : fst
-        the fsa that recognizes border strings
-    lang : fst
-        the fsa that recognizes the language in question
-    n : int
-        length of the strings used to generate the border strings
-    '''
-    path_to_library = str(pathlib.Path(__file__).parent.absolute().parent)
-    test3_files = [path_to_library+"/data_gen/100k/"+lang_name+"_Test3.txt",
-                   path_to_library+"/data_gen/10k/"+lang_name+"_Test3.txt",
-                   path_to_library+"/data_gen/1k/"+lang_name+"_Test3.txt"]
-    f = [open(test3_files[0], "w+"),
-         open(test3_files[1], "w+"),
-         open(test3_files[2], "w+")]
-
-    count = 0
-
-    # 5 times:
-    for i in range(5):
-        # writes 2*xk/10 random strings to the files in f
-        # border(lang, n) creates border pairs for length n
-        by_len(border(lang, n), f, count)
-
-    for i in range(3):
-        f[i].close()
-
-    return count
-
-def create_adversarial_examples(pos_dict, fsa, lang_name, min_len, max_len):
-    for i in range(ls_min_len,ls_max_len+1):
-        c = build(border,fsa,lang_name, i)
-    return c
-
-def by_len(ex, f, count):
-    random_examples=pynini.randgen(ex,10000)
-    ps = random_examples.paths(input_token_type="utf8", output_token_type="utf8")
-
-    while not ps.done():
-        if ps.istring() and ps.ostring():
-            f[0].write(ps.istring() + "\tTRUE\n")
-            f[0].write(ps.ostring() + "\tFALSE\n")
-            if count % 10 ==0:
-                f[1].write(ps.istring() + "\tTRUE\n")
-                f[1].write(ps.ostring() + "\tFALSE\n")
-                if count %100 ==0:
-                    f[2].write(ps.istring() + "\tTRUE\n")
-                    f[2].write(ps.ostring() + "\tFALSE\n")
-        ps.next()
-        count=count+1
-
-
-# Utility function that gets the strings of an fsa
-# with length from min_len to max_len
-
-def get_pos_string(fsa, min_len, max_len):
-    fsa_dict = {}
-    for i in range(min_len, max_len + 1):
-        fsa_dict[i] = pynini.intersect(fsa, pynini.closure(sigma, i, i))
-        # print(list_string_set(fsa_dict[i]))
-    return fsa_dict
-
-
-# Utility function that gets the strings of the complement
-# of an fsa with length from min_len to max_len
-
-def get_neg_string(fsa, min_len, max_len):
-    fsa_dict = {}
-    for i in range(min_len, max_len + 1):
-        fsa_dict[i] = pynini.difference(pynini.closure(sigma, i, i), fsa)
-        # print(list_string_set(fsa_dict[i]))
-    return fsa_dict
-
+def fill_bucket(fsa, length, n):
+    isyms = fsa.input_symbols()
+    osyms = fsa.output_symbols()
+    a=pynini.intersect(fsa,sigma(fsa)**length)
+    a.optimize()
+    ps = a.paths(input_token_type=isyms,
+                 output_token_type=osyms)
+    return random.choices(list(ps.ostrings()), k=int(n))
 
 # Create {n} random strings from fsa.
 # No duplicates in the results.
 # The output fsa is the difference between the original
 # fsa and the delta fsa used to generate unique strings.
 
+# create {num} random strings of positive/negative examples.
+# This may be duplicates.
+def create_data_with_duplicate(name, fsa, cofsa, min_len, max_len, num):
+    threshold = 20 * num**2 # not ^ because ^ is xor
+    test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
+                  os.path.join(dirMid, f"{x}{name}.txt"),
+                  os.path.join(dirSmall, f"{x}{name}.txt"),
+                  os.path.join(dirLog, f"{x}.txt")]
+    f = [open(x, "w+") for x in test_files]
 
-def rand_gen_no_duplicate(acceptor, n):
-    loop = 100000
-    for i in range(loop):
-        print('trying to generate random strings ('+str(i)+')')
-        num = int(n + n*i*0.1)
-        temp = pynini.randgen(acceptor, npath=num, seed=0, select="uniform", max_length=2147483647, weighted=False)
-        rand_list = list_string_set(temp)
-        rand_list = list(set(rand_list))
-        uniq_len = len(rand_list)
-        if uniq_len < n and i < loop - 1:
-            #print('insufficient random strings\n')
-            continue
-        else:
-            random.shuffle(rand_list)
-            rand_list = rand_list[:n]
-            rand_list.sort()
-            acceptor = pynini.difference(acceptor, temp)
-            return acceptor, rand_list
+    syms = fsa.input_symbols()
+    noneps = list(syms)[1:]
+    pos_dict = dict()
+    neg_dict = dict()
+    for i in range(min_len, max_len + 1):
+        n_pos = 0
+        n_neg = 0
+        pos_strings = []
+        neg_strings = []
+        while len(pos_strings) < num or len(neg_strings) < num:
+            s = random.choices(noneps, k=i)
+            s = ' '.join([x[1] for x in s])
+            if (A(s, token_type=syms) @ fsa).num_states() != 0:
+                if n_pos < num:
+                    pos_strings.append(s.replace(' ',''))
+                elif False and n_pos >= threshold:
+                    # if there are too many positive strings then
+                    # the negative strings are very rare
+                    # so we fill the neg bucket 
+                    neg_strings += fill_bucket(cofsa, i, num-n_neg)
+                    n_neg = num
+                n_pos += 1
+            else:
+                if n_neg < num:
+                    neg_strings.append(s.replace(' ',''))
+                elif False and n_neg >= threshold:
+                    # if there are too many negative strings then
+                    # the positive strings are very rare
+                    # so we fill the pos bucket 
+                    pos_strings += fill_bucket(fsa, i, num-n_pos)
+                    n_pos = num
+                n_neg += 1
 
-def alternate_rand_gen_no_duplicate(acceptor, n):
-    rand_list = []
-    loop = 10
-    seed = 0
-    for i in range(loop):
-        print('(alternate) trying to generate random strings ('+str(i)+')')
-        num = int(n + n*i*.01)
-        temp = pynini.randgen(acceptor, npath=num, seed=seed, select='uniform', max_length=2147483647, weighted=False)
-        print('made new `temp`')
-        temp_list = list_string_set(temp)
-        print('temp got '+str(len(temp_list))+' random strings')
-        temp_list = list(set(temp_list))
-        new_strings = [t for t in temp_list if t not in rand_list]
-        print('got '+str(len(new_strings))+' new strings')
-        for t in temp_list:
-            if t not in rand_list:
-                rand_list.append(t)
-                if len(rand_list)==n:
-                    print('rand_list now has '+str(len(rand_list))+' strings')
-                    print('finally got enough strings in rand_list; i='+str(i))
-                    return acceptor, rand_list
-        acceptor = pynini.difference(acceptor, temp)
-        seed += 1
-        print('rand_list now has '+str(len(rand_list))+' strings')
-        print('need to add strings to rand_list ('+str(i)+')')
-    print('finished loop; returning incomplete set')
-    return acceptor, rand_list
+        pos_dict[i] = set(pos_strings)
+        neg_dict[i] = set(neg_strings)
+        count = 0
+        for ele in pos_strings:
+            f[0].write(ele + '\t' + 'TRUE\n')
+            if count % factor == 0:
+                f[1].write(ele + '\t' + 'TRUE\n')
+                if count % (factor*factor) == 0:
+                    f[2].write(ele + '\t' + 'TRUE\n')
+            count = count + 1
+        count = 0
+        for ele in neg_strings:
+            f[0].write(ele + '\t' + 'FALSE\n')
+            if count % factor == 0:
+                f[1].write(ele + '\t' + 'FALSE\n')
+            if count % (factor*factor) == 0:
+                f[2].write(ele + '\t' + 'FALSE\n')
+            count = count + 1
+        f[3].write('\t'.join([str(i),str(n_pos),str(n_neg)]) + '\n')
 
-def cody_rand_gen_no_duplicate(acceptor, n):
-    loop = 50000
-    result_set = set()
-    seed = 0
-    for i in range(loop):
-        print('started loop '+str(i))
-        num = int(n + n*i*0.1)
-        temp = pynini.randgen(acceptor, npath=num, seed=seed, select='uniform', max_length=2147483647, weighted=False)
-        rand_list = list_string_set(temp)
-        result_set = result_set.union(set(rand_list))
-        uniq_len = len(result_set)
-        if uniq_len < n and i < loop - 1:
-            print('insufficient random strings')
-            seed += 1
-            continue
-        else:
-            rand_list = list(result_set)
-            random.shuffle(rand_list)
-            rand_list = rand_list[:n]
-            rand_list.sort()
-            acceptor = pynini.difference(acceptor, temp)
-            print('returning')
-            if len(rand_list) >= n:
-                print('got full rand_list\n')
-            return acceptor, rand_list
+    for i in range(len(f)):
+        f[i].close()
+    return pos_dict, neg_dict
 
 # Create {num} positive and negative examples from fsa.
 # No duplicates in the dataset.
+def create_data_no_duplicate(name, fsa, pos_dict, neg_dict, min_len, max_len, num):
+    threshold = 20 * num**2 # not ^ because ^ is xor
+    test_files = [os.path.join(dirLarge, f"{x}{name}.txt"),
+                  os.path.join(dirMid, f"{x}{name}.txt"),
+                  os.path.join(dirSmall, f"{x}{name}.txt")]
+    f = [open(x, "w+") for x in test_files]
 
-
-def create_data_no_duplicate(filename, pos_dict, neg_dict, min_len, max_len, num):
-    with open(filename, "w+") as f:
-        for i in range(min_len, max_len + 1):
-            print('\nworking on length '+str(i))
-
-            # generate positive strings
-            print('getting positive strings for length '+str(i))
-            acceptor, pos_results = alternate_rand_gen_no_duplicate(pos_dict[i], num)
-            amount_pos = len(pos_results)
-            if amount_pos < num:
-                print('WARNING: Only', str(amount_pos), 'positive strings generated for length', str(i))
-            pos_dict[i] = acceptor
-
-            # generate negative strings
-            print('getting negative strings for length '+str(i))
-            acceptor, neg_results = alternate_rand_gen_no_duplicate(neg_dict[i], num)
-            amount_neg = len(neg_results)
-            if amount_neg < num:
-                print('WARNING: Only', str(amount_neg), 'negative strings generated for length', str(i))
-            neg_dict[i] = acceptor
-
-            # check which of the pos results or neg results is smaller, and set that to the stopping number
-            if amount_pos > amount_neg:
-                stop = amount_neg
+    syms = fsa.input_symbols()
+    noneps = list(syms)[1:]
+    opos_dict = dict()
+    oneg_dict = dict()
+    for i in range(min_len, max_len + 1):
+        n_pos = 0
+        n_neg = 0
+        pos_strings = []
+        neg_strings = []
+        while len(pos_strings) < num or len(neg_strings) < num:
+            s = random.choices(noneps, k=i)
+            s = ' '.join([x[1] for x in s])
+            sx = s.replace(' ','')
+            if sx in pos_strings or sx in neg_strings:
+                continue
+            if i in pos_dict and (sx in pos_dict[i] or sx in neg_dict[i]):
+                continue
+            if (A(s, token_type=syms) @ fsa).num_states() != 0:
+                if n_pos < num:
+                    pos_strings.append(sx)
+                elif False and n_pos >= threshold:
+                    temp = set()
+                    ndi = neg_dict.get(i, set())
+                    while (len(temp) < num - len(neg_strings)):
+                        to_gen = num - len(neg_strings) - len(temp)
+                        new_strings = set(fill_bucket(cofsa, i, to_gen))
+                        new_strings = new_strings.difference(ndi)
+                        new_strings = new_strings.difference(neg_strings)
+                        temp = temp.union(new_strings)
+                    neg_strings = neg_strings + list(temp)
+                n_pos += 1
             else:
-                stop = amount_pos
+                if n_neg < num:
+                    neg_strings.append(sx)
+                elif False and n_neg >= threshold:
+                    temp = set()
+                    pdi = pos_dict.get(i, set())
+                    while (len(temp) < num - len(pos_strings)):
+                        to_gen = num - len(pos_strings) - len(temp)
+                        new_strings = set(fill_bucket(fsa, i, to_gen))
+                        new_strings = new_strings.difference(pdi)
+                        new_strings = new_strings.difference(pos_strings)
+                        temp = temp.union(new_strings)
+                    pos_strings = pos_strings + list(temp)
+                n_neg += 1
+        opos_dict[i] = pos_dict.get(i,set()).union(pos_strings)
+        oneg_dict[i] = neg_dict.get(i,set()).union(neg_strings)
 
-            # write positive results to file, stopping at stopping number
-            counter = 0
-            for ele in pos_results:
-                f.write(ele + "\t" + "TRUE\n")
-                counter+=1
-                if counter == stop:
-                    break
+        # write positive results to file, stopping at stopping number
+        count = 0
+        for ele in pos_strings:
+            f[0].write(ele + "\t" + "TRUE\n")
+            if count % factor == 0:
+                f[1].write(ele + "\t" + "TRUE\n")
+            if count % (factor*factor) == 0:
+                f[2].write(ele + "\t" + "TRUE\n")
+            count = count + 1
 
-            # write negative results to file, stopping at stopping number
-            counter = 0
-            for ele in neg_results:
-                f.write(ele + "\t" + "FALSE\n")
-                counter+=1
-                if counter == stop:
-                    break
+        # write negative results to file, stopping at stopping number
+        count = 0
+        for ele in neg_strings:
+            f[0].write(ele + "\t" + "FALSE\n")
+            if count % factor == 0:
+                f[1].write(ele + "\t" + "FALSE\n")
+            if count % (factor*factor) == 0:
+                f[2].write(ele + "\t" + "FALSE\n")
+            count = count + 1
 
-    return pos_dict, neg_dict
+    for i in range(len(f)):
+        f[i].close()
+    return opos_dict, oneg_dict
 
+################
+# functions for determining the border and generating
+# adversial pairs
+################
 
-# create {num} random strings of positive/negative examples.
-# This may be duplicates.
-def create_data_with_duplicate(filename, pos_dict, neg_dict, min_len, max_len, num, get_difference):
-    with open(filename, "w+") as f:
-        for i in range(min_len, max_len + 1):
-            pos_fsa = \
-                pynini.randgen(pos_dict[i], npath=num, seed=0, select="uniform", max_length=2147483647, weighted=False)
-            if get_difference == 1:
-                pos_dict[i] = pynini.difference(pos_dict[i], pos_fsa)
-            for ele in list_string_set(pos_fsa):
-                f.write(ele + "\t" + "TRUE\n")
-            neg_fsa = \
-                pynini.randgen(neg_dict[i], npath=num, seed=0, select="uniform", max_length=2147483647, weighted=False)
-            if get_difference == 1:
-                neg_dict[i] = pynini.difference(neg_dict[i], neg_fsa)
-            for ele in list_string_set(neg_fsa):
-                f.write(ele + "\t" + "FALSE\n")
-    return pos_dict, neg_dict
+# defining edit distance transducer given an alphabet
+def editExactly1(fsa):
+    syms = fsa.input_symbols()
+    noneps = list(syms)[1:]
+    deletions  = [T(x[1],"",token_type=syms) for x in noneps]
+    insertions = [T("",x[1],token_type=syms) for x in noneps]
+    subs = [T(x[1],y[1],token_type=syms) for x in noneps for y in noneps]
+    edits = pynini.union(*deletions,*insertions,*subs)
+    edits.optimize()
+    ss = sigmastar(fsa)
+    edit1transducer = ss + edits + ss
+    # a transducer that produces all strings that are within
+    # 1 edit of its input string
+    return edit1transducer.optimize()
 
+def create_adversarial_examples(
+    pos_dict,
+    neg_dict,
+    border_fst,
+    border_inv,
+    min_len,
+    max_len,
+    length
+):
+    # the border_fst here is bpairs,
+    # which relates strings x in the_fsa to
+    # those strings y in the_cofsa such that
+    # string edit distance (x,y) = 1
+    isyms = border_fst.input_symbols()
+    osyms = border_fst.output_symbols()
+    noneps = list(isyms)[1:]
 
-# function that will take the 100k word list and create 10k and 1k from that list
-def prune(f, name):
-    path_to_library = str(pathlib.Path(__file__).parent.absolute().parent)
+    tests = {'short':'SA', 'long':'LA'}
+    test  = tests[length]
+    test_files = [
+        os.path.join(dirLarge, f"{x}_Test{test}.txt"),
+        os.path.join(dirMid, f"{x}_Test{test}.txt"),
+        os.path.join(dirSmall, f"{x}_Test{test}.txt")
+    ]
+    f = [open(x, "w+") for x in test_files]
 
-    data = open(name).readlines()
+    numtogen = {'short':largedata // num_ss , 'long':largedata // num_ls}
+    for n in range(min_len,max_len+1):
+        pos_strings = []
+        neg_strings = []
+        num = numtogen[length] // 2
+        while len(pos_strings) < num:
+            s = random.choices(noneps, k=n)
+            s = ' '.join([x[1] for x in s])
+            sx = s.replace(' ','')
+            if sx in pos_strings or sx in pos_dict.get(n,set()):
+                continue
+            if sx in neg_strings or sx in neg_dict.get(n,set()):
+                continue
+            avail = A(s, token_type=isyms) @ border_fst
+            if avail.num_states() != 0:
+                ps = avail.paths(input_token_type=isyms,
+                                 output_token_type=osyms)
+                near = random.choice(list(ps.ostrings()))
+                pos_strings.append(sx)
+                neg_strings.append(near.replace(' ',''))
+            else:
+                avail = A(s, token_type=isyms) @ border_inv
+                if avail.num_states() == 0:
+                    continue
+                ps = avail.paths(input_token_type=isyms,
+                                 output_token_type=osyms)
+                near = random.choice(list(ps.ostrings()))
+                neg_strings.append(sx)
+                pos_strings.append(near.replace(' ',''))
+        count = 0
+        for i in range(len(pos_strings)):
+            istr = pos_strings[i]
+            ostr = neg_strings[i]
+            f[0].write(istr + "\tTRUE\n")
+            f[0].write(ostr + "\tFALSE\n")
+            if count % factor == 0:
+                f[1].write(istr + "\tTRUE\n")
+                f[1].write(ostr + "\tFALSE\n")
+                if count % (factor*factor) == 0:
+                    f[2].write(istr + "\tTRUE\n")
+                    f[2].write(ostr + "\tFALSE\n")
+            count=count+1
+    for i in range(len(f)):
+        f[i].close()
 
-    small = [open(path_to_library+"/data_gen/10k/" + f, "w+"),
-                open(path_to_library+"/data_gen/1k/" + f, "w+")]
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--lang', type=str, required=True)
+    args = parser.parse_args()
+    x = args.lang # name of the language
 
-    tr = []
-    fl = []
-    count = 0
+    if not os.path.exists("data_gen"):
+        os.mkdir("data_gen")
+    if not os.path.exists("data_gen/Small"):
+        os.mkdir("data_gen/Small")
+    if not os.path.exists("data_gen/Mid"):
+        os.mkdir("data_gen/Mid")
+    if not os.path.exists("data_gen/Large"):
+        os.mkdir("data_gen/Large")
+    if not os.path.exists("data_gen/Log"):
+        os.mkdir("data_gen/Log")
 
-    for line in data:
-        if count % 2 == 0:
-            tr.append(line)
-        else:
-            fl.append(line)
-        count += 1
-    count = 0
+    mainDir = os.getcwd()
+    dirLog = os.path.join(mainDir, "data_gen/Log")
+    dirLarge = os.path.join(mainDir, "data_gen/Large")
+    dirMid = os.path.join(mainDir, "data_gen/Mid")
+    dirSmall = os.path.join(mainDir, "data_gen/Small")
 
-    for x in range(len(tr)):
-        if count % 10 == 0:
-            small[0].write(tr[x] + fl[x])
-            if count %100 ==0:
-                small[1].write(tr[x] + fl[x])
-        count=count+1
-
-    return True
-
-###########################################################
-## util functions to generate data and confirm file size ##
-###########################################################
-## moved this to a separate file
-
-
-# have not made use of this yet
-'''def construct_data(n):
-    return True
-
-def construct_all():
-    tags = open("tags.txt").readlines()
-
-    for x in tags:
-        construct_data(x[:-1])
-    return True'''
-
-
-############################################
-####main body (util functions finished)#####
-############################################
-
-
-path_to_library = pathlib.Path(__file__).parent.absolute().parent
-#print(path_to_library)
-tags = open(path_to_library / pathlib.Path("tags.txt"))
-tags = tags.readlines()
-
-# define hyper-parameters
-for x in tags:
-    print('\nStarting on', x)
-    my_fsa = pynini.Fst.read(str(path_to_library) + "/src/fstlib/fst_format/" + x[:-1] + ".fst")
-    x = x[:-1]
-    ss_min_len = 10
-    ss_max_len = 19
-    train_pos_num = 5000
-    dev_pos_num = 5000
-
-    test1_pos_num = 5000
-    test2_pos_num = 2500
-    test3_pos_num = 5000
-
+    # lengths of short strings and long strings
+    ss_min_len = 20
+    ss_max_len = 29
     ls_min_len = 31
     ls_max_len = 50
 
-    dir_name = str(path_to_library)+"/data_gen/100k/" + x
+    num_ss = ss_max_len - ss_min_len + 1  # 10 short string lengths
+    num_ls = ls_max_len - ls_min_len + 1  # 20 long  string lengths
+
+    base = 1000 # set to 50 for testing?
+    factor = 10 # 10
+
+    smalldata = base               # 1000
+    middddata = smalldata * factor # 10000
+    largedata = middddata * factor # 100000
+
+    # number of positive train and dev strings per length
+    train_pos_num = largedata//(num_ss*2) # 5000
+    dev_pos_num   = largedata//(num_ss*2) # 5000
+
+    # test1 ~ testSR which means Short Random
+    # test2 ~ testLR which means Long Random
+    # test3 ~ testSA which means Short Adversarial
+    # test4 ~ testLA which means Long Adversarial
+
+    # number of positive strings by length for the test sets
+    testSR_pos_num = largedata//(num_ss*2) # 5000
+    testLR_pos_num = largedata//(num_ls*2) # 2500
+    testSA_pos_num = largedata//(num_ss*2) # 5000
+    testLA_pos_num = largedata//(num_ls*2) # 2500
 
 
-    #FIRST - set up dictionary
-    pos_dict = get_pos_string(my_fsa, ss_min_len, ss_max_len)
-    neg_dict = get_neg_string(my_fsa, ss_min_len, ss_max_len)
+    # The FSA we analyze and related FSAs
 
+    fstfile = os.path.join(mainDir, "src/fstlib/fst_format", f"{x}.fst")
+    the_fsa = pynini.Fst.read(fstfile)
+    the_ss = sigmastar(the_fsa)
+    editTransducer = editExactly1(the_fsa)
+    the_cofsa = pynini.difference(the_ss,the_fsa)
+    the_cofsa.optimize()
 
-    # create training data with duplicates
-    # start with a file that has 100k words. from there, prune to have 10k and 1k from that file.
-    pos_dict, neg_dict = \
-    create_data_with_duplicate(dir_name + "_Training.txt", pos_dict, neg_dict, ss_min_len, ss_max_len, train_pos_num, 1)
-    prune(x + "_Training.txt", dir_name + "_Training.txt")
+    # this gives entire border for the adversarial test sets
+    bpairs = the_fsa @ editTransducer @ the_cofsa
+    bpairs.optimize()
+    bpairs_inv = bpairs.copy()
+    bpairs_inv.invert()
+    bpairs_inv.optimize()
 
-    # create dev and test_1 (no duplicates, no overlap in train/dev/test data)
-    pos_dict, neg_dict = create_data_no_duplicate(dir_name + "_Dev.txt", pos_dict, neg_dict, ss_min_len, ss_max_len, dev_pos_num)
-    prune(x + "_Dev.txt", dir_name + "_Dev.txt")
+    # Create training data, allowing duplicates,
+    # from the short strings
+    # start with a file that has 100k words.
+    # From there, prune to have 10k and 1k from that file.
 
-    pos_dict, neg_dict = create_data_no_duplicate(dir_name + "_Test1.txt", pos_dict, neg_dict, ss_min_len, ss_max_len, test1_pos_num)
-    prune(x + "_Test1.txt", dir_name + "_Test1.txt")
+    pos_dict_after_train, neg_dict_after_train = create_data_with_duplicate(
+        "_Train",
+        the_fsa,
+        the_cofsa,
+        ss_min_len,
+        ss_max_len,
+        train_pos_num
+    )
 
+    # create dev and testSR (no duplicates, no overlap with train, dev, test data)
+    pos_dict_after_dev, neg_dict_after_dev = create_data_no_duplicate(
+        "_Dev",
+        the_fsa,
+        pos_dict_after_train,
+        neg_dict_after_train,
+        ss_min_len,
+        ss_max_len,
+        dev_pos_num
+    )
 
-    # generate long strings
-    pos_dict = get_pos_string(my_fsa, ls_min_len, ls_max_len)
-    neg_dict = get_neg_string(my_fsa, ls_min_len, ls_max_len)
+    create_data_no_duplicate(
+        "_TestSR",
+        the_fsa,
+        pos_dict_after_dev,
+        neg_dict_after_dev,
+        ss_min_len,
+        ss_max_len,
+        testSR_pos_num
+    )
 
-    # create test_2 (no duplicates)
-    create_data_no_duplicate(dir_name + "_Test2.txt", pos_dict, neg_dict, ls_min_len, ls_max_len, test2_pos_num)
-    prune(x + "_Test2.txt", dir_name + "_Test2.txt")
+    # create testLR (no duplicates, no overlap in train,dev,test data)
+    # no overlap with shorter data sets guaranteed by disjoint set of
+    # string lengths
+    create_data_no_duplicate(
+        "_TestLR",
+        the_fsa,
+        dict(),
+        dict(),
+        ls_min_len,
+        ls_max_len,
+        testLR_pos_num
+    )
 
+    # create testSA (short adversarial examples, disjoint from train,dev data;
+    # may overlap with testSR)
+    create_adversarial_examples(
+        pos_dict_after_dev,
+        neg_dict_after_dev,
+        bpairs,
+        bpairs_inv,
+        ss_min_len,
+        ss_max_len,
+        length='short'
+    )
 
-    # create test_3 (adversarial examples)
-    create_adversarial_examples(pos_dict, my_fsa, x, ls_min_len, ls_max_len)
-
-    print("Finished", x)
-
-print("Finished!")
+    # create testLA (long adversarial examples, may overlap with testLR)
+    create_adversarial_examples(
+        dict(),
+        dict(),
+        bpairs,
+        bpairs_inv,
+        ls_min_len,
+        ls_max_len,
+        length='long'
+    )

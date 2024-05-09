@@ -1,0 +1,3 @@
+:import "syms16.plebby"
+\/{~\/{<a b a b>,<b a b a>},~\/{<a a a a>,<b b b b>}}
+:writeATT "../fstlib/att_format/16.16.LT.4.1.2.att" _ _ it

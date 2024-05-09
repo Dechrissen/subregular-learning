@@ -1,0 +1,11 @@
+name: subreg
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy=1.22.4
+  - pynini=2.1.2
+  - python=3.9.13
+  - pyyaml=6.0.1
+  - scikit-learn=1.1.1
+  - tensorflow=2.8.1

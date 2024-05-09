@@ -1,0 +1,3 @@
+:import "syms64.plebby"
+~[g]*%||%<g g g>
+:writeATT "../fstlib/att_format/64.64.Zp.3.1.5.att" _ _ it

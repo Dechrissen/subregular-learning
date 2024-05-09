@@ -1,0 +1,3 @@
+:import "syms16.plebby"
+[a,b,c,d,e,f,g]~/\{\/{~~\/{<a a>},~\/{<a b>,<b a>}},\/{~~\/{<a b>,<b a>},~\/{<a a>}}}
+:writeATT "../fstlib/att_format/16.07.TLT.2.1.4.att" _ _ it
